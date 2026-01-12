@@ -27,16 +27,16 @@ Implement a Diff Viewer component for Tachikoma to display file changes, configu
 
 ## Acceptance Criteria
 
-- [ ] Side-by-side diff view
-- [ ] Unified diff view
-- [ ] Syntax highlighting
-- [ ] Line numbers
-- [ ] Addition/deletion/modification highlighting
-- [ ] Expand/collapse unchanged sections
-- [ ] Navigation between changes
-- [ ] Word-level diff within lines
-- [ ] Copy individual changes
-- [ ] Support for large diffs with virtualization
+- [x] Side-by-side diff view
+- [x] Unified diff view
+- [x] Syntax highlighting
+- [x] Line numbers
+- [x] Addition/deletion/modification highlighting
+- [x] Expand/collapse unchanged sections
+- [x] Navigation between changes
+- [x] Word-level diff within lines
+- [x] Copy individual changes
+- [x] Support for large diffs with virtualization
 
 ---
 
