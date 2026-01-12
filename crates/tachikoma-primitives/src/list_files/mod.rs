@@ -1,40 +1,8 @@
-# 034 - List Files Implementation
-
-**Phase:** 2 - Five Primitives
-**Spec ID:** 034
-**Status:** Complete
-**Dependencies:** 031-primitives-crate
-**Estimated Context:** ~10% of Sonnet window
-
----
-
-## Objective
-
-Implement the `list_files` primitive that lists directory contents with filtering, sorting, and metadata options.
-
----
-
-## Acceptance Criteria
-
-- [x] List files in a directory
-- [x] Filter by extension/pattern
-- [x] Include/exclude directories
-- [x] Return file metadata (size, modified time)
-- [x] Support pagination for large directories
-- [x] Handle permission errors gracefully
-
----
-
-## Implementation Details
-
-### 1. List Files Module (src/list_files/mod.rs)
-
-```rust
 //! List files primitive implementation.
 
 mod options;
 
-pub use options::ListFilesOptions;
+pub use options::{ListFilesOptions, SortBy};
 
 use crate::{
     context::PrimitiveContext,
@@ -120,12 +88,20 @@ pub async fn list_files(
     let truncated = if let Some(limit) = options.limit {
         let offset = options.offset.unwrap_or(0);
         if offset < entries.len() {
+            let remaining_after_offset = entries.len() - offset;
             entries = entries.into_iter().skip(offset).take(limit).collect();
-            offset + limit < total_count
+            limit < remaining_after_offset
         } else {
             entries.clear();
             false
         }
+    } else if let Some(offset) = options.offset {
+        if offset < entries.len() {
+            entries = entries.into_iter().skip(offset).collect();
+        } else {
+            entries.clear();
+        }
+        false
     } else {
         false
     };
@@ -231,11 +207,18 @@ fn read_directory(
             .and_then(|e| e.to_str())
             .map(|s| s.to_string());
 
+        let modified = metadata
+            .modified()
+            .ok()
+            .and_then(|time| time.duration_since(std::time::UNIX_EPOCH).ok())
+            .map(|duration| duration.as_secs());
+
         entries.push(FileEntry {
             path: entry_path,
             is_dir,
             size,
             extension,
+            modified,
         });
     }
 
@@ -290,16 +273,6 @@ fn matches_glob(name: &str, pattern: &str) -> bool {
     name == pattern
 }
 
-/// Sorting options.
-#[derive(Debug, Clone, Copy, Default)]
-pub enum SortBy {
-    #[default]
-    Name,
-    Size,
-    Extension,
-    Type,
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -317,6 +290,8 @@ mod tests {
         let result = list_files(&ctx, ".", None).await.unwrap();
 
         assert_eq!(result.total_count, 2); // exclude dirs by default
+        assert_eq!(result.entries.len(), 2);
+        assert!(result.entries.iter().all(|e| !e.is_dir));
     }
 
     #[tokio::test]
@@ -346,120 +321,198 @@ mod tests {
 
         assert_eq!(result.total_count, 2);
         assert!(result.entries.iter().any(|e| e.is_dir));
+        assert!(result.entries.iter().any(|e| !e.is_dir));
+    }
+
+    #[tokio::test]
+    async fn test_list_files_dirs_only() {
+        let dir = tempdir().unwrap();
+        write(dir.path().join("a.txt"), "a").unwrap();
+        create_dir(dir.path().join("subdir1")).unwrap();
+        create_dir(dir.path().join("subdir2")).unwrap();
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        let opts = ListFilesOptions::new().directories_only();
+        let result = list_files(&ctx, ".", Some(opts)).await.unwrap();
+
+        assert_eq!(result.entries.len(), 2);
+        assert!(result.entries.iter().all(|e| e.is_dir));
+    }
+
+    #[tokio::test]
+    async fn test_list_files_hidden() {
+        let dir = tempdir().unwrap();
+        write(dir.path().join("visible.txt"), "a").unwrap();
+        write(dir.path().join(".hidden.txt"), "b").unwrap();
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        
+        // Default - exclude hidden
+        let result = list_files(&ctx, ".", None).await.unwrap();
+        assert_eq!(result.entries.len(), 1);
+        assert!(!result.entries[0].path.file_name().unwrap().to_str().unwrap().starts_with('.'));
+
+        // Include hidden
+        let opts = ListFilesOptions::new().include_hidden();
+        let result = list_files(&ctx, ".", Some(opts)).await.unwrap();
+        assert_eq!(result.entries.len(), 2);
+    }
+
+    #[tokio::test]
+    async fn test_list_files_pattern() {
+        let dir = tempdir().unwrap();
+        write(dir.path().join("test_file.txt"), "a").unwrap();
+        write(dir.path().join("other_file.txt"), "b").unwrap();
+        write(dir.path().join("test_data.rs"), "c").unwrap();
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        let opts = ListFilesOptions::new().pattern("test*");
+        let result = list_files(&ctx, ".", Some(opts)).await.unwrap();
+
+        assert_eq!(result.entries.len(), 2);
+        assert!(result.entries.iter().all(|e| 
+            e.path.file_name().unwrap().to_str().unwrap().starts_with("test")
+        ));
+    }
+
+    #[tokio::test]
+    async fn test_list_files_pagination() {
+        let dir = tempdir().unwrap();
+        for i in 0..10 {
+            write(dir.path().join(format!("file{:02}.txt", i)), "content").unwrap();
+        }
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        
+        // Limit without offset
+        let opts = ListFilesOptions::new().limit(5);
+        let result = list_files(&ctx, ".", Some(opts)).await.unwrap();
+        assert_eq!(result.entries.len(), 5);
+        assert_eq!(result.total_count, 10);
+        assert!(result.truncated);
+
+        // With offset
+        let opts = ListFilesOptions::new().limit(3).offset(2);
+        let result = list_files(&ctx, ".", Some(opts)).await.unwrap();
+        assert_eq!(result.entries.len(), 3);
+        assert_eq!(result.total_count, 10);
+        assert!(result.truncated);
+
+        // Beyond available entries
+        let opts = ListFilesOptions::new().offset(15);
+        let result = list_files(&ctx, ".", Some(opts)).await.unwrap();
+        assert_eq!(result.entries.len(), 0);
+        assert!(!result.truncated);
+    }
+
+    #[tokio::test]
+    async fn test_list_files_sorting() {
+        let dir = tempdir().unwrap();
+        write(dir.path().join("c.txt"), "large").unwrap();
+        write(dir.path().join("a.txt"), "small").unwrap();
+        write(dir.path().join("b.txt"), "medium").unwrap();
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        
+        // Sort by name
+        let opts = ListFilesOptions::new().sort(SortBy::Name);
+        let result = list_files(&ctx, ".", Some(opts)).await.unwrap();
+        let names: Vec<_> = result.entries.iter()
+            .map(|e| e.path.file_name().unwrap().to_str().unwrap())
+            .collect();
+        assert_eq!(names, vec!["a.txt", "b.txt", "c.txt"]);
+
+        // Sort by size
+        let opts = ListFilesOptions::new().sort(SortBy::Size);
+        let result = list_files(&ctx, ".", Some(opts)).await.unwrap();
+        let sizes: Vec<_> = result.entries.iter().map(|e| e.size.unwrap()).collect();
+        assert!(sizes.is_sorted());
+
+        // Reverse sort
+        let opts = ListFilesOptions::new().sort(SortBy::Name).reversed();
+        let result = list_files(&ctx, ".", Some(opts)).await.unwrap();
+        let names: Vec<_> = result.entries.iter()
+            .map(|e| e.path.file_name().unwrap().to_str().unwrap())
+            .collect();
+        assert_eq!(names, vec!["c.txt", "b.txt", "a.txt"]);
+    }
+
+    #[tokio::test]
+    async fn test_list_files_not_found() {
+        let ctx = PrimitiveContext::new(PathBuf::from("/tmp"));
+        let result = list_files(&ctx, "nonexistent", None).await;
+
+        assert!(matches!(result, Err(PrimitiveError::FileNotFound { .. })));
+    }
+
+    #[tokio::test]
+    async fn test_list_files_not_directory() {
+        let dir = tempdir().unwrap();
+        write(dir.path().join("file.txt"), "content").unwrap();
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        let result = list_files(&ctx, "file.txt", None).await;
+
+        assert!(matches!(result, Err(PrimitiveError::Validation { .. })));
+    }
+
+    #[tokio::test]
+    async fn test_glob_patterns() {
+        assert!(matches_glob("test.txt", "*"));
+        assert!(matches_glob("test.txt", "test*"));
+        assert!(matches_glob("test.txt", "*.txt"));
+        assert!(matches_glob("test.txt", "*test*"));
+        assert!(!matches_glob("test.txt", "*.rs"));
+        assert!(!matches_glob("test.txt", "other*"));
+    }
+
+    #[tokio::test]
+    async fn test_list_files_metadata() {
+        let dir = tempdir().unwrap();
+        write(dir.path().join("test.txt"), "content").unwrap();
+        create_dir(dir.path().join("subdir")).unwrap();
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        let opts = ListFilesOptions::new().include_directories();
+        let result = list_files(&ctx, ".", Some(opts)).await.unwrap();
+
+        assert_eq!(result.entries.len(), 2);
+        
+        for entry in result.entries {
+            // All entries should have modified time
+            assert!(entry.modified.is_some());
+            
+            if entry.is_dir {
+                // Directory should not have size
+                assert!(entry.size.is_none());
+            } else {
+                // File should have size
+                assert!(entry.size.is_some());
+                assert_eq!(entry.size.unwrap(), 7); // "content" = 7 bytes
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn test_list_files_permission_error() {
+        // This test may not work on all systems, so we'll skip it if it fails
+        let ctx = PrimitiveContext::new(PathBuf::from("/"));
+        let result = list_files(&ctx, "/root", None).await;
+
+        // Should either get permission denied or file not found (if /root doesn't exist)
+        // or path not allowed (if security prevents access)
+        assert!(result.is_err());
+        match result {
+            Err(PrimitiveError::PermissionDenied { .. }) => {
+                // Expected case
+            }
+            Err(PrimitiveError::FileNotFound { .. }) => {
+                // Also acceptable if /root doesn't exist
+            }
+            Err(PrimitiveError::PathNotAllowed { .. }) => {
+                // Also acceptable if security prevents access
+            }
+            _ => panic!("Expected permission, not found, or path not allowed error"),
+        }
     }
 }
-```
-
-### 2. List Files Options (src/list_files/options.rs)
-
-```rust
-//! Options for list_files primitive.
-
-use super::SortBy;
-
-/// Options for listing files.
-#[derive(Debug, Clone, Default)]
-pub struct ListFilesOptions {
-    /// Filter by file extension.
-    pub extension: Option<String>,
-    /// Filter by glob pattern.
-    pub pattern: Option<String>,
-    /// Include directories in output.
-    pub include_dirs: bool,
-    /// Only list directories.
-    pub dirs_only: bool,
-    /// Include hidden files (starting with .).
-    pub include_hidden: bool,
-    /// Maximum number of results.
-    pub limit: Option<usize>,
-    /// Offset for pagination.
-    pub offset: Option<usize>,
-    /// Sort order.
-    pub sort_by: SortBy,
-    /// Reverse sort order.
-    pub reverse: bool,
-}
-
-impl ListFilesOptions {
-    /// Create new default options.
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    /// Filter by extension.
-    pub fn extension(mut self, ext: &str) -> Self {
-        self.extension = Some(ext.trim_start_matches('.').to_string());
-        self
-    }
-
-    /// Filter by glob pattern.
-    pub fn pattern(mut self, pattern: &str) -> Self {
-        self.pattern = Some(pattern.to_string());
-        self
-    }
-
-    /// Include directories in results.
-    pub fn include_directories(mut self) -> Self {
-        self.include_dirs = true;
-        self
-    }
-
-    /// Only list directories.
-    pub fn directories_only(mut self) -> Self {
-        self.dirs_only = true;
-        self.include_dirs = true;
-        self
-    }
-
-    /// Include hidden files.
-    pub fn include_hidden(mut self) -> Self {
-        self.include_hidden = true;
-        self
-    }
-
-    /// Limit number of results.
-    pub fn limit(mut self, limit: usize) -> Self {
-        self.limit = Some(limit);
-        self
-    }
-
-    /// Set pagination offset.
-    pub fn offset(mut self, offset: usize) -> Self {
-        self.offset = Some(offset);
-        self
-    }
-
-    /// Set sort order.
-    pub fn sort(mut self, sort_by: SortBy) -> Self {
-        self.sort_by = sort_by;
-        self
-    }
-
-    /// Reverse sort order.
-    pub fn reversed(mut self) -> Self {
-        self.reverse = true;
-        self
-    }
-}
-```
-
----
-
-## Testing Requirements
-
-1. Basic directory listing works
-2. Extension filtering is case-insensitive
-3. Pattern matching supports wildcards
-4. Hidden files are excluded by default
-5. Pagination works correctly
-6. Sorting by different fields works
-7. Empty directories return empty list
-8. Permission errors are handled gracefully
-
----
-
-## Related Specs
-
-- Depends on: [031-primitives-crate.md](031-primitives-crate.md)
-- Next: [035-list-files-recursive.md](035-list-files-recursive.md)
-- Used by: Agent loop for directory exploration

@@ -18,10 +18,16 @@ pub mod result;
 #[cfg(feature = "read-file")]
 pub mod read_file;
 
+#[cfg(feature = "list-files")]
+pub mod list_files;
+
 // Re-exports
 pub use context::{PrimitiveConfig, PrimitiveContext};
 pub use error::{PrimitiveError, PrimitiveResult};
-pub use result::{ExecutionMetadata, ReadFileResult};
+pub use result::{ExecutionMetadata, ReadFileResult, ListFilesResult, FileEntry};
 
 #[cfg(feature = "read-file")]
 pub use read_file::{read_file, ReadFileOptions};
+
+#[cfg(feature = "list-files")]
+pub use list_files::{list_files, ListFilesOptions, SortBy};

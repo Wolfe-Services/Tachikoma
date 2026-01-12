@@ -56,6 +56,8 @@ pub struct FileEntry {
     pub size: Option<u64>,
     /// File extension.
     pub extension: Option<String>,
+    /// Modified time (UNIX timestamp).
+    pub modified: Option<u64>,
 }
 
 /// Result of a bash operation.
