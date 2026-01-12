@@ -3,7 +3,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use tachikoma_common_core::ForgeSessionId;
-use uuid::Uuid;
 
 use crate::round::ForgeRound;
 
@@ -100,7 +99,7 @@ impl ForgeSession {
     pub fn new(config: ForgeSessionConfig, topic: ForgeTopic) -> Self {
         let now = Utc::now();
         Self {
-            id: ForgeSessionId(Uuid::new_v4()),
+            id: ForgeSessionId::new(),
             status: ForgeSessionStatus::Creating,
             config,
             topic,
