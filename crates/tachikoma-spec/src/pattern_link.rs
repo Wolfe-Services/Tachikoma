@@ -55,7 +55,7 @@ pub enum PatternRefFormat {
 }
 
 /// Relationship between spec and pattern
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum PatternRelationship {
     /// Spec implements this pattern
     Implements,
