@@ -16,14 +16,14 @@ Implement attended mode for the Ralph Loop - an interactive mode where the user 
 
 ## Acceptance Criteria
 
-- [ ] Pause before each iteration for approval
-- [ ] Display iteration preview
-- [ ] User can approve, skip, or modify
-- [ ] Interactive command interface
-- [ ] Change review before commit
-- [ ] Breakpoint support
-- [ ] Session notes/annotations
-- [ ] Smooth transition to/from unattended
+- [x] Pause before each iteration for approval
+- [x] Display iteration preview
+- [x] User can approve, skip, or modify
+- [x] Interactive command interface
+- [x] Change review before commit
+- [x] Breakpoint support
+- [x] Session notes/annotations
+- [x] Smooth transition to/from unattended
 
 ---
 
