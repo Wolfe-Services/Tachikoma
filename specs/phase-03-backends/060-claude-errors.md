@@ -16,12 +16,12 @@ Implement comprehensive error handling for the Claude backend, including API err
 
 ## Acceptance Criteria
 
-- [ ] Parse all Claude API error types
-- [ ] Map to `BackendError` variants
-- [ ] Implement retry logic with backoff
-- [ ] Handle rate limits with Retry-After
-- [ ] Graceful degradation on overload
-- [ ] Error context preservation
+- [x] Parse all Claude API error types
+- [x] Map to `BackendError` variants
+- [x] Implement retry logic with backoff
+- [x] Handle rate limits with Retry-After
+- [x] Graceful degradation on overload
+- [x] Error context preservation
 
 ---
 
