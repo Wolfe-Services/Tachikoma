@@ -13,14 +13,14 @@ Implement automatic generation and updating of README.md files for spec phases. 
 
 ## Acceptance Criteria
 
-- [ ] READMEs are auto-generated from spec file analysis
-- [ ] Spec metadata is extracted and formatted correctly
-- [ ] Progress indicators are calculated accurately
-- [ ] READMEs update when specs change
-- [ ] Manual sections are preserved during regeneration
-- [ ] Generation is triggered by file watchers
-- [ ] Batch regeneration is supported
-- [ ] Generation errors are reported clearly
+- [x] READMEs are auto-generated from spec file analysis
+- [x] Spec metadata is extracted and formatted correctly
+- [x] Progress indicators are calculated accurately
+- [x] READMEs update when specs change
+- [x] Manual sections are preserved during regeneration
+- [x] Generation is triggered by file watchers
+- [x] Batch regeneration is supported
+- [x] Generation errors are reported clearly
 
 ## Implementation Details
 
