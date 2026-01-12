@@ -13,6 +13,7 @@ pub mod parsing;
 pub mod pattern_link;
 pub mod progress;
 pub mod readme;
+pub mod rendering;
 pub mod search_api;
 pub mod search_index;
 pub mod templates;
