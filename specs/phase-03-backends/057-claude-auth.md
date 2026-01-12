@@ -16,13 +16,13 @@ Implement secure API key handling for the Claude backend, including environment 
 
 ## Acceptance Criteria
 
-- [ ] Secure API key storage using `Secret<T>`
-- [ ] Environment variable loading (`ANTHROPIC_API_KEY`)
-- [ ] File-based key loading (with secure permissions check)
-- [ ] Key validation before use
-- [ ] Support for multiple API keys (rotation)
-- [ ] Audit logging for key usage
-- [ ] Prevention of key exposure in logs/debug output
+- [x] Secure API key storage using `Secret<T>`
+- [x] Environment variable loading (`ANTHROPIC_API_KEY`)
+- [x] File-based key loading (with secure permissions check)
+- [x] Key validation before use
+- [x] Support for multiple API keys (rotation)
+- [x] Audit logging for key usage
+- [x] Prevention of key exposure in logs/debug output
 
 ---
 
