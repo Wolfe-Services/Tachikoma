@@ -16,12 +16,12 @@ Define a common trait abstraction for all primitives enabling uniform handling, 
 
 ## Acceptance Criteria
 
-- [ ] Common Primitive trait definition
-- [ ] Async execution support
-- [ ] Tool schema generation for MCP/API
-- [ ] Dynamic dispatch capability
-- [ ] Primitive registry for discovery
-- [ ] Serializable input/output types
+- [x] Common Primitive trait definition
+- [x] Async execution support
+- [x] Tool schema generation for MCP/API
+- [x] Dynamic dispatch capability
+- [x] Primitive registry for discovery
+- [x] Serializable input/output types
 
 ---
 
