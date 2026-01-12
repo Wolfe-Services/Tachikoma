@@ -26,16 +26,16 @@ Implement native notification support for the Tachikoma application, providing s
 
 ## Acceptance Criteria
 
-- [ ] Native notification display
-- [ ] Notification actions (buttons)
-- [ ] Click handling
-- [ ] Close handling
-- [ ] Sound configuration
-- [ ] Notification queueing
-- [ ] Platform-specific features
-- [ ] Do Not Disturb respect
-- [ ] Notification history
-- [ ] Reply actions (where supported)
+- [x] Native notification display
+- [x] Notification actions (buttons)
+- [x] Click handling
+- [x] Close handling
+- [x] Sound configuration
+- [x] Notification queueing
+- [x] Platform-specific features
+- [x] Do Not Disturb respect
+- [x] Notification history
+- [x] Reply actions (where supported)
 
 ---
 
