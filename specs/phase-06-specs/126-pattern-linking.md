@@ -13,14 +13,14 @@ Implement pattern reference linking to connect specs with architectural patterns
 
 ## Acceptance Criteria
 
-- [ ] Pattern references are detected in specs
-- [ ] Bidirectional linking works (spec -> pattern, pattern -> specs)
-- [ ] Pattern references support multiple formats
-- [ ] Link validation ensures patterns exist
-- [ ] Pattern usage statistics are tracked
-- [ ] Navigation between specs and patterns works
-- [ ] Pattern inheritance is handled
-- [ ] Pattern links are indexed for search
+- [x] Pattern references are detected in specs
+- [x] Bidirectional linking works (spec -> pattern, pattern -> specs)
+- [x] Pattern references support multiple formats
+- [x] Link validation ensures patterns exist
+- [x] Pattern usage statistics are tracked
+- [x] Navigation between specs and patterns works
+- [x] Pattern inheritance is handled
+- [x] Pattern links are indexed for search
 
 ## Implementation Details
 
