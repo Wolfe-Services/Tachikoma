@@ -10,7 +10,7 @@
   const animatedPercent = tweened(0, { duration: 400, easing: cubicOut });
 
   $: animatedPercent.set(usage.usagePercent);
-  $: zone = getContextZone($animatedPercent);
+  $: zone = getContextZone(usage.usagePercent);
 
   const zoneColors: Record<ContextZone, string> = {
     safe: 'var(--color-success-fg)',
