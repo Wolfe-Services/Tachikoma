@@ -16,13 +16,13 @@ Define configuration types for all LLM backends, including API endpoints, authen
 
 ## Acceptance Criteria
 
-- [ ] Backend-agnostic `BackendConfig` enum
-- [ ] Provider-specific config structs
-- [ ] Secret/API key handling via `Secret<T>`
-- [ ] Endpoint URL configuration
-- [ ] Default values for all providers
-- [ ] YAML serialization support
-- [ ] Environment variable overrides
+- [x] Backend-agnostic `BackendConfig` enum
+- [x] Provider-specific config structs
+- [x] Secret/API key handling via `Secret<T>`
+- [x] Endpoint URL configuration
+- [x] Default values for all providers
+- [x] YAML serialization support
+- [x] Environment variable overrides
 
 ---
 
