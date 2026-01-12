@@ -43,9 +43,9 @@ pub fn write_atomic(path: &Path, content: &[u8]) -> io::Result<()> {
         Ok(()) => Ok(()),
         Err(e) => {
             // Handle cross-filesystem case (errno 18 - EXDEV: cross-device link)
-            if e.kind() == io::ErrorKind::CrossesFilesystems 
-                || e.raw_os_error() == Some(18) // EXDEV on Unix
+            if e.raw_os_error() == Some(18) // EXDEV on Unix
                 || e.to_string().contains("cross-device")
+                || e.to_string().contains("Cross-device link")
             {
                 debug!("Cross-filesystem detected, using copy+remove");
                 
@@ -168,9 +168,9 @@ impl AtomicWriter {
             },
             Err(e) => {
                 // Handle cross-filesystem case
-                if e.kind() == io::ErrorKind::CrossesFilesystems 
-                    || e.raw_os_error() == Some(18) // EXDEV on Unix
+                if e.raw_os_error() == Some(18) // EXDEV on Unix
                     || e.to_string().contains("cross-device")
+                    || e.to_string().contains("Cross-device link")
                 {
                     debug!("Cross-filesystem detected, using copy+remove");
                     
@@ -445,5 +445,61 @@ mod tests {
         // In a real cross-filesystem scenario, the rename would fail and fallback to copy
         write_atomic(&path, b"updated").unwrap();
         assert_eq!(fs::read_to_string(&path).unwrap(), "updated");
+    }
+
+    #[test] 
+    fn test_locked_atomic_edit() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("test.txt");
+        fs::write(&path, "hello world").unwrap();
+
+        locked_atomic_edit(&path, |content| {
+            Ok(content.replace("world", "rust"))
+        }).unwrap();
+
+        assert_eq!(fs::read_to_string(&path).unwrap(), "hello rust");
+    }
+
+    #[test]
+    fn test_atomic_writer_cleanup_on_drop() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("test.txt");
+        fs::write(&path, "original").unwrap();
+
+        let temp_path = {
+            let writer = AtomicWriter::new(&path).unwrap();
+            writer.write(b"new content").unwrap();
+            writer.temp_path().to_owned()
+        }; // writer is dropped here without commit
+
+        // Temp file should be cleaned up
+        assert!(!temp_path.exists());
+        // Original file should be unchanged
+        assert_eq!(fs::read_to_string(&path).unwrap(), "original");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_file_lock_exclusive() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("test.txt");
+        fs::write(&path, "content").unwrap();
+
+        // Test that we can acquire a lock
+        let _lock = lock::FileLock::exclusive(&path).unwrap();
+        // Lock is held until _lock is dropped
+    }
+
+    #[cfg(unix)] 
+    #[test]
+    fn test_file_lock_shared() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("test.txt");
+        fs::write(&path, "content").unwrap();
+
+        // Test that we can acquire shared locks
+        let _lock1 = lock::FileLock::shared(&path).unwrap();
+        let _lock2 = lock::FileLock::shared(&path).unwrap();
+        // Both locks are held until dropped
     }
 }
