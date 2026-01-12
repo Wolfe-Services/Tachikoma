@@ -3,6 +3,9 @@ resolver = "2"
 members = [
     "crates/*",
 ]
+exclude = [
+    "tools/ralph",
+]
 
 [workspace.package]
 version = "0.1.0"
@@ -34,6 +37,9 @@ reqwest = { version = "0.11", features = ["json", "stream"] }
 
 # CLI
 clap = { version = "4.4", features = ["derive", "env"] }
+
+# Date/Time
+chrono = { version = "0.4", features = ["serde"] }
 
 # Testing
 proptest = "1.4"

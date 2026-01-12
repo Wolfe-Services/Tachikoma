@@ -260,7 +260,12 @@ impl ClaudeClient {
                     // Log result preview
                     if let Some(tx) = &output_tx {
                         let preview = if result.output.len() > 500 {
-                            format!("{}...[truncated]", &result.output[..500])
+                            // Safe truncation respecting UTF-8 character boundaries
+                            let mut end = 500;
+                            while !result.output.is_char_boundary(end) && end > 0 {
+                                end -= 1;
+                            }
+                            format!("{}...[truncated]", &result.output[..end])
                         } else {
                             result.output.clone()
                         };

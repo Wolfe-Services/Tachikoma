@@ -13,10 +13,6 @@
     "file": "chunks/environment.js",
     "name": "environment"
   },
-  "_escape.js": {
-    "file": "chunks/escape.js",
-    "name": "escape"
-  },
   "_exports.js": {
     "file": "chunks/exports.js",
     "name": "exports"
@@ -25,15 +21,14 @@
     "file": "chunks/index.js",
     "name": "index",
     "imports": [
-      "_ssr.js"
+      "_vendor.js"
     ]
   },
   "_internal.js": {
     "file": "chunks/internal.js",
     "name": "internal",
     "imports": [
-      "_ssr.js",
-      "_ssr2.js",
+      "_vendor.js",
       "_environment.js"
     ]
   },
@@ -44,17 +39,13 @@
       "_utils.js"
     ]
   },
-  "_ssr.js": {
-    "file": "chunks/ssr.js",
-    "name": "ssr"
-  },
-  "_ssr2.js": {
-    "file": "chunks/ssr2.js",
-    "name": "ssr"
-  },
   "_utils.js": {
     "file": "chunks/utils.js",
     "name": "utils"
+  },
+  "_vendor.js": {
+    "file": "chunks/vendor.js",
+    "name": "vendor"
   },
   "node_modules/@sveltejs/kit/src/runtime/app/server/remote/index.js": {
     "file": "remote-entry.js",
@@ -72,11 +63,9 @@
     "src": "node_modules/@sveltejs/kit/src/runtime/components/svelte-4/error.svelte",
     "isEntry": true,
     "imports": [
-      "_ssr.js",
+      "_vendor.js",
       "_exports.js",
-      "_utils.js",
-      "_ssr2.js",
-      "_escape.js"
+      "_utils.js"
     ]
   },
   "node_modules/@sveltejs/kit/src/runtime/server/index.js": {
@@ -99,7 +88,7 @@
     "src": "src/routes/+layout.svelte",
     "isEntry": true,
     "imports": [
-      "_ssr.js"
+      "_vendor.js"
     ],
     "css": [
       "_app/immutable/assets/_layout.BqMN6I8Z.css"
@@ -111,9 +100,8 @@
     "src": "src/routes/+page.svelte",
     "isEntry": true,
     "imports": [
-      "_ssr.js",
-      "_index.js",
-      "_escape.js"
+      "_vendor.js",
+      "_index.js"
     ],
     "css": [
       "_app/immutable/assets/_page.DSIh4lOr.css"
