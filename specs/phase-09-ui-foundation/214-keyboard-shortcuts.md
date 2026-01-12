@@ -26,16 +26,16 @@ Implement a comprehensive keyboard shortcuts system for Tachikoma with global an
 
 ## Acceptance Criteria
 
-- [ ] Global keyboard shortcut registration
-- [ ] Component-scoped shortcuts
-- [ ] Modifier key support (Cmd/Ctrl, Alt, Shift)
-- [ ] Shortcut conflict detection
-- [ ] Customizable keybindings
-- [ ] Shortcut help dialog
-- [ ] Platform-aware key display (Cmd vs Ctrl)
-- [ ] Disabled state support
-- [ ] Focus-aware shortcuts
-- [ ] Svelte action for easy binding
+- [x] Global keyboard shortcut registration
+- [x] Component-scoped shortcuts
+- [x] Modifier key support (Cmd/Ctrl, Alt, Shift)
+- [x] Shortcut conflict detection
+- [x] Customizable keybindings
+- [x] Shortcut help dialog
+- [x] Platform-aware key display (Cmd vs Ctrl)
+- [x] Disabled state support
+- [x] Focus-aware shortcuts
+- [x] Svelte action for easy binding
 
 ---
 
