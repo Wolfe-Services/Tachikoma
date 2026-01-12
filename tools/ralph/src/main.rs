@@ -31,7 +31,7 @@ enum SpecResult {
     /// Spec completed successfully
     Completed,
     /// Hit redline, needs fresh context to continue
-    NeedsReboot,
+    NeedsReboot { had_changes: bool },
     /// Hit max iterations without completing
     MaxIterations,
 }
@@ -281,12 +281,18 @@ async fn run_single(
         StopReason::Redline => {
             println!("⚠️  REDLINE: Token limit exceeded. Will retry with fresh context.");
             // Still commit any progress made
-            if auto_commit {
+            let had_changes = if auto_commit {
                 if let Some(hash) = git::auto_commit_spec(project_root, spec.entry.id, &spec.entry.name)? {
                     println!("Committed partial progress as {}", hash);
+                    true
+                } else {
+                    println!("No changes to commit.");
+                    false
                 }
-            }
-            SpecResult::NeedsReboot
+            } else {
+                false
+            };
+            SpecResult::NeedsReboot { had_changes }
         }
         StopReason::MaxIterations => {
             println!("⚠️  Max iterations reached without completing.");
@@ -316,6 +322,7 @@ async fn run_loop(
     let mut specs_completed = 0;
     let mut consecutive_failures = 0;
     let mut reboot_count = 0;
+    let mut no_changes_count = 0;
     const MAX_REBOOTS_PER_SPEC: usize = 3;
 
     println!("\n========================================");
@@ -345,6 +352,7 @@ async fn run_loop(
 
         println!("\n--- Starting Spec {:03}: {} ---\n", spec.entry.id, spec.entry.name);
         reboot_count = 0;
+        no_changes_count = 0;
 
         // Run for this spec (with reboot support)
         loop {
@@ -355,8 +363,13 @@ async fn run_loop(
                     println!("\nSpec {:03} completed successfully!", spec.entry.id);
                     break;
                 }
-                Ok(SpecResult::NeedsReboot) => {
+                Ok(SpecResult::NeedsReboot { had_changes }) => {
                     reboot_count += 1;
+                    if !had_changes {
+                        no_changes_count += 1;
+                    } else {
+                        no_changes_count = 0;
+                    }
 
                     // Check if spec was actually completed during this run
                     // (agent might have finished but hit redline during verification)
@@ -373,6 +386,22 @@ async fn run_loop(
                         specs_completed += 1;
                         println!("\n✅ Spec {:03} was completed (last spec!).", spec.entry.id);
                         break;
+                    }
+
+                    // If we've had no changes multiple times, the implementation is probably done
+                    // but checkboxes weren't marked - auto-mark them
+                    if no_changes_count >= 2 {
+                        println!("\n📝 No changes detected {} times. Auto-marking checkboxes...", no_changes_count);
+                        if let Err(e) = auto_mark_spec_complete(&spec.entry.path) {
+                            tracing::warn!("Failed to auto-mark checkboxes: {}", e);
+                        } else {
+                            // Commit the checkbox updates
+                            let _ = git::auto_commit_spec(project_root, spec.entry.id, &spec.entry.name);
+                            specs_completed += 1;
+                            consecutive_failures = 0;
+                            println!("✅ Spec {:03} auto-marked as complete.", spec.entry.id);
+                            break;
+                        }
                     }
 
                     if reboot_count >= MAX_REBOOTS_PER_SPEC {
@@ -657,4 +686,31 @@ Begin by reading the spec file.
         incomplete.join("\n"),
         spec.entry.path.display()
     )
+}
+
+/// Auto-mark all checkboxes in a spec file as complete
+fn auto_mark_spec_complete(spec_path: &std::path::Path) -> Result<()> {
+    let content = std::fs::read_to_string(spec_path)?;
+
+    // Replace all unchecked boxes with checked boxes in acceptance criteria section
+    let mut in_criteria = false;
+    let mut new_lines = Vec::new();
+
+    for line in content.lines() {
+        if line.contains("## Acceptance Criteria") {
+            in_criteria = true;
+        } else if line.starts_with("## ") || line.starts_with("---") {
+            in_criteria = false;
+        }
+
+        if in_criteria && line.trim().starts_with("- [ ]") {
+            // Replace unchecked with checked
+            new_lines.push(line.replace("- [ ]", "- [x]"));
+        } else {
+            new_lines.push(line.to_string());
+        }
+    }
+
+    std::fs::write(spec_path, new_lines.join("\n") + "\n")?;
+    Ok(())
 }
