@@ -26,15 +26,15 @@ Implement comprehensive loading state components for Tachikoma including skeleto
 
 ## Acceptance Criteria
 
-- [ ] Skeleton component with customizable shapes
-- [ ] Shimmer animation effect
-- [ ] Spinner component with sizes
-- [ ] Progress bar (determinate/indeterminate)
-- [ ] Circular progress indicator
-- [ ] Loading overlay for containers
-- [ ] Skeleton presets for common layouts
-- [ ] Reduced motion support
-- [ ] Loading state store for global tracking
+- [x] Skeleton component with customizable shapes
+- [x] Shimmer animation effect
+- [x] Spinner component with sizes
+- [x] Progress bar (determinate/indeterminate)
+- [x] Circular progress indicator
+- [x] Loading overlay for containers
+- [x] Skeleton presets for common layouts
+- [x] Reduced motion support
+- [x] Loading state store for global tracking
 
 ---
 
