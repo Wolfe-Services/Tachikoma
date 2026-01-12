@@ -13,14 +13,14 @@ Implement versioning for specifications to track changes over time, support roll
 
 ## Acceptance Criteria
 
-- [ ] Spec versions are tracked with semantic versioning
-- [ ] Change history is maintained
-- [ ] Rollback to previous versions works
-- [ ] Git integration extracts version history
-- [ ] Version comparison (diff) is supported
-- [ ] Version metadata is embedded in specs
-- [ ] Breaking changes are flagged
-- [ ] Version migration is supported
+- [x] Spec versions are tracked with semantic versioning
+- [x] Change history is maintained
+- [x] Rollback to previous versions works
+- [x] Git integration extracts version history
+- [x] Version comparison (diff) is supported
+- [x] Version metadata is embedded in specs
+- [x] Breaking changes are flagged
+- [x] Version migration is supported
 
 ## Implementation Details
 
