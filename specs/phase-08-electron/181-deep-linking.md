@@ -26,15 +26,15 @@ Implement deep linking support for the Tachikoma application, allowing external 
 
 ## Acceptance Criteria
 
-- [ ] Custom URL scheme (tachikoma://) registration
-- [ ] Deep link parsing and routing
-- [ ] Single instance handling of deep links
-- [ ] OAuth callback support
-- [ ] File opening via URLs
-- [ ] Action triggers via URLs
-- [ ] Cross-platform deep link handling
-- [ ] Security validation of deep links
-- [ ] Deep link history tracking
+- [x] Custom URL scheme (tachikoma://) registration
+- [x] Deep link parsing and routing
+- [x] Single instance handling of deep links
+- [x] OAuth callback support
+- [x] File opening via URLs
+- [x] Action triggers via URLs
+- [x] Cross-platform deep link handling
+- [x] Security validation of deep links
+- [x] Deep link history tracking
 
 ---
 
