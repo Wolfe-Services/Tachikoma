@@ -4,6 +4,7 @@ mod color;
 mod format;
 mod icons;
 mod printer;
+mod progress;
 mod table;
 mod text;
 
@@ -14,6 +15,10 @@ pub use color::{
 pub use format::{Displayable, OutputFormat as InternalOutputFormat};
 pub use icons::{Icons, IconContext};
 pub use printer::{Output, OutputConfig};
+pub use progress::{
+    ProgressBar, ProgressStyle, Spinner, SpinnerHandle, MultiProgress, MultiProgressHandle,
+    SPINNER_DOTS, SPINNER_LINE, SPINNER_ARROWS, SPINNER_BRAILLE
+};
 pub use table::{Table, TableBuilder, TableStyle, Column, Alignment};
 pub use text::{TextFormatter, Wrapped};
 
