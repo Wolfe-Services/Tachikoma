@@ -13,14 +13,14 @@ Implement a conversational interface for generating and refining specifications 
 
 ## Acceptance Criteria
 
-- [ ] Interactive spec generation through dialogue works
-- [ ] Conversation state is maintained across turns
-- [ ] Intelligent prompts guide users through sections
-- [ ] Input validation provides helpful feedback
-- [ ] Partial specs can be saved and resumed
-- [ ] Generated specs follow templates correctly
-- [ ] Refinement suggestions improve spec quality
-- [ ] Context from existing specs is leveraged
+- [x] Interactive spec generation through dialogue works
+- [x] Conversation state is maintained across turns
+- [x] Intelligent prompts guide users through sections
+- [x] Input validation provides helpful feedback
+- [x] Partial specs can be saved and resumed
+- [x] Generated specs follow templates correctly
+- [x] Refinement suggestions improve spec quality
+- [x] Context from existing specs is leveraged
 
 ## Implementation Details
 
