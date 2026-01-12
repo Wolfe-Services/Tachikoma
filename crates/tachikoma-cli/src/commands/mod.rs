@@ -5,6 +5,7 @@ mod completions;
 mod config;
 mod doctor;
 mod init;
+mod manpages;
 mod tools;
 
 pub use backends::BackendsCommand;
@@ -12,6 +13,7 @@ pub use completions::CompletionsCommand;
 pub use config::ConfigCommand;
 pub use doctor::DoctorCommand;
 pub use init::InitCommand;
+pub use manpages::ManpagesCommand;
 pub use tools::ToolsCommand;
 
 use async_trait::async_trait;

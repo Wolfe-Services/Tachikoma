@@ -6,7 +6,7 @@ use clap::{ArgAction, ColorChoice, Parser, Subcommand, ValueHint};
 
 use crate::commands::{
     BackendsCommand, ConfigCommand, DoctorCommand, 
-    InitCommand, ToolsCommand, CompletionsCommand,
+    InitCommand, ToolsCommand, CompletionsCommand, ManpagesCommand,
 };
 use crate::error::CliError;
 
