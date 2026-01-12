@@ -27,16 +27,16 @@ Implement automatic update functionality using electron-updater, supporting diff
 
 ## Acceptance Criteria
 
-- [ ] Automatic update checking on app start
-- [ ] Manual update check trigger
-- [ ] Download progress indication
-- [ ] Update ready notification
-- [ ] Install on quit option
-- [ ] Update channels (stable, beta, alpha)
-- [ ] Differential/delta updates
-- [ ] Rollback on failed update
-- [ ] Update history tracking
-- [ ] Offline handling
+- [x] Automatic update checking on app start
+- [x] Manual update check trigger
+- [x] Download progress indication
+- [x] Update ready notification
+- [x] Install on quit option
+- [x] Update channels (stable, beta, alpha)
+- [x] Differential/delta updates
+- [x] Rollback on failed update
+- [x] Update history tracking
+- [x] Offline handling
 
 ---
 
