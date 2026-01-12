@@ -26,16 +26,16 @@ Configure and optimize the Linux build process for Tachikoma, including AppImage
 
 ## Acceptance Criteria
 
-- [ ] AppImage with automatic updates
-- [ ] DEB package for Debian/Ubuntu
-- [ ] RPM package for Fedora/RHEL
-- [ ] Snap package for universal distribution
-- [ ] Flatpak package configuration
-- [ ] GPG package signing
-- [ ] Desktop file and icons
-- [ ] MIME type associations
-- [ ] Wayland and X11 support
-- [ ] ARM64 Linux support
+- [x] AppImage with automatic updates
+- [x] DEB package for Debian/Ubuntu
+- [x] RPM package for Fedora/RHEL
+- [x] Snap package for universal distribution
+- [x] Flatpak package configuration
+- [x] GPG package signing
+- [x] Desktop file and icons
+- [x] MIME type associations
+- [x] Wayland and X11 support
+- [x] ARM64 Linux support
 
 ---
 
