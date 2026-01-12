@@ -30,6 +30,8 @@ pub mod edit_file;
 #[cfg(feature = "code-search")]
 pub mod code_search;
 
+pub mod rate_limit;
+
 // Re-exports
 pub use context::{PrimitiveConfig, PrimitiveContext};
 pub use error::{PrimitiveError, PrimitiveResult};
