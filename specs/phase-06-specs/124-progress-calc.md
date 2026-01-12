@@ -13,14 +13,14 @@ Implement comprehensive progress calculation for specs, phases, and the overall 
 
 ## Acceptance Criteria
 
-- [ ] Spec-level progress is calculated accurately
-- [ ] Phase-level aggregation works correctly
-- [ ] Project-level rollup is computed
-- [ ] Multiple progress metrics are supported
-- [ ] Weighted progress calculations work
-- [ ] Progress history is tracked
-- [ ] Real-time progress updates are efficient
-- [ ] Progress visualization data is generated
+- [x] Spec-level progress is calculated accurately
+- [x] Phase-level aggregation works correctly
+- [x] Project-level rollup is computed
+- [x] Multiple progress metrics are supported
+- [x] Weighted progress calculations work
+- [x] Progress history is tracked
+- [x] Real-time progress updates are efficient
+- [x] Progress visualization data is generated
 
 ## Implementation Details
 
