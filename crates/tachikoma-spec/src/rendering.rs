@@ -494,9 +494,9 @@ fn pluralize_helper(
 
 fn if_eq_helper(
     h: &Helper,
-    _: &Handlebars,
-    _: &Context,
-    _: &mut HbRenderContext,
+    hb: &Handlebars,
+    ctx: &Context,
+    rc: &mut HbRenderContext,
     out: &mut dyn Output,
 ) -> HelperResult {
     let a = h.param(0).map(|v| v.value());
@@ -506,10 +506,10 @@ fn if_eq_helper(
     
     if should_render_main {
         if let Some(template) = h.template() {
-            out.write(&template.name().unwrap_or_default())?;
+            template.render(hb, ctx, rc, out)?;
         }
     } else if let Some(inverse) = h.inverse() {
-        out.write(&inverse.name().unwrap_or_default())?;
+        inverse.render(hb, ctx, rc, out)?;
     }
 
     Ok(())
