@@ -16,12 +16,12 @@ Create a mode toggle component that allows users to switch between agentic (auto
 
 ## Acceptance Criteria
 
-- [ ] Visual toggle between agentic and interactive modes
-- [ ] Clear mode descriptions and implications
-- [ ] Mode-specific option configurations
-- [ ] Animated transition between modes
-- [ ] Keyboard accessible toggle
-- [ ] Mode recommendation based on task type
+- [x] Visual toggle between agentic and interactive modes
+- [x] Clear mode descriptions and implications
+- [x] Mode-specific option configurations
+- [x] Animated transition between modes
+- [x] Keyboard accessible toggle
+- [x] Mode recommendation based on task type
 
 ---
 
