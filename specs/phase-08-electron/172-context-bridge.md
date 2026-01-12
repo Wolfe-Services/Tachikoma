@@ -27,14 +27,14 @@ Implement a secure Context Bridge API that safely exposes functionality from the
 
 ## Acceptance Criteria
 
-- [ ] Type-safe API exposed via contextBridge
-- [ ] React hooks for consuming the API
-- [ ] Proper cleanup of event listeners
-- [ ] Error boundary integration
-- [ ] Loading states for async operations
-- [ ] Mock implementations for development/testing
-- [ ] TypeScript declarations for window.electronAPI
-- [ ] API versioning support
+- [x] Type-safe API exposed via contextBridge
+- [x] React hooks for consuming the API
+- [x] Proper cleanup of event listeners
+- [x] Error boundary integration
+- [x] Loading states for async operations
+- [x] Mock implementations for development/testing
+- [x] TypeScript declarations for window.electronAPI
+- [x] API versioning support
 
 ---
 
