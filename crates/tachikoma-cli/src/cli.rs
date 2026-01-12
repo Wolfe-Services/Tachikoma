@@ -214,6 +214,14 @@ impl Cli {
                 cmd.execute(&ctx)?;
                 Ok(())
             },
+            Command::Manpages(cmd) => {
+                cmd.execute(&ctx)?;
+                Ok(())
+            },
+            _ => {
+                eprintln!("Command not yet implemented");
+                std::process::exit(1);
+            }
         }
     }
 }
