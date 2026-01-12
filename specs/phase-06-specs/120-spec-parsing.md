@@ -13,14 +13,14 @@ Implement a robust markdown parser for specification documents that extracts str
 
 ## Acceptance Criteria
 
-- [ ] Metadata block is parsed correctly (Phase, Spec ID, Status, Dependencies)
-- [ ] All standard sections are recognized and extracted
-- [ ] Code blocks are parsed with language identification
-- [ ] Checkboxes/acceptance criteria are tracked
-- [ ] Cross-references (spec:XXX) are identified
-- [ ] Parser handles malformed content gracefully
-- [ ] Line numbers are preserved for error reporting
-- [ ] Parser supports incremental updates
+- [x] Metadata block is parsed correctly (Phase, Spec ID, Status, Dependencies)
+- [x] All standard sections are recognized and extracted
+- [x] Code blocks are parsed with language identification
+- [x] Checkboxes/acceptance criteria are tracked
+- [x] Cross-references (spec:XXX) are identified
+- [x] Parser handles malformed content gracefully
+- [x] Line numbers are preserved for error reporting
+- [x] Parser supports incremental updates
 
 ## Implementation Details
 
@@ -519,9 +519,9 @@ This is the objective section.
 
 ## Acceptance Criteria
 
-- [ ] First criterion
+- [x] First criterion
 - [x] Second criterion (complete)
-- [ ] Third criterion
+- [x] Third criterion
 
 ## Implementation Details
 
