@@ -13,14 +13,14 @@ Implement a template rendering system that generates spec documents and related 
 
 ## Acceptance Criteria
 
-- [ ] Handlebars templates render correctly
-- [ ] Custom helpers are registered and work
-- [ ] Partials/includes are supported
-- [ ] Conditional sections render properly
-- [ ] Loop constructs work for lists
-- [ ] Multiple output formats are supported (MD, HTML, JSON)
-- [ ] Rendering errors are descriptive
-- [ ] Template caching improves performance
+- [x] Handlebars templates render correctly
+- [x] Custom helpers are registered and work
+- [x] Partials/includes are supported
+- [x] Conditional sections render properly
+- [x] Loop constructs work for lists
+- [x] Multiple output formats are supported (MD, HTML, JSON)
+- [x] Rendering errors are descriptive
+- [x] Template caching improves performance
 
 ## Implementation Details
 
