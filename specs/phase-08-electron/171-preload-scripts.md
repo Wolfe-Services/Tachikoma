@@ -27,15 +27,15 @@ Implement secure preload scripts that bridge the main process and renderer while
 
 ## Acceptance Criteria
 
-- [ ] Preload script runs in isolated context
-- [ ] Minimal API surface exposed to renderer
-- [ ] Type-safe bridge API
-- [ ] IPC wrapper functions for all channels
-- [ ] Event listener registration and cleanup
-- [ ] Platform information exposure
-- [ ] No direct Node.js or Electron access in renderer
-- [ ] Proper error handling in bridge calls
-- [ ] Support for multiple preload scripts (per window type)
+- [x] Preload script runs in isolated context
+- [x] Minimal API surface exposed to renderer
+- [x] Type-safe bridge API
+- [x] IPC wrapper functions for all channels
+- [x] Event listener registration and cleanup
+- [x] Platform information exposure
+- [x] No direct Node.js or Electron access in renderer
+- [x] Proper error handling in bridge calls
+- [x] Support for multiple preload scripts (per window type)
 
 ---
 
