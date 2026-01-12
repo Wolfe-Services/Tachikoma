@@ -70,36 +70,83 @@ const config: Configuration = {
     target: [
       {
         target: 'dmg',
-        arch: ['x64', 'arm64'],
+        arch: ['universal'],
       },
       {
         target: 'zip',
-        arch: ['x64', 'arm64'],
+        arch: ['universal'],
+      },
+      {
+        target: 'pkg',
+        arch: ['universal'],
       },
     ],
     category: 'public.app-category.developer-tools',
+    type: 'distribution',
     icon: 'build/icon.icns',
     darkModeSupport: true,
     hardenedRuntime: true,
     gatekeeperAssess: false,
     entitlements: 'build/entitlements.mac.plist',
-    entitlementsInherit: 'build/entitlements.mac.plist',
+    entitlementsInherit: 'build/entitlements.mac.inherit.plist',
     notarize: {
-      teamId: process.env.APPLE_TEAM_ID,
+      teamId: process.env.APPLE_TEAM_ID || '',
     },
+    identity: process.env.APPLE_IDENTITY || 'Developer ID Application',
+    bundleVersion: process.env.BUILD_NUMBER || '1',
+    minimumSystemVersion: '10.15.0',
+    x64ArchFiles: '*',
+    mergeASARs: true,
+    binaries: [
+      'Contents/Frameworks/Tachikoma Helper.app/Contents/MacOS/Tachikoma Helper',
+      'Contents/Frameworks/Tachikoma Helper (GPU).app/Contents/MacOS/Tachikoma Helper (GPU)',
+      'Contents/Frameworks/Tachikoma Helper (Renderer).app/Contents/MacOS/Tachikoma Helper (Renderer)',
+    ],
     extendInfo: {
-      NSMicrophoneUsageDescription: 'This app requires microphone access for voice features.',
-      NSCameraUsageDescription: 'This app requires camera access for video features.',
-      NSAppleEventsUsageDescription: 'This app requires Apple Events access for automation.',
+      CFBundleDocumentTypes: [
+        {
+          CFBundleTypeName: 'Tachikoma Project',
+          CFBundleTypeRole: 'Editor',
+          CFBundleTypeExtensions: ['tachi', 'tachikoma'],
+          CFBundleTypeIconFile: 'file-icon.icns',
+          LSHandlerRank: 'Owner',
+          LSItemContentTypes: ['io.tachikoma.project'],
+        },
+      ],
+      UTExportedTypeDeclarations: [
+        {
+          UTTypeIdentifier: 'io.tachikoma.project',
+          UTTypeDescription: 'Tachikoma Project',
+          UTTypeConformsTo: ['public.data', 'public.content'],
+          UTTypeTagSpecification: {
+            'public.filename-extension': ['tachi', 'tachikoma'],
+            'public.mime-type': ['application/x-tachikoma'],
+          },
+        },
+      ],
+      NSMicrophoneUsageDescription: 'Tachikoma requires microphone access for voice input features.',
+      NSCameraUsageDescription: 'Tachikoma requires camera access for video features.',
+      NSAppleEventsUsageDescription: 'Tachikoma requires Apple Events access for automation.',
+      NSDocumentsFolderUsageDescription: 'Tachikoma requires access to your Documents folder.',
+      NSDesktopFolderUsageDescription: 'Tachikoma requires access to your Desktop.',
+      NSDownloadsFolderUsageDescription: 'Tachikoma requires access to your Downloads folder.',
+      LSMinimumSystemVersion: '10.15.0',
+      NSSupportsAutomaticGraphicsSwitching: true,
+      NSHighResolutionCapable: true,
     },
   },
 
   // DMG configuration
   dmg: {
+    window: {
+      width: 540,
+      height: 380,
+    },
     contents: [
       {
         x: 130,
         y: 220,
+        type: 'file',
       },
       {
         x: 410,
@@ -108,20 +155,65 @@ const config: Configuration = {
         path: '/Applications',
       },
     ],
-    window: {
-      width: 540,
-      height: 380,
-    },
     background: 'build/dmg-background.png',
+    backgroundColor: '#1a1a1a',
     icon: 'build/icon.icns',
     iconSize: 80,
     title: '${productName} ${version}',
+    format: 'ULFO',
+    sign: true,
+    writeUpdateInfo: true,
   },
 
   // PKG configuration
   pkg: {
     license: '../LICENSE',
     installLocation: '/Applications',
+    allowAnywhere: false,
+    allowCurrentUserHome: false,
+    allowRootDirectory: false,
+    identity: process.env.APPLE_INSTALLER_IDENTITY || 'Developer ID Installer',
+    scripts: 'build/pkg-scripts',
+  },
+
+  // Mac App Store configuration
+  mas: {
+    category: 'public.app-category.developer-tools',
+    type: 'distribution',
+    entitlements: 'build/entitlements.mas.plist',
+    entitlementsInherit: 'build/entitlements.mas.inherit.plist',
+    provisioningProfile: 'build/embedded.provisionprofile',
+    hardenedRuntime: false,
+    identity: process.env.APPLE_MAS_IDENTITY || '3rd Party Mac Developer Application',
+    extendInfo: {
+      CFBundleDocumentTypes: [
+        {
+          CFBundleTypeName: 'Tachikoma Project',
+          CFBundleTypeRole: 'Editor',
+          CFBundleTypeExtensions: ['tachi', 'tachikoma'],
+          CFBundleTypeIconFile: 'file-icon.icns',
+          LSHandlerRank: 'Owner',
+          LSItemContentTypes: ['io.tachikoma.project'],
+        },
+      ],
+      UTExportedTypeDeclarations: [
+        {
+          UTTypeIdentifier: 'io.tachikoma.project',
+          UTTypeDescription: 'Tachikoma Project',
+          UTTypeConformsTo: ['public.data', 'public.content'],
+          UTTypeTagSpecification: {
+            'public.filename-extension': ['tachi', 'tachikoma'],
+            'public.mime-type': ['application/x-tachikoma'],
+          },
+        },
+      ],
+      NSMicrophoneUsageDescription: 'Tachikoma requires microphone access for voice input features.',
+      NSCameraUsageDescription: 'Tachikoma requires camera access for video features.',
+      NSAppleEventsUsageDescription: 'Tachikoma requires Apple Events access for automation.',
+      LSMinimumSystemVersion: '10.15.0',
+      NSSupportsAutomaticGraphicsSwitching: true,
+      NSHighResolutionCapable: true,
+    },
   },
 
   // Windows configuration
