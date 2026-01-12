@@ -1,0 +1,1 @@
+const r=/[&"<]/g,i=/[&<]/g;function g(o,l=!1){const t=String(o),s=l?r:i;s.lastIndex=0;let c="",e=0;for(;s.test(t);){const n=s.lastIndex-1,a=t[n];c+=t.substring(e,n)+(a==="&"?"&amp;":a==='"'?"&quot;":"&lt;"),e=n+1}return c+t.substring(e)}export{g as e};

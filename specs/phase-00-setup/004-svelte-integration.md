@@ -16,12 +16,12 @@ Set up SvelteKit in the `web/` directory configured for Electron's renderer proc
 
 ## Acceptance Criteria
 
-- [ ] SvelteKit project initialized in `web/`
-- [ ] Static adapter configured for Electron
-- [ ] TypeScript properly configured
-- [ ] Vite configured for Electron renderer
-- [ ] Global types for Tachikoma IPC bridge
-- [ ] Base layout and routing structure
+- [x] SvelteKit project initialized in `web/`
+- [x] Static adapter configured for Electron
+- [x] TypeScript properly configured
+- [x] Vite configured for Electron renderer
+- [x] Global types for Tachikoma IPC bridge
+- [x] Base layout and routing structure
 
 ---
 
