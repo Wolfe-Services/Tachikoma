@@ -16,14 +16,14 @@ Implement context redline detection for the Ralph Loop - monitoring context wind
 
 ## Acceptance Criteria
 
-- [ ] Monitor context window usage percentage
-- [ ] Configurable redline thresholds
-- [ ] Multiple detection strategies
-- [ ] Warning events before redline
-- [ ] Output parsing for usage indicators
-- [ ] Token estimation heuristics
-- [ ] Degradation pattern detection
-- [ ] Integration with auto-reboot
+- [x] Monitor context window usage percentage
+- [x] Configurable redline thresholds
+- [x] Multiple detection strategies
+- [x] Warning events before redline
+- [x] Output parsing for usage indicators
+- [x] Token estimation heuristics
+- [x] Degradation pattern detection
+- [x] Integration with auto-reboot
 
 ---
 
