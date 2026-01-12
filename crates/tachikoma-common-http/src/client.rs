@@ -1,34 +1,3 @@
-# 020 - HTTP Client Foundation
-
-**Phase:** 1 - Core Common Crates
-**Spec ID:** 020
-**Status:** Complete
-**Dependencies:** 019-async-runtime
-**Estimated Context:** ~10% of Sonnet window
-
----
-
-## Objective
-
-Create a configured HTTP client wrapper with sensible defaults, connection pooling, and middleware support for API calls.
-
----
-
-## Acceptance Criteria
-
-- [x] reqwest client with configured defaults
-- [x] Connection pooling
-- [x] Timeout configuration
-- [x] User-Agent header
-- [x] Request/response logging (debug)
-
----
-
-## Implementation Details
-
-### 1. HTTP Client (crates/tachikoma-common-http/src/client.rs)
-
-```rust
 //! HTTP client configuration.
 
 use reqwest::{Client, ClientBuilder};
@@ -132,7 +101,10 @@ impl HttpClient {
 
     /// Make a GET request.
     pub async fn get(&self, url: &str) -> Result<reqwest::Response, HttpError> {
-        self.inner.get(url).send().await.map_err(HttpError::from)
+        tracing::debug!("Making GET request to: {}", url);
+        let response = self.inner.get(url).send().await.map_err(HttpError::from)?;
+        tracing::debug!("GET response: {} {}", response.status(), url);
+        Ok(response)
     }
 
     /// Make a POST request with JSON body.
@@ -141,12 +113,15 @@ impl HttpClient {
         url: &str,
         body: &T,
     ) -> Result<reqwest::Response, HttpError> {
-        self.inner
+        tracing::debug!("Making POST request to: {}", url);
+        let response = self.inner
             .post(url)
             .json(body)
             .send()
             .await
-            .map_err(HttpError::from)
+            .map_err(HttpError::from)?;
+        tracing::debug!("POST response: {} {}", response.status(), url);
+        Ok(response)
     }
 
     /// Check response status and convert errors.
@@ -189,34 +164,46 @@ impl Default for HttpClient {
         Self::new().expect("failed to create HTTP client")
     }
 }
-```
 
-### 2. Crate Setup
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::time::Duration;
 
-```toml
-[package]
-name = "tachikoma-common-http"
-version.workspace = true
-edition.workspace = true
+    #[test]
+    fn test_default_config() {
+        let config = HttpConfig::default();
+        assert_eq!(config.connect_timeout, Duration::from_secs(10));
+        assert_eq!(config.request_timeout, Duration::from_secs(30));
+        assert!(config.user_agent.starts_with("tachikoma/"));
+        assert_eq!(config.pool_max_idle_per_host, 10);
+        assert!(config.gzip);
+    }
 
-[dependencies]
-reqwest = { workspace = true, features = ["json", "gzip"] }
-serde.workspace = true
-thiserror.workspace = true
-```
+    #[test]
+    fn test_client_creation() {
+        let client = HttpClient::new();
+        assert!(client.is_ok());
+    }
 
----
+    #[test]
+    fn test_client_with_custom_config() {
+        let config = HttpConfig {
+            connect_timeout: Duration::from_secs(5),
+            request_timeout: Duration::from_secs(15),
+            user_agent: "test-agent".to_string(),
+            pool_max_idle_per_host: 5,
+            gzip: false,
+        };
+        
+        let client = HttpClient::with_config(config);
+        assert!(client.is_ok());
+    }
 
-## Testing Requirements
-
-1. Client builds with default config
-2. Timeout errors are detected
-3. Rate limit responses parsed correctly
-4. Error responses converted properly
-
----
-
-## Related Specs
-
-- Depends on: [019-async-runtime.md](019-async-runtime.md)
-- Next: [021-http-request-types.md](021-http-request-types.md)
+    #[test]
+    fn test_build_client() {
+        let config = HttpConfig::default();
+        let client = build_client(config);
+        assert!(client.is_ok());
+    }
+}
