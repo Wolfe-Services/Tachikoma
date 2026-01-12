@@ -16,12 +16,12 @@ Implement comprehensive state management for missions in the UI layer, including
 
 ## Acceptance Criteria
 
-- [ ] `MissionStore` with full CRUD operations
-- [ ] Real-time state synchronization via IPC
-- [ ] Optimistic updates with rollback on failure
-- [ ] Derived stores for filtered/sorted missions
-- [ ] Mission state history tracking
-- [ ] Persistence of UI state across sessions
+- [x] `MissionStore` with full CRUD operations
+- [x] Real-time state synchronization via IPC
+- [x] Optimistic updates with rollback on failure
+- [x] Derived stores for filtered/sorted missions
+- [x] Mission state history tracking
+- [x] Persistence of UI state across sessions
 
 ---
 
