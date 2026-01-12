@@ -27,16 +27,16 @@ Implement native dialog wrappers for the Electron application, providing consist
 
 ## Acceptance Criteria
 
-- [ ] File open dialog with filters and multi-select
-- [ ] File save dialog with default names and extensions
-- [ ] Directory picker dialog
-- [ ] Message box for confirmations and alerts
-- [ ] Error dialog for critical errors
-- [ ] Progress dialog for long operations
-- [ ] Custom dialog windows for complex inputs
-- [ ] Dialog result promises with proper typing
-- [ ] Platform-specific dialog behavior
-- [ ] Dialog state management (prevent multiple dialogs)
+- [x] File open dialog with filters and multi-select
+- [x] File save dialog with default names and extensions
+- [x] Directory picker dialog
+- [x] Message box for confirmations and alerts
+- [x] Error dialog for critical errors
+- [x] Progress dialog for long operations
+- [x] Custom dialog windows for complex inputs
+- [x] Dialog result promises with proper typing
+- [x] Platform-specific dialog behavior
+- [x] Dialog state management (prevent multiple dialogs)
 
 ---
 
