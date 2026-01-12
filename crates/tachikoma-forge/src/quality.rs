@@ -547,7 +547,8 @@ mod tests {
         assert_eq!(report.snapshots_count, 1);
         
         let markdown = report.to_markdown();
-        assert!(markdown.contains("Current Score: 75/100"));
+        println!("Generated markdown:\n{}", markdown);
+        assert!(markdown.contains("**Current Score:** 75/100"));
         assert!(markdown.contains("Quality Report"));
     }
 }
