@@ -23,10 +23,11 @@ pub struct SpecDirectoryWatcher {
 impl SpecDirectoryWatcher {
     pub fn new(spec_root: PathBuf) -> Result<Self, notify::Error> {
         let (tx, rx) = mpsc::channel(100);
+        let spec_root_clone = spec_root.clone();
 
         let mut watcher = notify::recommended_watcher(move |res: Result<Event, _>| {
             if let Ok(event) = res {
-                if let Some(spec_event) = Self::classify_event(&event, &spec_root) {
+                if let Some(spec_event) = Self::classify_event(&event, &spec_root_clone) {
                     let _ = tx.blocking_send(spec_event);
                 }
             }

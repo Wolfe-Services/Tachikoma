@@ -361,6 +361,8 @@ impl ProgressCalculator {
             0
         };
 
+        let blockers = counts.blocked;
+        
         PhaseProgress {
             phase,
             name: name.to_string(),
@@ -368,7 +370,7 @@ impl ProgressCalculator {
             spec_counts: counts,
             avg_spec_progress: avg_progress,
             specs: spec_progress,
-            blockers: counts.blocked,
+            blockers,
             estimated_completion: None, // Would need velocity calculation
         }
     }
