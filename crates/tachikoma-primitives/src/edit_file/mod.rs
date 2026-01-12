@@ -3,12 +3,16 @@
 mod options;
 mod diff;
 mod unique;
+pub mod atomic;
 
 pub use options::EditFileOptions;
 pub use diff::Diff;
 pub use unique::{
     UniquenessResult, MatchLocation, MatchSelection, EditValidationError,
     check_uniqueness, format_matches, select_match, validate_edit_target
+};
+pub use atomic::{
+    write_atomic, AtomicWriter, atomic_edit, locked_atomic_edit,
 };
 
 use crate::{
@@ -213,8 +217,8 @@ pub async fn edit_file(
     // Preserve original file metadata
     let original_metadata = fs::metadata(&resolved_path)?;
 
-    // Write new content
-    fs::write(&resolved_path, &new_bytes)?;
+    // Write new content atomically
+    atomic::write_atomic(&resolved_path, &new_bytes)?;
 
     // Preserve permissions if requested
     if options.preserve_permissions {

@@ -22,8 +22,19 @@ use std::path::PathBuf;
 use tokio::sync::mpsc;
 use tracing_subscriber::EnvFilter;
 
-use claude_client::ClaudeClient;
+use claude_client::{ClaudeClient, StopReason};
 use spec_parser::{find_next_spec, get_progress_summary, parse_readme, ParsedSpec};
+
+/// Result of running a single spec
+#[derive(Debug, Clone, PartialEq)]
+enum SpecResult {
+    /// Spec completed successfully
+    Completed,
+    /// Hit redline, needs fresh context to continue
+    NeedsReboot,
+    /// Hit max iterations without completing
+    MaxIterations,
+}
 
 /// Ralph Wiggum Loop - Agentic coding harness
 #[derive(Parser)]
@@ -55,6 +66,10 @@ enum Commands {
         #[arg(short, long, default_value = "50")]
         max_iterations: usize,
 
+        /// Token limit before forcing fresh context (default: 150000)
+        #[arg(long, default_value = "150000")]
+        redline: u32,
+
         /// Skip auto-commit after completion
         #[arg(long)]
         no_commit: bool,
@@ -65,6 +80,10 @@ enum Commands {
         /// Maximum iterations per spec (default: 50)
         #[arg(short, long, default_value = "50")]
         max_iterations: usize,
+
+        /// Token limit before forcing fresh context (default: 150000)
+        #[arg(long, default_value = "150000")]
+        redline: u32,
 
         /// Maximum specs to process (default: unlimited)
         #[arg(long)]
@@ -134,17 +153,19 @@ async fn main() -> Result<()> {
         Commands::Run {
             spec,
             max_iterations,
+            redline,
             no_commit,
         } => {
-            run_single(&project_root, spec, max_iterations, !no_commit).await?;
+            run_single(&project_root, spec, max_iterations, redline, !no_commit).await?;
         }
         Commands::Loop {
             max_iterations,
+            redline,
             max_specs,
             fail_streak,
             no_commit,
         } => {
-            run_loop(&project_root, max_iterations, max_specs, fail_streak, !no_commit).await?;
+            run_loop(&project_root, max_iterations, redline, max_specs, fail_streak, !no_commit).await?;
         }
         Commands::Status => {
             show_status(&specs_dir)?;
@@ -168,8 +189,9 @@ async fn run_single(
     project_root: &PathBuf,
     spec_id: Option<u32>,
     max_iterations: usize,
+    redline_threshold: u32,
     auto_commit: bool,
-) -> Result<()> {
+) -> Result<SpecResult> {
     let specs_dir = project_root.join("specs");
 
     // Find the spec to implement
@@ -228,7 +250,7 @@ async fn run_single(
     println!("Starting agentic loop (max {} iterations)...\n", max_iterations);
 
     let result = client
-        .run_agentic_loop(&system_prompt, &task_prompt, max_iterations, Some(tx))
+        .run_agentic_loop(&system_prompt, &task_prompt, max_iterations, redline_threshold, Some(tx))
         .await?;
 
     // Wait for output to finish
@@ -242,22 +264,49 @@ async fn run_single(
     println!("  Output tokens: {}", result.total_output_tokens);
     println!("  Total tokens: {}", result.total_tokens());
     println!("  Estimated cost: ${:.4}", result.estimated_cost());
+    println!("  Stop reason: {:?}", result.stop_reason);
     println!("========================================\n");
 
-    // Auto-commit if enabled and there are changes
-    if auto_commit {
-        if let Some(hash) = git::auto_commit_spec(project_root, spec.entry.id, &spec.entry.name)? {
-            println!("Committed changes as {}", hash);
+    // Determine spec result based on stop reason
+    let spec_result = match result.stop_reason {
+        StopReason::Completed => {
+            // Auto-commit if enabled and there are changes
+            if auto_commit {
+                if let Some(hash) = git::auto_commit_spec(project_root, spec.entry.id, &spec.entry.name)? {
+                    println!("Committed changes as {}", hash);
+                }
+            }
+            SpecResult::Completed
         }
-    }
+        StopReason::Redline => {
+            println!("⚠️  REDLINE: Token limit exceeded. Will retry with fresh context.");
+            // Still commit any progress made
+            if auto_commit {
+                if let Some(hash) = git::auto_commit_spec(project_root, spec.entry.id, &spec.entry.name)? {
+                    println!("Committed partial progress as {}", hash);
+                }
+            }
+            SpecResult::NeedsReboot
+        }
+        StopReason::MaxIterations => {
+            println!("⚠️  Max iterations reached without completing.");
+            if auto_commit {
+                if let Some(hash) = git::auto_commit_spec(project_root, spec.entry.id, &spec.entry.name)? {
+                    println!("Committed partial progress as {}", hash);
+                }
+            }
+            SpecResult::MaxIterations
+        }
+    };
 
-    Ok(())
+    Ok(spec_result)
 }
 
 /// Run the Ralph loop continuously
 async fn run_loop(
     project_root: &PathBuf,
     max_iterations: usize,
+    redline_threshold: u32,
     max_specs: Option<usize>,
     fail_streak_limit: usize,
     auto_commit: bool,
@@ -266,11 +315,13 @@ async fn run_loop(
 
     let mut specs_completed = 0;
     let mut consecutive_failures = 0;
-    let mut total_cost = 0.0;
+    let mut reboot_count = 0;
+    const MAX_REBOOTS_PER_SPEC: usize = 3;
 
     println!("\n========================================");
     println!("  RALPH LOOP - CONTINUOUS MODE");
     println!("  Max iterations per spec: {}", max_iterations);
+    println!("  Redline threshold: {} tokens", redline_threshold);
     println!("  Fail streak limit: {}", fail_streak_limit);
     println!("========================================\n");
 
@@ -293,27 +344,48 @@ async fn run_loop(
         };
 
         println!("\n--- Starting Spec {:03}: {} ---\n", spec.entry.id, spec.entry.name);
+        reboot_count = 0;
 
-        // Run for this spec
-        match run_single(project_root, Some(spec.entry.id), max_iterations, auto_commit).await {
-            Ok(_) => {
-                specs_completed += 1;
-                consecutive_failures = 0;
-                println!("\nSpec {:03} completed successfully!", spec.entry.id);
-            }
-            Err(e) => {
-                consecutive_failures += 1;
-                tracing::error!("Spec {:03} failed: {}", spec.entry.id, e);
-                println!("\nSpec {:03} FAILED: {}", spec.entry.id, e);
-
-                if consecutive_failures >= fail_streak_limit {
-                    println!(
-                        "\nStopping: {} consecutive failures (limit: {})",
-                        consecutive_failures, fail_streak_limit
-                    );
+        // Run for this spec (with reboot support)
+        loop {
+            match run_single(project_root, Some(spec.entry.id), max_iterations, redline_threshold, auto_commit).await {
+                Ok(SpecResult::Completed) => {
+                    specs_completed += 1;
+                    consecutive_failures = 0;
+                    println!("\nSpec {:03} completed successfully!", spec.entry.id);
+                    break;
+                }
+                Ok(SpecResult::NeedsReboot) => {
+                    reboot_count += 1;
+                    if reboot_count >= MAX_REBOOTS_PER_SPEC {
+                        println!("\n⚠️  Spec {:03} hit redline {} times. Moving to next spec.", spec.entry.id, reboot_count);
+                        consecutive_failures += 1;
+                        break;
+                    }
+                    println!("\n🔄 Rebooting with fresh context (attempt {}/{})...\n", reboot_count, MAX_REBOOTS_PER_SPEC);
+                    tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+                    // Continue inner loop - will retry same spec with fresh context
+                }
+                Ok(SpecResult::MaxIterations) => {
+                    consecutive_failures += 1;
+                    println!("\nSpec {:03} hit max iterations without completing.", spec.entry.id);
+                    break;
+                }
+                Err(e) => {
+                    consecutive_failures += 1;
+                    tracing::error!("Spec {:03} failed: {}", spec.entry.id, e);
+                    println!("\nSpec {:03} FAILED: {}", spec.entry.id, e);
                     break;
                 }
             }
+        }
+
+        if consecutive_failures >= fail_streak_limit {
+            println!(
+                "\nStopping: {} consecutive failures (limit: {})",
+                consecutive_failures, fail_streak_limit
+            );
+            break;
         }
 
         // Brief pause between specs

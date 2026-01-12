@@ -158,12 +158,14 @@ impl ClaudeClient {
     /// Returns when:
     /// - The model completes without tool calls (end_turn)
     /// - Max iterations reached
+    /// - Token redline exceeded (needs fresh context)
     /// - An error occurs
     pub async fn run_agentic_loop(
         &self,
         system_prompt: &str,
         initial_message: &str,
         max_iterations: usize,
+        redline_threshold: u32,
         output_tx: Option<mpsc::Sender<String>>,
     ) -> Result<LoopResult> {
         let mut messages = vec![Message {
@@ -182,7 +184,14 @@ impl ClaudeClient {
 
             if iterations > max_iterations {
                 tracing::warn!("Max iterations ({}) reached", max_iterations);
-                break;
+                return Ok(LoopResult {
+                    iterations,
+                    total_input_tokens,
+                    total_output_tokens,
+                    final_text: String::new(),
+                    messages,
+                    stop_reason: StopReason::MaxIterations,
+                });
             }
 
             // Log iteration
@@ -203,21 +212,29 @@ impl ClaudeClient {
                 total_output_tokens += usage.output_tokens;
             }
 
-            // Check for context redline (>80% of ~200k = 160k tokens)
+            // Check for context redline - STOP if exceeded
             let total_tokens = total_input_tokens + total_output_tokens;
-            if total_tokens > 150_000 {
+            if total_tokens > redline_threshold {
                 tracing::warn!(
-                    "Context redline warning: {} tokens used (>150k)",
-                    total_tokens
+                    "Context redline exceeded: {} tokens (threshold: {}). Stopping for fresh context.",
+                    total_tokens, redline_threshold
                 );
                 if let Some(tx) = &output_tx {
                     let _ = tx
                         .send(format!(
-                            "\n[REDLINE WARNING: {} tokens used - consider fresh context]\n",
-                            total_tokens
+                            "\n[REDLINE EXCEEDED: {} tokens > {} threshold - stopping for fresh context]\n",
+                            total_tokens, redline_threshold
                         ))
                         .await;
                 }
+                return Ok(LoopResult {
+                    iterations,
+                    total_input_tokens,
+                    total_output_tokens,
+                    final_text: String::new(),
+                    messages,
+                    stop_reason: StopReason::Redline,
+                });
             }
 
             // Add assistant response to messages
@@ -242,7 +259,30 @@ impl ClaudeClient {
                 // No tool calls - check stop reason
                 if response.stop_reason.as_deref() == Some("end_turn") {
                     tracing::info!("Loop completed: end_turn");
-                    break;
+                    // Extract final text before returning
+                    let final_text = messages
+                        .iter()
+                        .rev()
+                        .find_map(|m| {
+                            if matches!(m.role, Role::Assistant) {
+                                m.content.iter().find_map(|c| match c {
+                                    ContentBlock::Text { text } => Some(text.clone()),
+                                    _ => None,
+                                })
+                            } else {
+                                None
+                            }
+                        })
+                        .unwrap_or_default();
+
+                    return Ok(LoopResult {
+                        iterations,
+                        total_input_tokens,
+                        total_output_tokens,
+                        final_text,
+                        messages,
+                        stop_reason: StopReason::Completed,
+                    });
                 }
             } else {
                 // Execute tool calls and add results
@@ -290,30 +330,6 @@ impl ClaudeClient {
                 });
             }
         }
-
-        // Extract final text response
-        let final_text = messages
-            .iter()
-            .rev()
-            .find_map(|m| {
-                if matches!(m.role, Role::Assistant) {
-                    m.content.iter().find_map(|c| match c {
-                        ContentBlock::Text { text } => Some(text.clone()),
-                        _ => None,
-                    })
-                } else {
-                    None
-                }
-            })
-            .unwrap_or_default();
-
-        Ok(LoopResult {
-            iterations,
-            total_input_tokens,
-            total_output_tokens,
-            final_text,
-            messages,
-        })
     }
 
     /// Make a single API call with streaming
@@ -482,6 +498,17 @@ impl ClaudeClient {
     }
 }
 
+/// Why the loop stopped
+#[derive(Debug, Clone, PartialEq)]
+pub enum StopReason {
+    /// Completed successfully (end_turn)
+    Completed,
+    /// Hit max iterations
+    MaxIterations,
+    /// Hit token redline - needs fresh context
+    Redline,
+}
+
 /// Result from running the agentic loop
 #[derive(Debug)]
 pub struct LoopResult {
@@ -490,6 +517,7 @@ pub struct LoopResult {
     pub total_output_tokens: u32,
     pub final_text: String,
     pub messages: Vec<Message>,
+    pub stop_reason: StopReason,
 }
 
 impl LoopResult {
