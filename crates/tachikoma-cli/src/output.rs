@@ -1,10 +1,66 @@
 //! Output formatting utilities for CLI commands.
 
+mod format;
+mod printer;
+mod table;
+mod text;
+
+pub use format::{Displayable, OutputFormat as InternalOutputFormat};
+pub use printer::{Output, OutputConfig};
+pub use table::{Table, TableBuilder, TableStyle, Column, Alignment};
+pub use text::{TextFormatter, Wrapped};
+
+use std::io::{self, Write};
+use is_terminal::IsTerminal;
 use serde::Serialize;
-use std::io::Write;
 
 use crate::cli::{OutputFormat, CommandContext};
 use crate::error::CliError;
+
+/// Check if stdout is a terminal
+pub fn is_terminal() -> bool {
+    io::stdout().is_terminal()
+}
+
+/// Check if stderr is a terminal
+pub fn is_stderr_terminal() -> bool {
+    io::stderr().is_terminal()
+}
+
+/// Get terminal width (default 80 if not a terminal)
+pub fn terminal_width() -> usize {
+    terminal_size::terminal_size()
+        .map(|(w, _)| w.0 as usize)
+        .unwrap_or(80)
+}
+
+/// Output destination
+pub enum Destination {
+    Stdout,
+    Stderr,
+    File(std::fs::File),
+    Buffer(Vec<u8>),
+}
+
+impl Write for Destination {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        match self {
+            Self::Stdout => io::stdout().write(buf),
+            Self::Stderr => io::stderr().write(buf),
+            Self::File(f) => f.write(buf),
+            Self::Buffer(b) => b.write(buf),
+        }
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        match self {
+            Self::Stdout => io::stdout().flush(),
+            Self::Stderr => io::stderr().flush(),
+            Self::File(f) => f.flush(),
+            Self::Buffer(_) => Ok(()),
+        }
+    }
+}
 
 /// Trait for types that can be formatted for output
 pub trait FormattedOutput {
@@ -17,14 +73,18 @@ pub fn print_output<T>(ctx: &CommandContext, value: &T) -> Result<(), CliError>
 where
     T: FormattedOutput + Serialize,
 {
-    let output = match ctx.format {
-        OutputFormat::Text => value.format_text(),
-        OutputFormat::Json => value.format_json().map_err(|e| {
-            CliError::Other(anyhow::anyhow!("JSON serialization failed: {}", e))
-        })?,
-    };
-
-    println!("{}", output);
+    let output = Output::new(ctx);
+    match ctx.format {
+        OutputFormat::Text => {
+            println!("{}", value.format_text());
+        },
+        OutputFormat::Json => {
+            let json = value.format_json().map_err(|e| {
+                CliError::Other(anyhow::anyhow!("JSON serialization failed: {}", e))
+            })?;
+            println!("{}", json);
+        },
+    }
     Ok(())
 }
 
@@ -42,6 +102,36 @@ where
     };
 
     writeln!(writer, "{}", output).map_err(CliError::Io)?;
+    Ok(())
+}
+
+/// Print list of items
+pub fn print_list<T, I>(ctx: &CommandContext, items: I, empty_msg: &str) -> Result<(), CliError>
+where
+    T: Serialize + std::fmt::Display,
+    I: IntoIterator<Item = T>,
+{
+    let output = Output::new(ctx);
+    let items: Vec<_> = items.into_iter().collect();
+
+    if items.is_empty() {
+        output.message(empty_msg);
+        return Ok(());
+    }
+
+    match ctx.format {
+        OutputFormat::Json => {
+            let json = serde_json::to_string_pretty(&items)
+                .map_err(|e| CliError::Other(anyhow::anyhow!("JSON serialization failed: {}", e)))?;
+            println!("{}", json);
+        }
+        OutputFormat::Text => {
+            for item in items {
+                println!("{}", item);
+            }
+        }
+    }
+
     Ok(())
 }
 
