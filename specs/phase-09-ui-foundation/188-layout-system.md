@@ -26,14 +26,14 @@ Implement a flexible layout system for Tachikoma with support for multiple layou
 
 ## Acceptance Criteria
 
-- [ ] Root application layout with Tauri window controls
-- [ ] Sidebar navigation layout component
-- [ ] Split panel layout with resizable panes
-- [ ] Tab-based content layout
-- [ ] Responsive breakpoint handling
-- [ ] Layout state persistence
-- [ ] Collapsible sidebar with toggle
-- [ ] Breadcrumb navigation support
+- [x] Root application layout with Tauri window controls
+- [x] Sidebar navigation layout component
+- [x] Split panel layout with resizable panes
+- [x] Tab-based content layout
+- [x] Responsive breakpoint handling
+- [x] Layout state persistence
+- [x] Collapsible sidebar with toggle
+- [x] Breadcrumb navigation support
 
 ---
 
