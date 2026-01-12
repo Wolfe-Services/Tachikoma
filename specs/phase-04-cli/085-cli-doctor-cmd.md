@@ -13,15 +13,15 @@ Implement the `tachikoma doctor` command for diagnosing system health, checking 
 
 ## Acceptance Criteria
 
-- [ ] Check system dependencies (Rust, cargo, etc.)
-- [ ] Validate configuration files
-- [ ] Test backend connectivity
-- [ ] Verify tool installations
-- [ ] Check environment variables
-- [ ] Display system information
-- [ ] Provide fix suggestions
-- [ ] Support JSON output for automation
-- [ ] Exit code reflects health status
+- [x] Check system dependencies (Rust, cargo, etc.)
+- [x] Validate configuration files
+- [x] Test backend connectivity
+- [x] Verify tool installations
+- [x] Check environment variables
+- [x] Display system information
+- [x] Provide fix suggestions
+- [x] Support JSON output for automation
+- [x] Exit code reflects health status
 
 ## Implementation Details
 
