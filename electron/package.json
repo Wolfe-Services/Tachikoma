@@ -7,7 +7,18 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:mac": "electron-builder --mac",
+    "build:mac:universal": "electron-builder --mac --universal",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux",
+    "build:all": "electron-builder --mac --win --linux",
+    "build:dir": "electron-builder --dir",
+    "package": "npm run build && electron-builder --publish never",
+    "release": "electron-builder --publish always",
+    "release:mac": "electron-builder --mac --publish always",
+    "release:win": "electron-builder --win --publish always",
+    "release:linux": "electron-builder --linux --publish always"
   },
   "dependencies": {
     "@electron-toolkit/utils": "^4.0.0",
