@@ -158,7 +158,7 @@ impl InvertedIndex {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SpecSearchIndex {
     /// Inverted index for full-text search
-    inverted: InvertedIndex,
+    pub inverted: InvertedIndex,
     /// Document store
     documents: HashMap<u32, IndexedSpec>,
     /// Facets for filtering
