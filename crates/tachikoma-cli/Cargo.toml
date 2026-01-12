@@ -35,6 +35,7 @@ async-trait = "0.1"
 terminal_size = "0.3"
 textwrap = "0.16"
 is-terminal = "0.4"
+regex = "1.10"
 
 [dev-dependencies]
 assert_cmd = "2.0"

@@ -1,11 +1,18 @@
 //! Output formatting utilities for CLI commands.
 
+mod color;
 mod format;
+mod icons;
 mod printer;
 mod table;
 mod text;
 
+pub use color::{
+    Color, ColorContext, ColorDepth, ColorMode, Palette, Style, Styled,
+    detect_color_support, strip_ansi, styled, success, error, warning, info, bold
+};
 pub use format::{Displayable, OutputFormat as InternalOutputFormat};
+pub use icons::{Icons, IconContext};
 pub use printer::{Output, OutputConfig};
 pub use table::{Table, TableBuilder, TableStyle, Column, Alignment};
 pub use text::{TextFormatter, Wrapped};
