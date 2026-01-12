@@ -31,7 +31,7 @@ pub struct Citation {
 }
 
 /// Supported citation formats
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum CitationFormat {
     /// spec:116 or SPEC-116
     SpecId,
