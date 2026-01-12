@@ -220,15 +220,20 @@ impl VersionManager {
         change_type: ChangeType,
         author: Option<String>,
     ) -> Result<SpecVersion, VersionError> {
-        let history = self.histories.entry(spec_id)
-            .or_insert_with(|| VersionHistory::new(spec_id));
+        // Get current commit hash first
+        let commit_hash = self.get_current_commit().await;
+
+        // Get or create history entry
+        let current_version = self.histories.get(&spec_id)
+            .map(|h| h.current.clone())
+            .unwrap_or_default();
 
         // Determine new version based on change type
         let new_version = match change_type {
-            ChangeType::Breaking => history.current.bump_major(),
+            ChangeType::Breaking => current_version.bump_major(),
             ChangeType::Created => SpecVersion::default(),
-            ChangeType::StatusChange | ChangeType::CriteriaChange => history.current.bump_patch(),
-            _ => history.current.bump_minor(),
+            ChangeType::StatusChange | ChangeType::CriteriaChange => current_version.bump_patch(),
+            _ => current_version.bump_minor(),
         };
 
         let entry = VersionEntry {
@@ -237,12 +242,18 @@ impl VersionManager {
             author,
             description: description.to_string(),
             change_type,
-            commit_hash: self.get_current_commit().await,
+            commit_hash,
             content_hash: None,
         };
 
+        // Now update history
+        let history = self.histories.entry(spec_id)
+            .or_insert_with(|| VersionHistory::new(spec_id));
         history.add_entry(entry);
-        self.save_to_storage(history).await?;
+
+        // Save to storage
+        let history_clone = history.clone();
+        self.save_to_storage(&history_clone).await?;
 
         Ok(new_version)
     }
@@ -264,14 +275,16 @@ impl VersionManager {
 
         let commits = git.get_file_history(spec_path).await?;
 
-        let history = self.histories.entry(spec_id)
-            .or_insert_with(|| VersionHistory::new(spec_id));
-
         for (i, commit) in commits.iter().enumerate() {
             let version = SpecVersion::new(1, i as u32, 0);
 
-            if !history.has_version(&version) {
-                history.add_entry(VersionEntry {
+            // Check if we already have this version
+            let needs_entry = !self.histories.get(&spec_id)
+                .map(|h| h.has_version(&version))
+                .unwrap_or(false);
+
+            if needs_entry {
+                let entry = VersionEntry {
                     version,
                     timestamp: commit.timestamp,
                     author: Some(commit.author.clone()),
@@ -279,11 +292,20 @@ impl VersionManager {
                     change_type: if i == 0 { ChangeType::Created } else { ChangeType::Updated },
                     commit_hash: Some(commit.hash.clone()),
                     content_hash: None,
-                });
+                };
+
+                let history = self.histories.entry(spec_id)
+                    .or_insert_with(|| VersionHistory::new(spec_id));
+                history.add_entry(entry);
             }
         }
 
-        self.save_to_storage(history).await?;
+        // Save to storage
+        if let Some(history) = self.histories.get(&spec_id) {
+            let history_clone = history.clone();
+            self.save_to_storage(&history_clone).await?;
+        }
+        
         Ok(())
     }
 
@@ -331,9 +353,9 @@ impl VersionManager {
         let history = self.get_history(spec_id)
             .ok_or_else(|| VersionError::NotFound(format!("History for spec {}", spec_id)))?;
 
-        let from_entry = history.get_entry(from)
+        let _from_entry = history.get_entry(from)
             .ok_or_else(|| VersionError::NotFound(format!("Version {}", from)))?;
-        let to_entry = history.get_entry(to)
+        let _to_entry = history.get_entry(to)
             .ok_or_else(|| VersionError::NotFound(format!("Version {}", to)))?;
 
         // Basic comparison - a more sophisticated diff would analyze content
