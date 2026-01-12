@@ -16,11 +16,11 @@ Set up structured logging using the `tracing` crate with configurable outputs, l
 
 ## Acceptance Criteria
 
-- [ ] tracing subscriber configuration
-- [ ] Multiple output targets (stderr, file)
-- [ ] JSON and pretty formatters
-- [ ] Log level filtering
-- [ ] Environment-based configuration
+- [x] tracing subscriber configuration
+- [x] Multiple output targets (stderr, file)
+- [x] JSON and pretty formatters
+- [x] Log level filtering
+- [x] Environment-based configuration
 
 ---
 
