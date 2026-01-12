@@ -13,14 +13,14 @@ Define the template system for creating consistent, well-structured specificatio
 
 ## Acceptance Criteria
 
-- [ ] Multiple template types are supported (feature, component, integration, refactor, test)
-- [ ] Templates include all required sections with placeholders
-- [ ] Variable substitution works for dynamic content
-- [ ] Custom templates can be added by projects
-- [ ] Template inheritance allows extending base templates
-- [ ] Validation ensures generated specs meet requirements
-- [ ] Template versioning supports evolution
-- [ ] CLI commands generate specs from templates
+- [x] Multiple template types are supported (feature, component, integration, refactor, test)
+- [x] Templates include all required sections with placeholders
+- [x] Variable substitution works for dynamic content
+- [x] Custom templates can be added by projects
+- [x] Template inheritance allows extending base templates
+- [x] Validation ensures generated specs meet requirements
+- [x] Template versioning supports evolution
+- [x] CLI commands generate specs from templates
 
 ## Implementation Details
 
