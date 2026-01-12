@@ -16,12 +16,12 @@ Implement comprehensive integration tests for all primitives, testing real-world
 
 ## Acceptance Criteria
 
-- [ ] Integration tests for each primitive
-- [ ] Cross-primitive workflow tests
-- [ ] Error scenario tests
-- [ ] Performance benchmarks
-- [ ] Security test cases
-- [ ] Test fixtures and helpers
+- [x] Integration tests for each primitive
+- [x] Cross-primitive workflow tests
+- [x] Error scenario tests
+- [x] Performance benchmarks
+- [x] Security test cases
+- [x] Test fixtures and helpers
 
 ---
 
