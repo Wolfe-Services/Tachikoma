@@ -26,16 +26,16 @@ Implement a comprehensive Modal (Dialog) component for Tachikoma with support fo
 
 ## Acceptance Criteria
 
-- [ ] Multiple sizes (sm, md, lg, xl, fullscreen)
-- [ ] Backdrop click to close (configurable)
-- [ ] Focus trap within modal
-- [ ] Escape key to close
-- [ ] Accessible with ARIA attributes
-- [ ] Smooth enter/exit animations
-- [ ] Portal-based rendering
-- [ ] Prevent body scroll when open
-- [ ] Nested modal support
-- [ ] Confirmation dialog variant
+- [x] Multiple sizes (sm, md, lg, xl, fullscreen)
+- [x] Backdrop click to close (configurable)
+- [x] Focus trap within modal
+- [x] Escape key to close
+- [x] Accessible with ARIA attributes
+- [x] Smooth enter/exit animations
+- [x] Portal-based rendering
+- [x] Prevent body scroll when open
+- [x] Nested modal support
+- [x] Confirmation dialog variant
 
 ---
 
