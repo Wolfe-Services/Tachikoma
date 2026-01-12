@@ -13,14 +13,14 @@ Define the standard format and lookup mechanism for README.md files within the s
 
 ## Acceptance Criteria
 
-- [ ] README format is standardized across all phases
-- [ ] Spec listings include ID, title, status, and progress
-- [ ] Progress indicators show completion percentage
-- [ ] Quick navigation links work correctly
-- [ ] README lookup is fast and cacheable
-- [ ] READMEs support embedded metadata
-- [ ] Cross-references to other phases work
-- [ ] README validation detects format issues
+- [x] README format is standardized across all phases
+- [x] Spec listings include ID, title, status, and progress
+- [x] Progress indicators show completion percentage
+- [x] Quick navigation links work correctly
+- [x] README lookup is fast and cacheable
+- [x] READMEs support embedded metadata
+- [x] Cross-references to other phases work
+- [x] README validation detects format issues
 
 ## Implementation Details
 
