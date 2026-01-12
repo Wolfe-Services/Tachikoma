@@ -506,10 +506,12 @@ mod tests {
     fn test_match_highlighting() {
         // Test basic highlighting
         let highlighted = highlight_match("fn main() {}", "main");
+        println!("Basic highlighting result: '{}'", highlighted);
         assert!(highlighted.contains("\x1b[1;31mmain\x1b[0m"));
         
         // Test case insensitive highlighting
         let highlighted = highlight_match("FN MAIN() {}", "main");
+        println!("Case insensitive result: '{}'", highlighted);
         assert!(highlighted.contains("\x1b[1;31mMAIN\x1b[0m"));
         
         // Test regex pattern
