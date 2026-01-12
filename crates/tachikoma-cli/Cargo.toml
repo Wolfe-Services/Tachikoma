@@ -38,6 +38,10 @@ is-terminal = "0.4"
 regex = "1.10"
 crossterm = "0.27"
 rpassword = "7.3"
+toml = "0.8"
+walkdir = "2.4"
+dirs = "5.0"
+reqwest = { workspace = true }
 
 [dev-dependencies]
 assert_cmd = "2.0"
