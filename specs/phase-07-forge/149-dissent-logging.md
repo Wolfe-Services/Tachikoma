@@ -16,12 +16,12 @@ Implement a dissent logging system that preserves minority opinions, rejected su
 
 ## Acceptance Criteria
 
-- [ ] Dissent record data structure
-- [ ] Automatic capture of minority opinions
-- [ ] Rejected suggestion tracking
-- [ ] Unresolved concern preservation
-- [ ] Dissent severity classification
-- [ ] Export with rationale
+- [x] Dissent record data structure
+- [x] Automatic capture of minority opinions
+- [x] Rejected suggestion tracking
+- [x] Unresolved concern preservation
+- [x] Dissent severity classification
+- [x] Export with rationale
 
 ---
 
