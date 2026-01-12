@@ -27,7 +27,7 @@ impl OutputFormat {
 
 /// Template rendering context
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RenderContext {
+pub struct TemplateContext {
     /// Spec metadata
     #[serde(flatten)]
     pub spec: SpecContext,
