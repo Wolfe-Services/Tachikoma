@@ -16,14 +16,14 @@ Implement the prompt.md loading system for the Ralph Loop - reading, validating,
 
 ## Acceptance Criteria
 
-- [ ] Load prompt.md from configured path
-- [ ] Parse YAML frontmatter metadata
-- [ ] Support for include directives
-- [ ] File watching for prompt changes
-- [ ] Prompt validation
-- [ ] Caching with invalidation
-- [ ] Support for multiple prompt files
-- [ ] Error handling with helpful messages
+- [x] Load prompt.md from configured path
+- [x] Parse YAML frontmatter metadata
+- [x] Support for include directives
+- [x] File watching for prompt changes
+- [x] Prompt validation
+- [x] Caching with invalidation
+- [x] Support for multiple prompt files
+- [x] Error handling with helpful messages
 
 ---
 
