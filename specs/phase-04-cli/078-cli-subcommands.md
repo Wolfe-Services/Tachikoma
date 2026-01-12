@@ -13,13 +13,13 @@ Define the hierarchical subcommand structure for Tachikoma CLI, organizing comma
 
 ## Acceptance Criteria
 
-- [ ] Top-level command groups defined
-- [ ] Nested subcommand support
-- [ ] Command trait for consistent execution
-- [ ] Shared context passed to all commands
-- [ ] Command aliases supported
-- [ ] Hidden commands for internal use
-- [ ] Command groups with common behavior
+- [x] Top-level command groups defined
+- [x] Nested subcommand support
+- [x] Command trait for consistent execution
+- [x] Shared context passed to all commands
+- [x] Command aliases supported
+- [x] Hidden commands for internal use
+- [x] Command groups with common behavior
 
 ## Implementation Details
 
