@@ -160,8 +160,25 @@ impl Cli {
             Command::Doctor(cmd) => cmd.execute(&ctx).await,
             Command::Tools(cmd) => cmd.execute(&ctx).await,
             Command::Backends(cmd) => cmd.execute(&ctx).await,
-            Command::Completions(cmd) => cmd.execute(&ctx),
+            Command::Completions(cmd) => {
+                cmd.execute(&ctx)?;
+                Ok(())
+            },
         }
+    }
+}
+
+impl CompletionsCommand {
+    /// Execute the completions command
+    pub fn execute(&self, _ctx: &CommandContext) -> Result<(), CliError> {
+        use clap::CommandFactory;
+        use clap_complete::generate;
+        use std::io;
+
+        let mut cmd = Cli::command();
+        let name = cmd.get_name().to_string();
+        generate(self.shell, &mut cmd, name, &mut io::stdout());
+        Ok(())
     }
 }
 
