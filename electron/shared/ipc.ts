@@ -34,6 +34,44 @@ export interface IpcChannels {
     request: { key: string; value: unknown };
     response: { success: boolean };
   };
+
+  // Updater operations
+  'updater:check': {
+    request: { silent?: boolean };
+    response: { success: boolean };
+  };
+  'updater:download': {
+    request: {};
+    response: { success: boolean };
+  };
+  'updater:install': {
+    request: {};
+    response: { success: boolean };
+  };
+  'updater:getState': {
+    request: {};
+    response: UpdateState;
+  };
+  'updater:setChannel': {
+    request: { channel: 'stable' | 'beta' | 'alpha' };
+    response: { success: boolean };
+  };
+  'updater:clearSkipped': {
+    request: {};
+    response: { success: boolean };
+  };
+  'updater:getHistory': {
+    request: {};
+    response: UpdateHistoryEntry[];
+  };
+  'updater:startAutoCheck': {
+    request: {};
+    response: { success: boolean };
+  };
+  'updater:stopAutoCheck': {
+    request: {};
+    response: { success: boolean };
+  };
 }
 
 // Event channels (main -> renderer)
