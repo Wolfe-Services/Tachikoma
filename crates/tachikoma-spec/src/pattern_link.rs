@@ -209,6 +209,79 @@ impl PatternIndex {
         self.patterns.insert(pattern.id.clone(), pattern);
     }
 
+    /// Get pattern with inheritance chain
+    pub fn get_pattern_with_inheritance(&self, pattern_id: &str) -> Option<Vec<&PatternDefinition>> {
+        let mut chain = Vec::new();
+        let mut current_id = pattern_id;
+
+        // Follow inheritance chain up to 10 levels to prevent infinite loops
+        for _ in 0..10 {
+            if let Some(pattern) = self.patterns.get(current_id) {
+                chain.push(pattern);
+                
+                if let Some(parent_id) = &pattern.parent {
+                    current_id = parent_id;
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+
+        if chain.is_empty() {
+            None
+        } else {
+            Some(chain)
+        }
+    }
+
+    /// Get all specs that implement a pattern or its children
+    pub fn specs_for_pattern_tree(&self, pattern_id: &str) -> Vec<u32> {
+        let mut all_specs = HashSet::new();
+
+        // Add direct implementations
+        if let Some(specs) = self.pattern_to_specs.get(pattern_id) {
+            all_specs.extend(specs);
+        }
+
+        // Add implementations of child patterns
+        for child_pattern in self.get_child_patterns(pattern_id) {
+            if let Some(specs) = self.pattern_to_specs.get(&child_pattern) {
+                all_specs.extend(specs);
+            }
+        }
+
+        all_specs.into_iter().collect()
+    }
+
+    /// Get child patterns (patterns that inherit from this one)
+    pub fn get_child_patterns(&self, pattern_id: &str) -> Vec<String> {
+        self.patterns.values()
+            .filter(|p| p.parent.as_ref() == Some(&pattern_id.to_string()))
+            .map(|p| p.id.clone())
+            .collect()
+    }
+
+    /// Get pattern lineage (parent -> child chain)
+    pub fn get_pattern_lineage(&self, pattern_id: &str) -> Vec<String> {
+        let mut lineage = Vec::new();
+        let mut current_id = pattern_id;
+
+        // Walk up the inheritance chain
+        while let Some(pattern) = self.patterns.get(current_id) {
+            lineage.insert(0, pattern.id.clone()); // Insert at beginning for parent->child order
+            
+            if let Some(parent_id) = &pattern.parent {
+                current_id = parent_id;
+            } else {
+                break;
+            }
+        }
+
+        lineage
+    }
+
     /// Add pattern reference from a spec
     pub fn add_reference(&mut self, reference: PatternReference) {
         self.pattern_to_specs
