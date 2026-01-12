@@ -27,16 +27,16 @@ Implement a comprehensive menu system for the Electron application including app
 
 ## Acceptance Criteria
 
-- [ ] Application menu follows platform conventions (macOS vs Windows/Linux)
-- [ ] All menu items have keyboard shortcuts
-- [ ] Context menus for common interactions
-- [ ] Dynamic menu updates based on app state
-- [ ] Menu item enable/disable based on context
-- [ ] Recent files menu integration
-- [ ] Edit menu with undo/redo support
-- [ ] View menu with zoom and fullscreen
-- [ ] Help menu with documentation links
-- [ ] Developer menu in development mode
+- [x] Application menu follows platform conventions (macOS vs Windows/Linux)
+- [x] All menu items have keyboard shortcuts
+- [x] Context menus for common interactions
+- [x] Dynamic menu updates based on app state
+- [x] Menu item enable/disable based on context
+- [x] Recent files menu integration
+- [x] Edit menu with undo/redo support
+- [x] View menu with zoom and fullscreen
+- [x] Help menu with documentation links
+- [x] Developer menu in development mode
 
 ---
 
