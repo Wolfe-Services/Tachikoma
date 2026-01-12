@@ -16,14 +16,14 @@ Implement loop state persistence for the Ralph Loop - saving and restoring loop 
 
 ## Acceptance Criteria
 
-- [ ] Serialize complete loop state
-- [ ] Persistent storage to disk
-- [ ] State versioning for compatibility
-- [ ] Atomic state updates
-- [ ] State recovery on startup
-- [ ] Corruption detection and recovery
-- [ ] State cleanup and rotation
-- [ ] Optional cloud backup
+- [x] Serialize complete loop state
+- [x] Persistent storage to disk
+- [x] State versioning for compatibility
+- [x] Atomic state updates
+- [x] State recovery on startup
+- [x] Corruption detection and recovery
+- [x] State cleanup and rotation
+- [x] Optional cloud backup
 
 ---
 
