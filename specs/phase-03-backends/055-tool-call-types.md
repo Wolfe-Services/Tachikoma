@@ -16,12 +16,12 @@ Define the types for tool call requests and responses. This includes the structu
 
 ## Acceptance Criteria
 
-- [ ] `ToolCall` struct for LLM tool invocations
-- [ ] `ToolResult` struct for tool execution results
-- [ ] Argument parsing and validation
-- [ ] Error handling for tool failures
-- [ ] Serialization to provider-specific formats
-- [ ] Streaming tool call accumulation
+- [x] `ToolCall` struct for LLM tool invocations
+- [x] `ToolResult` struct for tool execution results
+- [x] Argument parsing and validation
+- [x] Error handling for tool failures
+- [x] Serialization to provider-specific formats
+- [x] Streaming tool call accumulation
 
 ---
 
