@@ -198,7 +198,7 @@ vi.mock('path', async () => {
 // Global test utilities
 globalThis.createMockWindow = () => {
   const { BrowserWindow } = require('electron');
-  return new BrowserWindow();
+  return BrowserWindow();
 };
 
 globalThis.createMockEvent = () => ({
