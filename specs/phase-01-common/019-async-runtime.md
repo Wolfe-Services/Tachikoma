@@ -16,11 +16,11 @@ Configure the Tokio async runtime with proper settings for the Tachikoma applica
 
 ## Acceptance Criteria
 
-- [ ] Tokio runtime configuration
-- [ ] Runtime builder helpers
-- [ ] Task spawning utilities
-- [ ] Graceful shutdown support
-- [ ] Runtime metrics
+- [x] Tokio runtime configuration
+- [x] Runtime builder helpers
+- [x] Task spawning utilities
+- [x] Graceful shutdown support
+- [x] Runtime metrics
 
 ---
 
