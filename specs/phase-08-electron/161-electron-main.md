@@ -26,15 +26,15 @@ Implement the Electron main process as the core entry point for the desktop appl
 
 ## Acceptance Criteria
 
-- [ ] Main process initializes with proper security defaults
-- [ ] Single instance lock prevents multiple app instances
-- [ ] Environment-aware configuration (dev/prod)
-- [ ] Graceful error handling and logging
-- [ ] App ready lifecycle properly managed
-- [ ] Memory management and garbage collection hints
-- [ ] GPU process configuration for optimal rendering
-- [ ] Protocol registration for custom schemes
-- [ ] Session management for cookies and storage
+- [x] Main process initializes with proper security defaults
+- [x] Single instance lock prevents multiple app instances
+- [x] Environment-aware configuration (dev/prod)
+- [x] Graceful error handling and logging
+- [x] App ready lifecycle properly managed
+- [x] Memory management and garbage collection hints
+- [x] GPU process configuration for optimal rendering
+- [x] Protocol registration for custom schemes
+- [x] Session management for cookies and storage
 
 ---
 
