@@ -13,15 +13,15 @@ Implement the `tachikoma tools` command for managing MCP tools, including listin
 
 ## Acceptance Criteria
 
-- [ ] `tools list` - list installed and available tools
-- [ ] `tools show` - show tool details and schema
-- [ ] `tools install` - install from registry or path
-- [ ] `tools uninstall` - remove installed tools
-- [ ] `tools update` - update to latest versions
-- [ ] `tools search` - search tool registries
-- [ ] `tools validate` - validate tool configurations
-- [ ] `tools test` - test tool execution
-- [ ] `tools enable/disable` - toggle tool availability
+- [x] `tools list` - list installed and available tools
+- [x] `tools show` - show tool details and schema
+- [x] `tools install` - install from registry or path
+- [x] `tools uninstall` - remove installed tools
+- [x] `tools update` - update to latest versions
+- [x] `tools search` - search tool registries
+- [x] `tools validate` - validate tool configurations
+- [x] `tools test` - test tool execution
+- [x] `tools enable/disable` - toggle tool availability
 
 ## Implementation Details
 
