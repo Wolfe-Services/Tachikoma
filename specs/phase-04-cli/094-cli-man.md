@@ -13,14 +13,14 @@ Implement man page generation for the CLI, producing properly formatted manual p
 
 ## Acceptance Criteria
 
-- [ ] Generate man pages for main command
-- [ ] Generate man pages for all subcommands
-- [ ] Standard man page sections
-- [ ] Examples section
-- [ ] See Also cross-references
-- [ ] Output to file or stdout
-- [ ] Installation instructions
-- [ ] Proper roff formatting
+- [x] Generate man pages for main command
+- [x] Generate man pages for all subcommands
+- [x] Standard man page sections
+- [x] Examples section
+- [x] See Also cross-references
+- [x] Output to file or stdout
+- [x] Installation instructions
+- [x] Proper roff formatting
 
 ## Implementation Details
 
