@@ -1,0 +1,35 @@
+# Spanish translation
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "app.name"
+msgstr "Tachikoma"
+
+msgid "app.tagline"
+msgstr "Tu escuadrón de codificadores de IA incansables"
+
+msgid "mission.start"
+msgstr "Iniciando misión..."
+
+msgid "mission.complete"
+msgstr "¡Misión completa!"
+
+msgid "mission.error"
+msgstr "Misión fallida: {error}"
+
+msgid "status.running"
+msgstr "Ejecutándose"
+
+msgid "status.paused"
+msgstr "Pausado"
+
+msgid "status.idle"
+msgstr "Inactivo"
+
+msgid "multiline.test"
+msgstr "Esta es una línea\n"
+"Y esta es otra línea"
+
+msgid "escape.test"
+msgstr "Dice \"hola\" al mundo"

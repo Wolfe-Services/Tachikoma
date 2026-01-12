@@ -1,5 +1,7 @@
 //! Internationalization support for Tachikoma.
 
+pub mod loader;
+
 use std::collections::HashMap;
 use std::path::Path;
 use std::sync::RwLock;
@@ -349,3 +351,8 @@ mod tests {
         assert_eq!(I18n::translate("hello"), "hello"); // fallback to msgid
     }
 }
+
+// Re-exports for convenience
+pub use loader::{
+    default_catalog, load_catalog, CatalogFormat, LoaderConfig, LazyLoader, LoaderStats,
+};

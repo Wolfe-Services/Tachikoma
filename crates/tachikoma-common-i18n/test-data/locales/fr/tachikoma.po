@@ -1,0 +1,19 @@
+# French translation
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "app.name"
+msgstr "Tachikoma"
+
+msgid "app.tagline"
+msgstr "Votre escouade de codeurs IA infatigables"
+
+msgid "mission.start"
+msgstr "Démarrage de la mission..."
+
+msgid "mission.complete"
+msgstr "Mission terminée !"
+
+msgid "mission.error"
+msgstr "Mission échouée : {error}"

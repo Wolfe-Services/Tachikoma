@@ -16,11 +16,11 @@ Implement loading of message catalogs from .po/.mo files and embedded resources 
 
 ## Acceptance Criteria
 
-- [ ] Load .po files (human-readable)
-- [ ] Load .mo files (compiled binary)
-- [ ] Embed default messages in binary
-- [ ] Lazy loading of additional locales
-- [ ] Hot reload in development
+- [x] Load .po files (human-readable)
+- [x] Load .mo files (compiled binary)
+- [x] Embed default messages in binary
+- [x] Lazy loading of additional locales
+- [x] Hot reload in development
 
 ---
 
