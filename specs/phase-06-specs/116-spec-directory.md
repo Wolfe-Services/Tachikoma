@@ -13,14 +13,14 @@ Define the canonical directory structure for the Tachikoma spec system (THE PIN 
 
 ## Acceptance Criteria
 
-- [ ] Spec directory structure is well-defined and discoverable
-- [ ] Phase-based organization supports logical grouping
-- [ ] Templates directory contains all spec templates
-- [ ] Generated artifacts have dedicated output locations
-- [ ] Index files enable fast spec lookup
-- [ ] Nested project specs are properly isolated
-- [ ] Symlinks and includes are handled correctly
-- [ ] Directory watching detects structure changes
+- [x] Spec directory structure is well-defined and discoverable
+- [x] Phase-based organization supports logical grouping
+- [x] Templates directory contains all spec templates
+- [x] Generated artifacts have dedicated output locations
+- [x] Index files enable fast spec lookup
+- [x] Nested project specs are properly isolated
+- [x] Symlinks and includes are handled correctly
+- [x] Directory watching detects structure changes
 
 ## Implementation Details
 
