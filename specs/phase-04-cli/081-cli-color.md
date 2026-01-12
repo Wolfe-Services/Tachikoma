@@ -13,14 +13,14 @@ Implement ANSI color and styling support for terminal output, with automatic det
 
 ## Acceptance Criteria
 
-- [ ] `--color` flag with auto/always/never modes
-- [ ] Terminal capability detection
-- [ ] Semantic color palette (success, error, warning, info)
-- [ ] Style support (bold, dim, italic, underline)
-- [ ] NO_COLOR environment variable support
-- [ ] 256-color and truecolor detection
-- [ ] Theme customization support
-- [ ] Color stripping for non-TTY output
+- [x] `--color` flag with auto/always/never modes
+- [x] Terminal capability detection
+- [x] Semantic color palette (success, error, warning, info)
+- [x] Style support (bold, dim, italic, underline)
+- [x] NO_COLOR environment variable support
+- [x] 256-color and truecolor detection
+- [x] Theme customization support
+- [x] Color stripping for non-TTY output
 
 ## Implementation Details
 
