@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- App Sandbox required for MAS -->
+    <key>com.apple.security.app-sandbox</key>
+    <true/>
+
+    <!-- App Groups for shared data -->
+    <key>com.apple.security.application-groups</key>
+    <array>
+        <string>$(TeamIdentifierPrefix)io.tachikoma.app</string>
+    </array>
+
+    <!-- Network -->
+    <key>com.apple.security.network.client</key>
+    <true/>
+
+    <!-- Files -->
+    <key>com.apple.security.files.user-selected.read-write</key>
+    <true/>
+    <key>com.apple.security.files.bookmarks.app-scope</key>
+    <true/>
+
+    <!-- Temporary exceptions for Electron -->
+    <key>com.apple.security.temporary-exception.mach-lookup.global-name</key>
+    <array>
+        <string>com.apple.accessibility.AXSpeechManager</string>
+    </array>
+
+    <!-- Audio input for MAS -->
+    <key>com.apple.security.device.audio-input</key>
+    <true/>
+</dict>
+</plist>
