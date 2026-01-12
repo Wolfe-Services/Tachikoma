@@ -16,13 +16,13 @@ Create a backend selector component that allows users to choose which AI backend
 
 ## Acceptance Criteria
 
-- [ ] List of configured backends with status indicators
-- [ ] Backend capability badges (context size, features)
-- [ ] Real-time availability checking
-- [ ] Pricing/cost estimation display
-- [ ] Default backend selection
-- [ ] Backend configuration link
-- [ ] Keyboard accessible selection
+- [x] List of configured backends with status indicators
+- [x] Backend capability badges (context size, features)
+- [x] Real-time availability checking
+- [x] Pricing/cost estimation display
+- [x] Default backend selection
+- [x] Backend configuration link
+- [x] Keyboard accessible selection
 
 ---
 
