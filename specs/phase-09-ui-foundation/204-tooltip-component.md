@@ -26,15 +26,15 @@ Implement a Tooltip component for Tachikoma with smart positioning, delay contro
 
 ## Acceptance Criteria
 
-- [ ] Multiple placement options (top, bottom, left, right + variations)
-- [ ] Smart auto-positioning to stay in viewport
-- [ ] Configurable show/hide delays
-- [ ] Support for text and rich content
-- [ ] Arrow pointer
-- [ ] Keyboard accessible (show on focus)
-- [ ] ARIA tooltip pattern compliance
-- [ ] Optional Tachikoma glow effect
-- [ ] Portal-based rendering
+- [x] Multiple placement options (top, bottom, left, right + variations)
+- [x] Smart auto-positioning to stay in viewport
+- [x] Configurable show/hide delays
+- [x] Support for text and rich content
+- [x] Arrow pointer
+- [x] Keyboard accessible (show on focus)
+- [x] ARIA tooltip pattern compliance
+- [x] Optional Tachikoma glow effect
+- [x] Portal-based rendering
 
 ---
 
