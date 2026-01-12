@@ -16,11 +16,11 @@ Implement function calling support for the Google Gemini backend, including func
 
 ## Acceptance Criteria
 
-- [ ] Convert `ToolDefinition` to Gemini function format
-- [ ] Parse functionCall parts from responses
-- [ ] Format function responses for continuation
-- [ ] Support function calling modes
-- [ ] Handle multiple function calls
+- [x] Convert `ToolDefinition` to Gemini function format
+- [x] Parse functionCall parts from responses
+- [x] Format function responses for continuation
+- [x] Support function calling modes
+- [x] Handle multiple function calls
 
 ---
 
