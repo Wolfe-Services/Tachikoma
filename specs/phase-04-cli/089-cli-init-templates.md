@@ -13,14 +13,14 @@ Implement a template system for project initialization that supports built-in te
 
 ## Acceptance Criteria
 
-- [ ] Built-in templates (basic, tools, workflow, chat, minimal)
-- [ ] Custom templates from Git repositories
-- [ ] Local template directories
-- [ ] Template variable substitution
-- [ ] Template manifest files
-- [ ] Template validation
-- [ ] Template caching
-- [ ] Template listing and search
+- [x] Built-in templates (basic, tools, workflow, chat, minimal)
+- [x] Custom templates from Git repositories
+- [x] Local template directories
+- [x] Template variable substitution
+- [x] Template manifest files
+- [x] Template validation
+- [x] Template caching
+- [x] Template listing and search
 
 ## Implementation Details
 
