@@ -2,7 +2,7 @@
 
 **Phase:** 1 - Core Common Crates
 **Spec ID:** 015
-**Status:** Planned
+**Status:** Complete
 **Dependencies:** 014-config-core-types
 **Estimated Context:** ~10% of Sonnet window
 
@@ -16,11 +16,11 @@ Implement YAML configuration file loading, parsing, and validation with support 
 
 ## Acceptance Criteria
 
-- [ ] Load config from `.tachikoma/config.yaml`
-- [ ] Merge with defaults for missing fields
-- [ ] Environment variable expansion (`${VAR}`)
-- [ ] Config validation
-- [ ] Error messages with line numbers
+- [x] Load config from `.tachikoma/config.yaml`
+- [x] Merge with defaults for missing fields
+- [x] Environment variable expansion (`${VAR}`)
+- [x] Config validation
+- [x] Error messages with line numbers
 
 ---
 

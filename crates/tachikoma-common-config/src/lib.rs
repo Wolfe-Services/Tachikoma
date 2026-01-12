@@ -4,8 +4,13 @@
 //! for `.tachikoma/config.yaml` files.
 
 pub mod types;
+pub mod loader;
+
+#[cfg(test)]
+mod integration_test;
 
 pub use types::*;
+pub use loader::*;
 
 #[cfg(test)]
 mod tests {

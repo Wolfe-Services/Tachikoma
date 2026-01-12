@@ -257,6 +257,7 @@ Execute specs in numerical order. Each phase must complete before the next.
 | 188 | [Layout System](phase-09-ui-foundation/188-layout-system.md) | layout, slot, nested, structure |
 | 189 | [Store Architecture](phase-09-ui-foundation/189-store-architecture.md) | store, state, writable, derived |
 | 190 | [IPC Store Bindings](phase-09-ui-foundation/190-ipc-store-bindings.md) | ipc, store, bind, sync |
+| 190b | [Glassmorphic Design System](phase-09-ui-foundation/190b-glassmorphic-design-system.md) | glass, blur, translucent, modern |
 | 191 | [Design Tokens](phase-09-ui-foundation/191-design-tokens.md) | token, design, css, variable |
 | 192 | [Typography System](phase-09-ui-foundation/192-typography.md) | font, typography, text, heading |
 | 193 | [Color System](phase-09-ui-foundation/193-color-system.md) | color, palette, theme, tachikoma |
