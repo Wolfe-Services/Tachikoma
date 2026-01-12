@@ -16,11 +16,11 @@ Implement token counting and estimation for all backends to support context trac
 
 ## Acceptance Criteria
 
-- [ ] Token counting interface
-- [ ] Provider-specific tokenizers
-- [ ] Message token estimation
-- [ ] Cost calculation
-- [ ] Token budget management
+- [x] Token counting interface
+- [x] Provider-specific tokenizers
+- [x] Message token estimation
+- [x] Cost calculation
+- [x] Token budget management
 
 ---
 
