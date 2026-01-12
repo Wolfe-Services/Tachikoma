@@ -16,12 +16,12 @@ Implement session resumption functionality that allows interrupted or paused For
 
 ## Acceptance Criteria
 
-- [ ] Resume from any saved state
-- [ ] Context reconstruction for models
-- [ ] Round continuity validation
-- [ ] Participant re-initialization
-- [ ] Progress preservation
-- [ ] Resume from specific round
+- [x] Resume from any saved state
+- [x] Context reconstruction for models
+- [x] Round continuity validation
+- [x] Participant re-initialization
+- [x] Progress preservation
+- [x] Resume from specific round
 
 ---
 
