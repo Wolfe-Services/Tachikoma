@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use handlebars::{Handlebars, Helper, HelperResult, Context, RenderContext as HbRenderContext, Output, Renderable};
+use handlebars::{Handlebars, Helper, HelperResult, Context, RenderContext as HbRenderContext, Output, Renderable, Template};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tokio::fs;
@@ -531,7 +531,7 @@ fn truncate_helper(
     h: &Helper,
     _: &Handlebars,
     _: &Context,
-    _: &mut RenderContext,
+    _: &mut HbRenderContext,
     out: &mut dyn Output,
 ) -> HelperResult {
     let text = h.param(0)
@@ -555,7 +555,7 @@ fn slug_helper(
     h: &Helper,
     _: &Handlebars,
     _: &Context,
-    _: &mut RenderContext,
+    _: &mut HbRenderContext,
     out: &mut dyn Output,
 ) -> HelperResult {
     let text = h.param(0)
