@@ -1,130 +1,162 @@
-/**
- * Theme Management System
- * Provides theme switching capabilities and persistence
- */
-
-import { browser } from '$app/environment';
 import { writable, derived } from 'svelte/store';
+import { browser } from '$app/environment';
+import { createPersistedStore } from './persistedStore';
 
-export type Theme = 'light' | 'dark' | 'system';
-export type ResolvedTheme = 'light' | 'dark';
+export type Theme = 'dark' | 'light' | 'system';
+export type ResolvedTheme = 'dark' | 'light';
+export type AccessibilityMode = 'default' | 'colorblind' | 'high-contrast';
 
-// Store the user's theme preference
-export const theme = writable<Theme>('system');
+interface ThemeState {
+  theme: Theme;
+  resolved: ResolvedTheme;
+  accessibilityMode: AccessibilityMode;
+}
 
-// Store the resolved theme (handles 'system' preference)
-export const resolvedTheme = writable<ResolvedTheme>('dark');
+function getSystemTheme(): ResolvedTheme {
+  if (!browser) return 'dark';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
 
-// Store system theme preference
-export const systemTheme = writable<ResolvedTheme>('dark');
+function resolveTheme(theme: Theme): ResolvedTheme {
+  if (theme === 'system') {
+    return getSystemTheme();
+  }
+  return theme;
+}
 
-// Derived store that determines if we're in dark mode
-export const isDarkMode = derived(
-  resolvedTheme,
-  ($resolvedTheme) => $resolvedTheme === 'dark'
-);
+function createThemeStore() {
+  const storedTheme = createPersistedStore<Theme>('dark', { key: 'theme' });
+  const storedAccessibility = createPersistedStore<AccessibilityMode>('default', { 
+    key: 'accessibility-mode' 
+  });
+  
+  let currentTheme: Theme = 'dark';
+  let currentAccessibility: AccessibilityMode = 'default';
 
-/**
- * Initialize theme system
- */
-export function initializeTheme(): void {
-  if (!browser) return;
+  storedTheme.subscribe(t => { currentTheme = t; });
+  storedAccessibility.subscribe(a => { currentAccessibility = a; });
 
-  // Get system preference
-  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-  systemTheme.set(mediaQuery.matches ? 'dark' : 'light');
-
-  // Listen for system theme changes
-  mediaQuery.addEventListener('change', (e) => {
-    systemTheme.set(e.matches ? 'dark' : 'light');
-    updateResolvedTheme();
+  const state = writable<ThemeState>({
+    theme: currentTheme,
+    resolved: resolveTheme(currentTheme),
+    accessibilityMode: currentAccessibility
   });
 
-  // Load saved theme or use system
-  const savedTheme = localStorage.getItem('tachikoma-theme') as Theme;
-  if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
-    theme.set(savedTheme);
+  // Sync persisted stores with state
+  storedTheme.subscribe(theme => {
+    state.update(s => ({
+      ...s,
+      theme,
+      resolved: resolveTheme(theme)
+    }));
+  });
+
+  storedAccessibility.subscribe(accessibilityMode => {
+    state.update(s => ({
+      ...s,
+      accessibilityMode
+    }));
+  });
+
+  // Watch for system theme changes
+  if (browser) {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.addEventListener('change', () => {
+      state.update(s => {
+        if (s.theme === 'system') {
+          return { ...s, resolved: getSystemTheme() };
+        }
+        return s;
+      });
+    });
+
+    // Watch for system accessibility preferences
+    const highContrastQuery = window.matchMedia('(prefers-contrast: high)');
+    highContrastQuery.addEventListener('change', (e) => {
+      if (e.matches && currentAccessibility === 'default') {
+        setAccessibilityMode('high-contrast');
+      }
+    });
+
+    // Apply initial high contrast if system prefers it
+    if (highContrastQuery.matches && currentAccessibility === 'default') {
+      setAccessibilityMode('high-contrast');
+    }
   }
 
-  // Subscribe to theme changes
-  theme.subscribe(($theme) => {
-    if (browser) {
-      localStorage.setItem('tachikoma-theme', $theme);
-      updateResolvedTheme();
-    }
-  });
+  // Apply theme and accessibility to document
+  if (browser) {
+    state.subscribe(({ resolved, accessibilityMode }) => {
+      document.documentElement.setAttribute('data-theme', resolved);
+      document.documentElement.setAttribute('data-accessibility', accessibilityMode);
+    });
+  }
 
-  // Initial resolution
-  updateResolvedTheme();
-}
+  function setAccessibilityMode(mode: AccessibilityMode) {
+    storedAccessibility.set(mode);
+  }
 
-/**
- * Update resolved theme based on current theme and system preference
- */
-function updateResolvedTheme(): void {
-  if (!browser) return;
-
-  let currentTheme: Theme;
-  theme.subscribe(($theme) => {
-    currentTheme = $theme;
-  })();
-
-  let currentSystemTheme: ResolvedTheme;
-  systemTheme.subscribe(($systemTheme) => {
-    currentSystemTheme = $systemTheme;
-  })();
-
-  const resolved = currentTheme === 'system' ? currentSystemTheme : currentTheme as ResolvedTheme;
-  resolvedTheme.set(resolved);
-
-  // Apply theme to document
-  document.documentElement.setAttribute('data-theme', resolved);
-}
-
-/**
- * Set theme preference
- */
-export function setTheme(newTheme: Theme): void {
-  theme.set(newTheme);
-}
-
-/**
- * Toggle between light and dark themes
- */
-export function toggleTheme(): void {
-  theme.update(($theme) => {
-    if ($theme === 'light') return 'dark';
-    if ($theme === 'dark') return 'light';
-    // If system, toggle to opposite of current system preference
-    let currentSystemTheme: ResolvedTheme;
-    systemTheme.subscribe(($systemTheme) => {
-      currentSystemTheme = $systemTheme;
-    })();
-    return currentSystemTheme === 'dark' ? 'light' : 'dark';
-  });
-}
-
-/**
- * Get current theme values for use in components
- */
-export function getThemeValues() {
-  if (!browser) return {};
-
-  const computedStyle = getComputedStyle(document.documentElement);
-  
   return {
-    // Colors
-    primary: computedStyle.getPropertyValue('--color-primary').trim(),
-    bgBase: computedStyle.getPropertyValue('--color-bg-base').trim(),
-    bgSurface: computedStyle.getPropertyValue('--color-bg-surface').trim(),
-    textPrimary: computedStyle.getPropertyValue('--color-text-primary').trim(),
-    textSecondary: computedStyle.getPropertyValue('--color-text-secondary').trim(),
-    border: computedStyle.getPropertyValue('--color-border').trim(),
-    
-    // Status colors
-    success: computedStyle.getPropertyValue('--color-success').trim(),
-    warning: computedStyle.getPropertyValue('--color-warning').trim(),
-    error: computedStyle.getPropertyValue('--color-error').trim(),
-    info: computedStyle.getPropertyValue('--color-info').trim(),
+    subscribe: state.subscribe,
+
+    setTheme: (theme: Theme) => {
+      storedTheme.set(theme);
+    },
+
+    setAccessibilityMode,
+
+    toggle: () => {
+      state.update(s => {
+        const newTheme: Theme = s.resolved === 'dark' ? 'light' : 'dark';
+        storedTheme.set(newTheme);
+        return {
+          ...s,
+          theme: newTheme,
+          resolved: newTheme
+        };
+      });
+    },
+
+    // Get computed theme colors
+    getColors: () => {
+      if (!browser) return {};
+      
+      const style = getComputedStyle(document.documentElement);
+      return {
+        // Brand
+        primary: style.getPropertyValue('--color-accent-fg').trim(),
+        primaryHover: style.getPropertyValue('--color-accent-emphasis').trim(),
+        
+        // Backgrounds
+        bgBase: style.getPropertyValue('--color-bg-base').trim(),
+        bgSurface: style.getPropertyValue('--color-bg-surface').trim(),
+        bgElevated: style.getPropertyValue('--color-bg-elevated').trim(),
+        bgHover: style.getPropertyValue('--color-bg-hover').trim(),
+        
+        // Text
+        textDefault: style.getPropertyValue('--color-fg-default').trim(),
+        textMuted: style.getPropertyValue('--color-fg-muted').trim(),
+        textSubtle: style.getPropertyValue('--color-fg-subtle').trim(),
+        
+        // Borders
+        border: style.getPropertyValue('--color-border-default').trim(),
+        borderSubtle: style.getPropertyValue('--color-border-subtle').trim(),
+        
+        // Status
+        success: style.getPropertyValue('--color-success-fg').trim(),
+        warning: style.getPropertyValue('--color-warning-fg').trim(),
+        error: style.getPropertyValue('--color-error-fg').trim(),
+        info: style.getPropertyValue('--color-info-fg').trim(),
+      };
+    }
   };
 }
+
+export const themeStore = createThemeStore();
+export const currentTheme = derived(themeStore, $theme => $theme.theme);
+export const resolvedTheme = derived(themeStore, $theme => $theme.resolved);
+export const isDarkMode = derived(themeStore, $theme => $theme.resolved === 'dark');
+export const accessibilityMode = derived(themeStore, $theme => $theme.accessibilityMode);
+
+// Convenience functions
+export const { setTheme, toggle: toggleTheme, setAccessibilityMode, getColors } = themeStore;

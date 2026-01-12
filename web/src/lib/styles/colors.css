@@ -1,0 +1,282 @@
+/**
+ * Tachikoma Color System
+ *
+ * A comprehensive color palette with semantic mappings
+ * and accessibility-compliant contrast ratios.
+ */
+
+:root {
+  /* ============================================
+   * TACHIKOMA BLUE - PRIMARY BRAND COLOR
+   * Base: #00d4ff (HSL: 190, 100%, 50%)
+   * ============================================ */
+
+  --tachikoma-50: #e6faff;
+  --tachikoma-100: #b3f0ff;
+  --tachikoma-200: #80e6ff;
+  --tachikoma-300: #4ddbff;
+  --tachikoma-400: #1ad1ff;
+  --tachikoma-500: #00d4ff;  /* Primary */
+  --tachikoma-600: #00a8cc;
+  --tachikoma-700: #007d99;
+  --tachikoma-800: #005266;
+  --tachikoma-900: #002633;
+  --tachikoma-950: #001a22;
+
+  /* Glow effects */
+  --tachikoma-glow: rgba(0, 212, 255, 0.5);
+  --tachikoma-glow-subtle: rgba(0, 212, 255, 0.2);
+
+  /* ============================================
+   * SEMANTIC COLOR PALETTES
+   * ============================================ */
+
+  /* Success - Green */
+  --success-50: #f0fdf4;
+  --success-100: #dcfce7;
+  --success-200: #bbf7d0;
+  --success-300: #86efac;
+  --success-400: #4ade80;
+  --success-500: #22c55e;
+  --success-600: #16a34a;
+  --success-700: #15803d;
+  --success-800: #166534;
+  --success-900: #14532d;
+
+  /* Warning - Amber */
+  --warning-50: #fffbeb;
+  --warning-100: #fef3c7;
+  --warning-200: #fde68a;
+  --warning-300: #fcd34d;
+  --warning-400: #fbbf24;
+  --warning-500: #f59e0b;
+  --warning-600: #d97706;
+  --warning-700: #b45309;
+  --warning-800: #92400e;
+  --warning-900: #78350f;
+
+  /* Error - Red */
+  --error-50: #fef2f2;
+  --error-100: #fee2e2;
+  --error-200: #fecaca;
+  --error-300: #fca5a5;
+  --error-400: #f87171;
+  --error-500: #ef4444;
+  --error-600: #dc2626;
+  --error-700: #b91c1c;
+  --error-800: #991b1b;
+  --error-900: #7f1d1d;
+
+  /* Info - Blue (distinct from Tachikoma blue) */
+  --info-50: #eff6ff;
+  --info-100: #dbeafe;
+  --info-200: #bfdbfe;
+  --info-300: #93c5fd;
+  --info-400: #60a5fa;
+  --info-500: #3b82f6;
+  --info-600: #2563eb;
+  --info-700: #1d4ed8;
+  --info-800: #1e40af;
+  --info-900: #1e3a8a;
+
+  /* Purple - For special highlights */
+  --purple-50: #faf5ff;
+  --purple-100: #f3e8ff;
+  --purple-200: #e9d5ff;
+  --purple-300: #d8b4fe;
+  --purple-400: #c084fc;
+  --purple-500: #a855f7;
+  --purple-600: #9333ea;
+  --purple-700: #7e22ce;
+  --purple-800: #6b21a8;
+  --purple-900: #581c87;
+}
+
+/* ============================================
+ * DARK THEME - Default for Tachikoma
+ * ============================================ */
+
+[data-theme="dark"],
+:root {
+  /* Background Layers (darkest to lightest) */
+  --color-bg-canvas: #010409;       /* Deepest background */
+  --color-bg-base: #0a0e14;         /* Main app background */
+  --color-bg-surface: #0d1117;      /* Cards, panels */
+  --color-bg-elevated: #161b22;     /* Elevated surfaces */
+  --color-bg-overlay: #1c2128;      /* Overlays, dropdowns */
+  --color-bg-muted: #21262d;        /* Muted backgrounds */
+  --color-bg-subtle: #30363d;       /* Subtle backgrounds */
+
+  /* Interactive Backgrounds */
+  --color-bg-hover: rgba(255, 255, 255, 0.04);
+  --color-bg-active: rgba(255, 255, 255, 0.06);
+  --color-bg-selected: rgba(0, 212, 255, 0.12);
+  --color-bg-selected-hover: rgba(0, 212, 255, 0.18);
+
+  /* Text Colors */
+  --color-fg-default: #e6edf3;      /* Primary text */
+  --color-fg-muted: #8b949e;        /* Secondary text */
+  --color-fg-subtle: #6e7681;       /* Tertiary text */
+  --color-fg-disabled: #484f58;     /* Disabled text */
+  --color-fg-onEmphasis: #ffffff;   /* Text on emphasis bg */
+
+  /* Border Colors */
+  --color-border-default: #30363d;
+  --color-border-muted: #21262d;
+  --color-border-subtle: #161b22;
+  --color-border-emphasis: var(--tachikoma-500);
+
+  /* Accent/Brand */
+  --color-accent-fg: var(--tachikoma-500);
+  --color-accent-emphasis: var(--tachikoma-600);
+  --color-accent-muted: rgba(0, 212, 255, 0.3);
+  --color-accent-subtle: rgba(0, 212, 255, 0.1);
+
+  /* Status Colors */
+  --color-success-fg: var(--success-500);
+  --color-success-emphasis: var(--success-600);
+  --color-success-muted: rgba(34, 197, 94, 0.3);
+  --color-success-subtle: rgba(34, 197, 94, 0.1);
+
+  --color-warning-fg: var(--warning-500);
+  --color-warning-emphasis: var(--warning-600);
+  --color-warning-muted: rgba(245, 158, 11, 0.3);
+  --color-warning-subtle: rgba(245, 158, 11, 0.1);
+
+  --color-error-fg: var(--error-500);
+  --color-error-emphasis: var(--error-600);
+  --color-error-muted: rgba(239, 68, 68, 0.3);
+  --color-error-subtle: rgba(239, 68, 68, 0.1);
+
+  --color-info-fg: var(--info-500);
+  --color-info-emphasis: var(--info-600);
+  --color-info-muted: rgba(59, 130, 246, 0.3);
+  --color-info-subtle: rgba(59, 130, 246, 0.1);
+
+  /* Syntax Highlighting */
+  --color-syntax-keyword: #ff7b72;
+  --color-syntax-string: #a5d6ff;
+  --color-syntax-number: #79c0ff;
+  --color-syntax-function: #d2a8ff;
+  --color-syntax-comment: #8b949e;
+  --color-syntax-operator: #ff7b72;
+  --color-syntax-variable: #ffa657;
+  --color-syntax-constant: #79c0ff;
+  --color-syntax-class: #7ee787;
+
+  /* Security/Severity Colors */
+  --color-severity-critical: #ff4757;
+  --color-severity-high: #ff6b6b;
+  --color-severity-medium: #ffa502;
+  --color-severity-low: #2ed573;
+  --color-severity-info: var(--tachikoma-500);
+}
+
+/* ============================================
+ * LIGHT THEME
+ * ============================================ */
+
+[data-theme="light"] {
+  /* Background Layers */
+  --color-bg-canvas: #f6f8fa;
+  --color-bg-base: #ffffff;
+  --color-bg-surface: #ffffff;
+  --color-bg-elevated: #ffffff;
+  --color-bg-overlay: #ffffff;
+  --color-bg-muted: #f6f8fa;
+  --color-bg-subtle: #eaeef2;
+
+  /* Interactive Backgrounds */
+  --color-bg-hover: rgba(0, 0, 0, 0.03);
+  --color-bg-active: rgba(0, 0, 0, 0.05);
+  --color-bg-selected: rgba(0, 168, 204, 0.08);
+  --color-bg-selected-hover: rgba(0, 168, 204, 0.12);
+
+  /* Text Colors */
+  --color-fg-default: #1f2328;
+  --color-fg-muted: #57606a;
+  --color-fg-subtle: #6e7781;
+  --color-fg-disabled: #8c959f;
+  --color-fg-onEmphasis: #ffffff;
+
+  /* Border Colors */
+  --color-border-default: #d0d7de;
+  --color-border-muted: #d8dee4;
+  --color-border-subtle: #eaeef2;
+  --color-border-emphasis: var(--tachikoma-600);
+
+  /* Accent/Brand (darker for light theme) */
+  --color-accent-fg: var(--tachikoma-700);
+  --color-accent-emphasis: var(--tachikoma-600);
+  --color-accent-muted: rgba(0, 168, 204, 0.3);
+  --color-accent-subtle: rgba(0, 168, 204, 0.08);
+
+  /* Status Colors (darker variants) */
+  --color-success-fg: var(--success-600);
+  --color-success-emphasis: var(--success-500);
+  --color-success-muted: rgba(22, 163, 74, 0.2);
+  --color-success-subtle: rgba(22, 163, 74, 0.08);
+
+  --color-warning-fg: var(--warning-700);
+  --color-warning-emphasis: var(--warning-600);
+  --color-warning-muted: rgba(217, 119, 6, 0.2);
+  --color-warning-subtle: rgba(217, 119, 6, 0.08);
+
+  --color-error-fg: var(--error-600);
+  --color-error-emphasis: var(--error-500);
+  --color-error-muted: rgba(220, 38, 38, 0.2);
+  --color-error-subtle: rgba(220, 38, 38, 0.08);
+
+  --color-info-fg: var(--info-600);
+  --color-info-emphasis: var(--info-500);
+  --color-info-muted: rgba(37, 99, 235, 0.2);
+  --color-info-subtle: rgba(37, 99, 235, 0.08);
+
+  /* Syntax Highlighting (light theme) */
+  --color-syntax-keyword: #cf222e;
+  --color-syntax-string: #0a3069;
+  --color-syntax-number: #0550ae;
+  --color-syntax-function: #8250df;
+  --color-syntax-comment: #6e7781;
+  --color-syntax-operator: #cf222e;
+  --color-syntax-variable: #953800;
+  --color-syntax-constant: #0550ae;
+  --color-syntax-class: #116329;
+
+  /* Security/Severity Colors */
+  --color-severity-critical: #dc2626;
+  --color-severity-high: #e53e3e;
+  --color-severity-medium: #d97706;
+  --color-severity-low: #16a34a;
+  --color-severity-info: var(--tachikoma-600);
+}
+
+/* ============================================
+ * COLOR BLINDNESS ACCESSIBLE ALTERNATIVES
+ * Applied when prefers-contrast is high or specific accessibility mode
+ * ============================================ */
+
+@media (prefers-contrast: high) {
+  [data-theme="dark"] {
+    --color-success-fg: #4ade80;
+    --color-warning-fg: #fbbf24;
+    --color-error-fg: #f87171;
+    --color-info-fg: var(--tachikoma-400);
+  }
+
+  [data-theme="light"] {
+    --color-success-fg: #15803d;
+    --color-warning-fg: #b45309;
+    --color-error-fg: #b91c1c;
+    --color-info-fg: var(--tachikoma-800);
+  }
+}
+
+/* Color blind friendly mode - activated via data attribute */
+[data-accessibility="colorblind"] {
+  /* Use patterns and alternative color combinations */
+  --color-success-fg: #0066cc; /* Blue instead of green */
+  --color-warning-fg: #ff6600; /* Orange with more contrast */
+  --color-error-fg: #cc0000;   /* High contrast red */
+  --color-info-fg: #6600cc;    /* Purple instead of blue */
+}
