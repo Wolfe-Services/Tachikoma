@@ -16,11 +16,11 @@ Implement tool calling support for the Ollama backend, including tool definition
 
 ## Acceptance Criteria
 
-- [ ] Convert `ToolDefinition` to Ollama format
-- [ ] Parse tool_calls from responses
-- [ ] Format tool results for continuation
-- [ ] Streaming response handling
-- [ ] Fallback for models without tool support
+- [x] Convert `ToolDefinition` to Ollama format
+- [x] Parse tool_calls from responses
+- [x] Format tool results for continuation
+- [x] Streaming response handling
+- [x] Fallback for models without tool support
 
 ---
 
