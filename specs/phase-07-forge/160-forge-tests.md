@@ -16,13 +16,13 @@ Implement comprehensive integration tests for the Forge system, covering the com
 
 ## Acceptance Criteria
 
-- [ ] End-to-end session tests
-- [ ] Mock provider infrastructure
-- [ ] Round progression tests
-- [ ] Convergence scenario tests
-- [ ] Error handling tests
-- [ ] Performance benchmarks
-- [ ] CLI integration tests
+- [x] End-to-end session tests
+- [x] Mock provider infrastructure
+- [x] Round progression tests
+- [x] Convergence scenario tests
+- [x] Error handling tests
+- [x] Performance benchmarks
+- [x] CLI integration tests
 
 ---
 
