@@ -16,12 +16,12 @@ Configure the Rust workspace with Cargo.toml, shared dependencies, and initial c
 
 ## Acceptance Criteria
 
-- [ ] Root `Cargo.toml` defines workspace
-- [ ] Workspace members pattern configured
-- [ ] Shared dependencies in `[workspace.dependencies]`
-- [ ] Common Rust version and edition set
-- [ ] Profile configurations for dev/release
-- [ ] Clippy and rustfmt configurations
+- [x] Root `Cargo.toml` defines workspace
+- [x] Workspace members pattern configured
+- [x] Shared dependencies in `[workspace.dependencies]`
+- [x] Common Rust version and edition set
+- [x] Profile configurations for dev/release
+- [x] Clippy and rustfmt configurations
 
 ---
 
