@@ -16,14 +16,14 @@ Implement comprehensive metrics collection for the Ralph Loop - tracking executi
 
 ## Acceptance Criteria
 
-- [ ] Iteration metrics (duration, success rate)
-- [ ] Session metrics (context usage, reboots)
-- [ ] Test metrics (pass rate, failure trends)
-- [ ] Progress metrics (velocity, efficiency)
-- [ ] Resource metrics (memory, CPU hints)
-- [ ] Metric aggregation and rollups
-- [ ] Metric export (Prometheus format)
-- [ ] Real-time metric streaming
+- [x] Iteration metrics (duration, success rate)
+- [x] Session metrics (context usage, reboots)
+- [x] Test metrics (pass rate, failure trends)
+- [x] Progress metrics (velocity, efficiency)
+- [x] Resource metrics (memory, CPU hints)
+- [x] Metric aggregation and rollups
+- [x] Metric export (Prometheus format)
+- [x] Real-time metric streaming
 
 ---
 
