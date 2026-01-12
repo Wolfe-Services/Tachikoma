@@ -27,14 +27,14 @@ Create a robust binding layer between Svelte stores and Tauri IPC commands, enab
 
 ## Acceptance Criteria
 
-- [ ] Type-safe IPC invoke wrapper
-- [ ] Event subscription management
-- [ ] Automatic retry logic for failed calls
-- [ ] Request/response caching
-- [ ] Optimistic updates support
-- [ ] Error transformation and handling
-- [ ] Loading state management
-- [ ] Real-time event-to-store bindings
+- [x] Type-safe IPC invoke wrapper
+- [x] Event subscription management
+- [x] Automatic retry logic for failed calls
+- [x] Request/response caching
+- [x] Optimistic updates support
+- [x] Error transformation and handling
+- [x] Loading state management
+- [x] Real-time event-to-store bindings
 
 ---
 
