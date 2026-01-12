@@ -422,7 +422,7 @@ fn date_helper(
     h: &Helper,
     _: &Handlebars,
     _: &Context,
-    _: &mut RenderContext,
+    _: &mut HbRenderContext,
     out: &mut dyn Output,
 ) -> HelperResult {
     let format = h.param(0)
@@ -438,7 +438,7 @@ fn status_badge_helper(
     h: &Helper,
     _: &Handlebars,
     _: &Context,
-    _: &mut RenderContext,
+    _: &mut HbRenderContext,
     out: &mut dyn Output,
 ) -> HelperResult {
     let status = h.param(0)
@@ -461,7 +461,7 @@ fn pluralize_helper(
     h: &Helper,
     _: &Handlebars,
     _: &Context,
-    _: &mut RenderContext,
+    _: &mut HbRenderContext,
     out: &mut dyn Output,
 ) -> HelperResult {
     let count = h.param(0)
@@ -484,7 +484,7 @@ fn if_eq_helper(
     h: &Helper,
     hb: &Handlebars,
     ctx: &Context,
-    rc: &mut RenderContext,
+    rc: &mut HbRenderContext,
     out: &mut dyn Output,
 ) -> HelperResult {
     let a = h.param(0).map(|v| v.value());
@@ -507,7 +507,7 @@ fn join_helper(
     h: &Helper,
     _: &Handlebars,
     _: &Context,
-    _: &mut RenderContext,
+    _: &mut HbRenderContext,
     out: &mut dyn Output,
 ) -> HelperResult {
     let array = h.param(0)
