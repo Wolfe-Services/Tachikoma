@@ -10,7 +10,7 @@ pub mod status;
 pub mod timestamp;
 pub mod types;
 
-pub use error::Error;
+pub use error::{Error, ErrorCategory, ErrorCode, ErrorResponse, Result};
 pub use id::*;
 pub use status::*;
 pub use timestamp::*;
