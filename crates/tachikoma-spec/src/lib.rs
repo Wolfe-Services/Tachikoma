@@ -13,6 +13,7 @@ pub mod pattern_link;
 pub mod progress;
 pub mod readme;
 pub mod templates;
+pub mod validation;
 pub mod watcher;
 
 pub use checkbox::*;
@@ -25,4 +26,5 @@ pub use pattern_link::*;
 pub use progress::*;
 pub use readme::*;
 pub use templates::*;
+pub use validation::*;
 pub use watcher::*;
