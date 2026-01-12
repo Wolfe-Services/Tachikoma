@@ -16,14 +16,14 @@ Create a rich prompt editor component with syntax highlighting, variable interpo
 
 ## Acceptance Criteria
 
-- [ ] Textarea with auto-resize functionality
-- [ ] Syntax highlighting for code blocks
-- [ ] Variable interpolation with `{{variable}}` syntax
-- [ ] Snippet insertion via slash commands
-- [ ] Character count and token estimation
-- [ ] Markdown preview toggle
-- [ ] Undo/redo support
-- [ ] Keyboard shortcuts for formatting
+- [x] Textarea with auto-resize functionality
+- [x] Syntax highlighting for code blocks
+- [x] Variable interpolation with `{{variable}}` syntax
+- [x] Snippet insertion via slash commands
+- [x] Character count and token estimation
+- [x] Markdown preview toggle
+- [x] Undo/redo support
+- [x] Keyboard shortcuts for formatting
 
 ---
 
