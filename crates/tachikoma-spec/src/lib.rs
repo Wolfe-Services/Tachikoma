@@ -15,6 +15,7 @@ pub mod progress;
 pub mod readme;
 pub mod templates;
 pub mod validation;
+pub mod versioning;
 pub mod watcher;
 
 pub use checkbox::*;
