@@ -229,14 +229,14 @@ fn highlight_match(line: &str, pattern: &str) -> String {
     let match_color = "\x1b[1;31m"; // Bold red
     let reset = "\x1b[0m";
     
-    // Try the pattern as-is first (in case it's a valid regex)
+    // First try the pattern as a regex (case-sensitive)
     if let Ok(regex) = regex::Regex::new(pattern) {
         return regex.replace_all(line, &format!("{}{}{}", match_color, "$0", reset)).to_string();
     }
     
     // If pattern is not a valid regex, escape it and try case-insensitive literal matching
     let escaped = regex::escape(pattern);
-    if let Ok(regex) = regex::Regex::new(&format!("(?i){}", escaped)) {
+    if let Ok(regex) = regex::RegexBuilder::new(&escaped).case_insensitive(true).build() {
         return regex.replace_all(line, &format!("{}{}{}", match_color, "$0", reset)).to_string();
     }
     
