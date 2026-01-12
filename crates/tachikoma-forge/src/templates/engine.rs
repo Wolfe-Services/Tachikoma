@@ -653,4 +653,81 @@ mod tests {
 
         assert!(engine.validate_template(&valid_template).is_ok());
     }
+
+    #[tokio::test]
+    async fn test_load_custom_templates() {
+        use tempfile::TempDir;
+        use std::fs;
+
+        // Create a temporary directory with a custom template
+        let temp_dir = TempDir::new().unwrap();
+        let template_path = temp_dir.path().join("custom.yaml");
+
+        let template_yaml = r#"
+name: custom_test
+system: "You are testing {{feature}}"
+user: "Please test: {{test_case}}"
+required_vars: ["feature", "test_case"]
+optional_vars:
+  context: "default context"
+output_type: null
+role: null
+"#;
+
+        fs::write(&template_path, template_yaml).unwrap();
+
+        // Load the template
+        let mut engine = TemplateEngine::new();
+        let initial_count = engine.list_templates().len();
+        
+        let loaded = engine.load_templates_from_dir(temp_dir.path()).await.unwrap();
+        
+        assert_eq!(loaded, 1);
+        assert_eq!(engine.list_templates().len(), initial_count + 1);
+        assert!(engine.get("custom_test").is_some());
+
+        // Test rendering the custom template
+        let context = TemplateContext::new()
+            .set("feature", "template loading")
+            .set("test_case", "load from YAML");
+
+        let (system, user) = engine.render("custom_test", &context).unwrap();
+        assert!(system.contains("testing template loading"));
+        assert!(user.contains("load from YAML"));
+    }
+
+    #[test]
+    fn test_output_type_specific_templates() {
+        let mut engine = TemplateEngine::new();
+        
+        // Create a code-specific template
+        let code_template = Template {
+            name: "code_specific".to_string(),
+            system: "You are a code generator for {{language}}".to_string(),
+            user: "Generate {{output_type}} code: {{description}}".to_string(),
+            required_vars: vec!["language".to_string(), "description".to_string(), "output_type".to_string()],
+            optional_vars: HashMap::new(),
+            output_type: Some(OutputType::Code),
+            role: None,
+        };
+        
+        engine.register(code_template);
+        assert!(engine.get("code_specific").is_some());
+        assert_eq!(engine.get("code_specific").unwrap().output_type, Some(OutputType::Code));
+    }
+
+    #[test]
+    fn test_template_inheritance() {
+        let engine = TemplateEngine::new();
+        
+        // Test that fragments are properly included
+        let template_str = "Base content: {{#spec_instructions}} Additional info.";
+        let context = TemplateContext::new();
+        
+        let result = engine.render_string(template_str, &context, &HashMap::new()).unwrap();
+        
+        // Should include the spec instructions fragment
+        assert!(result.contains("Use clear section headers"));
+        assert!(result.contains("Additional info."));
+    }
 }
