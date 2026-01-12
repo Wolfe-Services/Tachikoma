@@ -26,16 +26,16 @@ Implement a Code Block component for Tachikoma with syntax highlighting, line nu
 
 ## Acceptance Criteria
 
-- [ ] Syntax highlighting for multiple languages
-- [ ] Line numbers (optional)
-- [ ] Line highlighting
-- [ ] Copy to clipboard button
-- [ ] Language label
-- [ ] Word wrap option
-- [ ] Dark theme optimized colors
-- [ ] Collapsible long code blocks
-- [ ] Support for bash, python, javascript, json, yaml, rust, and more
-- [ ] Custom Tachikoma-themed syntax colors
+- [x] Syntax highlighting for multiple languages
+- [x] Line numbers (optional)
+- [x] Line highlighting
+- [x] Copy to clipboard button
+- [x] Language label
+- [x] Word wrap option
+- [x] Dark theme optimized colors
+- [x] Collapsible long code blocks
+- [x] Support for bash, python, javascript, json, yaml, rust, and more
+- [x] Custom Tachikoma-themed syntax colors
 
 ---
 
