@@ -26,15 +26,15 @@ Implement a versatile Card component for Tachikoma to display grouped content wi
 
 ## Acceptance Criteria
 
-- [ ] Basic card with padding and border
-- [ ] Card header with title and actions
-- [ ] Card footer for actions
-- [ ] Clickable/interactive card variant
-- [ ] Hover effects with optional glow
-- [ ] Loading state with skeleton
-- [ ] Multiple padding sizes
-- [ ] Collapsible card
-- [ ] Card with image/media
+- [x] Basic card with padding and border
+- [x] Card header with title and actions
+- [x] Card footer for actions
+- [x] Clickable/interactive card variant
+- [x] Hover effects with optional glow
+- [x] Loading state with skeleton
+- [x] Multiple padding sizes
+- [x] Collapsible card
+- [x] Card with image/media
 
 ---
 
