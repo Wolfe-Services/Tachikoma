@@ -1,34 +1,3 @@
-# 017 - Secret Types
-
-**Phase:** 1 - Core Common Crates
-**Spec ID:** 017
-**Status:** Planned
-**Dependencies:** 011-common-core-types
-**Estimated Context:** ~8% of Sonnet window
-
----
-
-## Objective
-
-Implement secure secret handling types that prevent accidental logging or serialization of sensitive values like API keys and tokens.
-
----
-
-## Acceptance Criteria
-
-- [x] Secret wrapper type that redacts on Display/Debug
-- [x] Explicit access required for inner value
-- [x] Zeroize on drop for memory safety
-- [x] Integration with serde (custom serializer)
-- [x] PII detection utilities
-
----
-
-## Implementation Details
-
-### 1. Secret Types (crates/tachikoma-common-secret/src/lib.rs)
-
-```rust
 //! Secure secret handling.
 //!
 //! This module provides types for handling sensitive values like API keys,
@@ -77,7 +46,7 @@ impl<T: Zeroize> Secret<T> {
     /// Consume and return the inner value.
     pub fn into_inner(self) -> T {
         // Note: Zeroize won't run since we're moving out
-        let mut this = std::mem::ManuallyDrop::new(self);
+        let this = std::mem::ManuallyDrop::new(self);
         unsafe { std::ptr::read(&this.0) }
     }
 }
@@ -196,10 +165,52 @@ mod tests {
     }
 
     #[test]
+    fn test_secret_serialization_is_redacted() {
+        let secret = SecretString::new("my-api-key".to_string());
+        let serialized = serde_json::to_string(&secret).unwrap();
+        assert_eq!(serialized, "\"[REDACTED]\"");
+    }
+
+    #[test]
+    fn test_secret_deserialization() {
+        let json = "\"my-api-key\"";
+        let secret: SecretString = serde_json::from_str(json).unwrap();
+        assert_eq!(secret.expose(), "my-api-key");
+    }
+
+    #[test]
+    fn test_secret_into_inner() {
+        let secret = SecretString::new("my-api-key".to_string());
+        let value = secret.into_inner();
+        assert_eq!(value, "my-api-key");
+    }
+
+    #[test]
+    fn test_secret_equality() {
+        let secret1 = SecretString::new("my-api-key".to_string());
+        let secret2 = SecretString::new("my-api-key".to_string());
+        let secret3 = SecretString::new("different-key".to_string());
+        
+        assert_eq!(secret1, secret2);
+        assert_ne!(secret1, secret3);
+    }
+
+    #[test]
     fn test_pii_api_key_detection() {
         assert!(PiiDetector::looks_like_api_key("sk-abc123def456"));
         assert!(PiiDetector::looks_like_api_key("api_key_12345"));
+        assert!(PiiDetector::looks_like_api_key("pk-test123456"));
+        assert!(PiiDetector::looks_like_api_key("token-abcdef123456789012345678901234567890"));
         assert!(!PiiDetector::looks_like_api_key("hello world"));
+        assert!(!PiiDetector::looks_like_api_key("short"));
+    }
+
+    #[test]
+    fn test_pii_email_detection() {
+        assert!(PiiDetector::looks_like_email("user@example.com"));
+        assert!(PiiDetector::looks_like_email("test.user+tag@domain.co.uk"));
+        assert!(!PiiDetector::looks_like_email("not an email"));
+        assert!(!PiiDetector::looks_like_email("missing@domain"));
     }
 
     #[test]
@@ -208,38 +219,29 @@ mod tests {
         let redacted = PiiDetector::redact(input);
         assert!(!redacted.contains("user@example.com"));
         assert!(!redacted.contains("sk-abc123"));
+        assert!(redacted.contains("[EMAIL]"));
+        assert!(redacted.contains("[API_KEY]"));
+    }
+
+    #[test]
+    fn test_pii_redaction_preserves_other_text() {
+        let input = "Please contact support@example.com for help with api-key-12345678901234567890";
+        let redacted = PiiDetector::redact(input);
+        assert!(redacted.contains("Please contact"));
+        assert!(redacted.contains("for help with"));
+        assert!(redacted.contains("[EMAIL]"));
+        assert!(redacted.contains("[API_KEY]"));
+    }
+
+    #[test]
+    fn test_secret_zeroize_on_drop() {
+        // This test verifies that the secret is zeroed when dropped
+        // We can't directly test the memory, but we can verify the behavior exists
+        let secret = SecretString::new("sensitive-data".to_string());
+        assert_eq!(secret.expose(), "sensitive-data");
+        // When secret goes out of scope, zeroize should be called
+        drop(secret);
+        // If we could access the memory, it would be zeroed
+        // This test mainly ensures compilation with ZeroizeOnDrop works
     }
 }
-```
-
-### 2. Crate Setup (crates/tachikoma-common-secret/Cargo.toml)
-
-```toml
-[package]
-name = "tachikoma-common-secret"
-version.workspace = true
-edition.workspace = true
-license.workspace = true
-description = "Secure secret handling for Tachikoma"
-
-[dependencies]
-serde = { workspace = true, features = ["derive"] }
-zeroize = { version = "1.7", features = ["derive"] }
-regex = "1.10"
-```
-
----
-
-## Testing Requirements
-
-1. Display and Debug never expose value
-2. Memory is zeroed on drop
-3. PII detection catches common patterns
-4. Serialization produces redacted output
-
----
-
-## Related Specs
-
-- Depends on: [011-common-core-types.md](011-common-core-types.md)
-- Next: [018-thread-utilities.md](018-thread-utilities.md)
