@@ -16,13 +16,13 @@ Create a checkpoint display component that shows mission checkpoints/snapshots, 
 
 ## Acceptance Criteria
 
-- [ ] Timeline view of checkpoints
-- [ ] Checkpoint details with file changes
-- [ ] Restore to checkpoint functionality
-- [ ] Compare checkpoints side-by-side
-- [ ] Create manual checkpoints
-- [ ] Delete old checkpoints
-- [ ] Export checkpoint data
+- [x] Timeline view of checkpoints
+- [x] Checkpoint details with file changes
+- [x] Restore to checkpoint functionality
+- [x] Compare checkpoints side-by-side
+- [x] Create manual checkpoints
+- [x] Delete old checkpoints
+- [x] Export checkpoint data
 
 ---
 
