@@ -26,14 +26,14 @@ Initialize and configure a SvelteKit project optimized for Tauri desktop applica
 
 ## Acceptance Criteria
 
-- [ ] SvelteKit 2.x project initialized with TypeScript
-- [ ] Vite configuration optimized for Tauri
-- [ ] Adapter-static configured for desktop builds
-- [ ] Path aliases configured (@lib, @components, @stores)
-- [ ] ESLint and Prettier configured
-- [ ] Development server integrates with Tauri
-- [ ] Production builds output to Tauri's expected directory
-- [ ] Hot Module Replacement (HMR) working in dev mode
+- [x] SvelteKit 2.x project initialized with TypeScript
+- [x] Vite configuration optimized for Tauri
+- [x] Adapter-static configured for desktop builds
+- [x] Path aliases configured (@lib, @components, @stores)
+- [x] ESLint and Prettier configured
+- [x] Development server integrates with Tauri
+- [x] Production builds output to Tauri's expected directory
+- [x] Hot Module Replacement (HMR) working in dev mode
 
 ---
 
