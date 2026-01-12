@@ -26,16 +26,16 @@ Implement a Tabs component for Tachikoma with support for horizontal and vertica
 
 ## Acceptance Criteria
 
-- [ ] Horizontal and vertical tab orientations
-- [ ] Icon and badge support
-- [ ] Closeable tabs (for dynamic tabs)
-- [ ] Keyboard navigation (arrow keys, Home, End)
-- [ ] WAI-ARIA compliant
-- [ ] Tab panel lazy loading option
-- [ ] Active tab indicator animation
-- [ ] Overflow handling with scroll
-- [ ] Draggable tab reordering (optional)
-- [ ] Controlled and uncontrolled modes
+- [x] Horizontal and vertical tab orientations
+- [x] Icon and badge support
+- [x] Closeable tabs (for dynamic tabs)
+- [x] Keyboard navigation (arrow keys, Home, End)
+- [x] WAI-ARIA compliant
+- [x] Tab panel lazy loading option
+- [x] Active tab indicator animation
+- [x] Overflow handling with scroll
+- [x] Draggable tab reordering (optional)
+- [x] Controlled and uncontrolled modes
 
 ---
 
