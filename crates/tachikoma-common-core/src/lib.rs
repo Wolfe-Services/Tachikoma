@@ -6,12 +6,14 @@
 
 pub mod error;
 pub mod id;
+pub mod result;
 pub mod status;
 pub mod timestamp;
 pub mod types;
 
 pub use error::{Error, ErrorCategory, ErrorCode, ErrorResponse, Result};
 pub use id::*;
+pub use result::{OptionExt, ResultExt, retry};
 pub use status::*;
 pub use timestamp::*;
 pub use types::*;
@@ -24,7 +26,7 @@ mod integration_tests {
     fn test_all_types_work_together() {
         // Test ID types
         let mission_id = MissionId::new();
-        let spec_id = SpecId::new();
+        let _spec_id = SpecId::new();
         
         // Test timestamp
         let timestamp = Timestamp::now();

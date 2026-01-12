@@ -16,10 +16,10 @@ Provide utility traits and extension methods for Result and Option types to simp
 
 ## Acceptance Criteria
 
-- [ ] ResultExt trait for context addition
-- [ ] OptionExt trait for conversion to Result
-- [ ] Retry utilities for fallible operations
-- [ ] Helper macros for common patterns
+- [x] ResultExt trait for context addition
+- [x] OptionExt trait for conversion to Result
+- [x] Retry utilities for fallible operations
+- [x] Helper macros for common patterns
 
 ---
 
