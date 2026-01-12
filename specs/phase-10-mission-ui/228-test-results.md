@@ -16,13 +16,13 @@ Create a test results component that displays test execution output in a structu
 
 ## Acceptance Criteria
 
-- [ ] Test suite tree with pass/fail indicators
-- [ ] Individual test case results
-- [ ] Error messages with stack traces
-- [ ] Test coverage summary
-- [ ] Duration metrics
-- [ ] Filter by status (passed/failed/skipped)
-- [ ] Re-run individual tests
+- [x] Test suite tree with pass/fail indicators
+- [x] Individual test case results
+- [x] Error messages with stack traces
+- [x] Test coverage summary
+- [x] Duration metrics
+- [x] Filter by status (passed/failed/skipped)
+- [x] Re-run individual tests
 
 ---
 
