@@ -16,12 +16,12 @@ Implement result formatting for code search output with multiple display modes, 
 
 ## Acceptance Criteria
 
-- [ ] Multiple output formats (plain, colored, JSON)
-- [ ] Grouped by file option
-- [ ] Customizable context display
-- [ ] Match highlighting
-- [ ] Path formatting (relative/absolute)
-- [ ] Summary statistics formatting
+- [x] Multiple output formats (plain, colored, JSON)
+- [x] Grouped by file option
+- [x] Customizable context display
+- [x] Match highlighting
+- [x] Path formatting (relative/absolute)
+- [x] Summary statistics formatting
 
 ---
 

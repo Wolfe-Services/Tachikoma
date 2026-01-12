@@ -406,7 +406,14 @@ async fn run_loop(
 
                     if reboot_count >= MAX_REBOOTS_PER_SPEC {
                         println!("\n⚠️  Spec {:03} hit redline {} times. Moving to next spec.", spec.entry.id, reboot_count);
-                        consecutive_failures += 1;
+                        // Only count as failure if NO progress was ever made
+                        // (If we made commits but ran out of context, that's not a failure)
+                        if no_changes_count >= reboot_count {
+                            consecutive_failures += 1;
+                        } else {
+                            // Made progress, just ran out of context - not a failure
+                            consecutive_failures = 0;
+                        }
                         break;
                     }
                     println!("\n🔄 Rebooting with fresh context (attempt {}/{})...\n", reboot_count, MAX_REBOOTS_PER_SPEC);
