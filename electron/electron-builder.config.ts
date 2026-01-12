@@ -225,13 +225,32 @@ const config: Configuration = {
       },
       {
         target: 'portable',
-        arch: ['x64'],
+        arch: ['x64', 'arm64'],
+      },
+      {
+        target: 'appx',
+        arch: ['x64', 'arm64'],
       },
     ],
     icon: 'build/icon.ico',
     publisherName: 'Tachikoma Team',
+    publisherDisplayName: 'Tachikoma Team',
     verifyUpdateCodeSignature: true,
     signAndEditExecutable: true,
+    signDlls: true,
+    certificateFile: process.env.WIN_CSC_LINK,
+    certificatePassword: process.env.WIN_CSC_KEY_PASSWORD,
+    certificateSubjectName: 'Tachikoma Team',
+    timeStampServer: 'http://timestamp.digicert.com',
+    rfc3161TimeStampServer: 'http://timestamp.digicert.com',
+    requestedExecutionLevel: 'asInvoker',
+    extraFiles: [
+      {
+        from: 'build/windows',
+        to: '.',
+        filter: ['**/*'],
+      },
+    ],
   },
 
   // NSIS installer configuration
@@ -244,13 +263,40 @@ const config: Configuration = {
     createStartMenuShortcut: true,
     shortcutName: 'Tachikoma',
     uninstallDisplayName: '${productName}',
-    installerIcon: 'build/icon.ico',
-    uninstallerIcon: 'build/icon.ico',
-    installerHeaderIcon: 'build/icon.ico',
-    license: '../LICENSE',
     deleteAppDataOnUninstall: false,
-    include: 'build/installer.nsh',
+    installerIcon: 'build/installer.ico',
+    uninstallerIcon: 'build/uninstaller.ico',
+    installerHeaderIcon: 'build/installer-header.ico',
+    license: '../LICENSE',
+    include: 'build/windows/installer.nsh',
+    script: 'build/windows/installer-script.nsi',
+    installerSidebar: 'build/windows/installer-sidebar.bmp',
+    uninstallerSidebar: 'build/windows/uninstaller-sidebar.bmp',
+    installerLanguages: ['en_US'],
+    runAfterFinish: true,
+    displayLanguageSelector: false,
+    unicode: true,
     warningsAsErrors: false,
+    differentialPackage: true,
+  },
+
+  // Portable configuration
+  portable: {
+    artifactName: '${productName}-${version}-portable-${arch}.${ext}',
+    requestExecutionLevel: 'user',
+  },
+
+  // Microsoft Store (MSIX) configuration
+  appx: {
+    applicationId: 'Tachikoma',
+    identityName: 'TachikomaTeam.Tachikoma',
+    publisher: 'CN=Tachikoma Team',
+    publisherDisplayName: 'Tachikoma Team',
+    displayName: 'Tachikoma',
+    languages: ['en-US'],
+    backgroundColor: '#1a1a1a',
+    showNameOnTiles: true,
+    artifactName: '${productName}-${version}-${arch}.${ext}',
   },
 
   // Linux configuration
