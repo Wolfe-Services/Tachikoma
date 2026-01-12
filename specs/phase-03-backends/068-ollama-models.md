@@ -16,12 +16,12 @@ Implement model management for the Ollama backend, including model discovery, ca
 
 ## Acceptance Criteria
 
-- [ ] Model discovery and enumeration
-- [ ] Model capability detection (context size, tools)
-- [ ] Model pull/download support
-- [ ] Model loading state tracking
-- [ ] Recommended models for roles
-- [ ] Model-specific configurations
+- [x] Model discovery and enumeration
+- [x] Model capability detection (context size, tools)
+- [x] Model pull/download support
+- [x] Model loading state tracking
+- [x] Recommended models for roles
+- [x] Model-specific configurations
 
 ---
 
