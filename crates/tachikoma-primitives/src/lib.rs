@@ -51,6 +51,9 @@ pub use edit_file::{
     check_uniqueness, format_matches, select_match, validate_edit_target
 };
 
+#[cfg(feature = "code-search")]
+pub use code_search::{code_search, search_literal, find_files, CodeSearchOptions};
+
 #[cfg(test)]
 mod tests {
     use super::*;
