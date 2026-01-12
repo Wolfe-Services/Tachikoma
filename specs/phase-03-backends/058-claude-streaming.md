@@ -16,12 +16,12 @@ Implement Server-Sent Events (SSE) streaming for the Claude backend to enable re
 
 ## Acceptance Criteria
 
-- [ ] SSE stream parsing from Claude API
-- [ ] Delta event handling (text, tool calls)
-- [ ] Stream error handling and recovery
-- [ ] Proper stream cleanup on cancellation
-- [ ] Token usage from stream end event
-- [ ] Backpressure handling
+- [x] SSE stream parsing from Claude API
+- [x] Delta event handling (text, tool calls)
+- [x] Stream error handling and recovery
+- [x] Proper stream cleanup on cancellation
+- [x] Token usage from stream end event
+- [x] Backpressure handling
 
 ---
 
