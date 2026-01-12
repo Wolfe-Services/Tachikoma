@@ -27,16 +27,16 @@ Implement a type-safe, secure Inter-Process Communication (IPC) system between t
 
 ## Acceptance Criteria
 
-- [ ] Type-safe IPC channel definitions
-- [ ] Bidirectional communication (main to renderer, renderer to main)
-- [ ] Request/response pattern with invoke/handle
-- [ ] Event broadcasting from main to renderers
-- [ ] Channel validation and sanitization
-- [ ] Error handling and propagation
-- [ ] IPC logging for debugging
-- [ ] Rate limiting for security
-- [ ] Message serialization/deserialization
-- [ ] Timeout handling for long operations
+- [x] Type-safe IPC channel definitions
+- [x] Bidirectional communication (main to renderer, renderer to main)
+- [x] Request/response pattern with invoke/handle
+- [x] Event broadcasting from main to renderers
+- [x] Channel validation and sanitization
+- [x] Error handling and propagation
+- [x] IPC logging for debugging
+- [x] Rate limiting for security
+- [x] Message serialization/deserialization
+- [x] Timeout handling for long operations
 
 ---
 
