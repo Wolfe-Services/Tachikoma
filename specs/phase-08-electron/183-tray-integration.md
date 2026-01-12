@@ -26,15 +26,15 @@ Implement system tray integration for the Tachikoma application, providing quick
 
 ## Acceptance Criteria
 
-- [ ] System tray icon display
-- [ ] Context menu on tray icon
-- [ ] Click/double-click handlers
-- [ ] Dynamic icon updates (status indicators)
-- [ ] Tooltip display
-- [ ] Platform-specific behavior (macOS menu bar)
-- [ ] Minimize to tray option
-- [ ] Notification badge support
-- [ ] Animation support for status changes
+- [x] System tray icon display
+- [x] Context menu on tray icon
+- [x] Click/double-click handlers
+- [x] Dynamic icon updates (status indicators)
+- [x] Tooltip display
+- [x] Platform-specific behavior (macOS menu bar)
+- [x] Minimize to tray option
+- [x] Notification badge support
+- [x] Animation support for status changes
 
 ---
 
