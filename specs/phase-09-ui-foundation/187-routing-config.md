@@ -25,14 +25,14 @@ Configure SvelteKit routing for Tachikoma's desktop application, including file-
 
 ## Acceptance Criteria
 
-- [ ] File-based routing structure established
-- [ ] Route guards for authentication
-- [ ] Dynamic route parameters working
-- [ ] Navigation store for route state
-- [ ] Deep linking from Tauri supported
-- [ ] Route transitions configured
-- [ ] 404 handling implemented
-- [ ] Route preloading optimized
+- [x] File-based routing structure established
+- [x] Route guards for authentication
+- [x] Dynamic route parameters working
+- [x] Navigation store for route state
+- [x] Deep linking from Tauri supported
+- [x] Route transitions configured
+- [x] 404 handling implemented
+- [x] Route preloading optimized
 
 ---
 
