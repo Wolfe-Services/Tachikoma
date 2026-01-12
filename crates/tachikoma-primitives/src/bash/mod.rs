@@ -1,12 +1,14 @@
 //! Bash command execution primitive.
 
 mod cancel;
+mod error;
 mod options;
 mod output;
 mod sanitize;
 mod timeout;
 
 pub use cancel::*;
+pub use error::*;
 pub use options::*;
 pub use output::*;
 pub use sanitize::*;
