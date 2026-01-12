@@ -16,12 +16,12 @@ Implement health checking infrastructure for backends, including periodic health
 
 ## Acceptance Criteria
 
-- [ ] Health check interface on all backends
-- [ ] Periodic health monitoring
-- [ ] Health status aggregation
-- [ ] Automatic failover support
-- [ ] Health history tracking
-- [ ] Alerting on status changes
+- [x] Health check interface on all backends
+- [x] Periodic health monitoring
+- [x] Health status aggregation
+- [x] Automatic failover support
+- [x] Health history tracking
+- [x] Alerting on status changes
 
 ---
 
