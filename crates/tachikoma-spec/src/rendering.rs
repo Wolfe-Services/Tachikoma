@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use handlebars::{Handlebars, Helper, HelperResult, Context, RenderContext as HbRenderContext, Output};
+use handlebars::{Handlebars, Helper, HelperResult, Context, RenderContext as HbRenderContext, Output, Renderable};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tokio::fs;
@@ -27,7 +27,7 @@ impl OutputFormat {
 
 /// Template rendering context
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TemplateContext {
+pub struct TemplateRenderContext {
     /// Spec metadata
     #[serde(flatten)]
     pub spec: SpecContext,
