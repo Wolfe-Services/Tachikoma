@@ -27,16 +27,16 @@ Implement comprehensive security configuration for the Electron application, fol
 
 ## Acceptance Criteria
 
-- [ ] Context isolation enabled for all windows
-- [ ] Sandbox mode enabled for renderers
-- [ ] Node integration disabled in renderers
-- [ ] Content Security Policy configured
-- [ ] WebSecurity enabled
-- [ ] Navigation restricted to allowed origins
-- [ ] New window creation blocked
-- [ ] Protocol handling secured
-- [ ] Certificate validation enforced
-- [ ] Permissions properly managed
+- [x] Context isolation enabled for all windows
+- [x] Sandbox mode enabled for renderers
+- [x] Node integration disabled in renderers
+- [x] Content Security Policy configured
+- [x] WebSecurity enabled
+- [x] Navigation restricted to allowed origins
+- [x] New window creation blocked
+- [x] Protocol handling secured
+- [x] Certificate validation enforced
+- [x] Permissions properly managed
 
 ---
 
