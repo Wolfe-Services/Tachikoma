@@ -70,6 +70,10 @@ pub enum PrimitiveError {
     #[error("edit target not found in file")]
     TargetNotFound,
 
+    /// Read file specific error.
+    #[error("read file error: {0}")]
+    ReadFile(#[from] crate::read_file::ReadFileError),
+
     /// IO error.
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),

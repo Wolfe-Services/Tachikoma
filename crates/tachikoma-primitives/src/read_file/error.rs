@@ -1,35 +1,3 @@
-# 033 - Read File Error Handling
-
-**Phase:** 2 - Five Primitives
-**Spec ID:** 033
-**Status:** Planned
-**Dependencies:** 032-read-file-impl
-**Estimated Context:** ~8% of Sonnet window
-
----
-
-## Objective
-
-Implement comprehensive error handling for the `read_file` primitive, including specific error types, helpful error messages, and recovery suggestions.
-
----
-
-## Acceptance Criteria
-
-- [x] Specific error types for each failure mode
-- [x] Human-readable error messages with context
-- [x] Error recovery suggestions
-- [x] Proper error logging with tracing
-- [x] Error conversion from std::io::Error
-- [x] Serializable error responses
-
----
-
-## Implementation Details
-
-### 1. Read File Errors (src/read_file/error.rs)
-
-```rust
 //! Error types specific to read_file operations.
 
 use std::path::PathBuf;
@@ -42,6 +10,7 @@ pub enum ReadFileError {
     /// File does not exist.
     #[error("file not found: {path}")]
     NotFound {
+        /// Path to the file that was not found.
         path: PathBuf,
         /// Suggestion for similar files if any.
         suggestion: Option<String>,
@@ -50,6 +19,7 @@ pub enum ReadFileError {
     /// Permission denied.
     #[error("permission denied reading file: {path}")]
     PermissionDenied {
+        /// Path to the file that was denied access.
         path: PathBuf,
         /// Required permission.
         required: String,
@@ -58,14 +28,18 @@ pub enum ReadFileError {
     /// File is too large.
     #[error("file too large: {path} is {actual_size} bytes (limit: {max_size} bytes)")]
     TooLarge {
+        /// Path to the file.
         path: PathBuf,
+        /// Actual file size in bytes.
         actual_size: u64,
+        /// Maximum allowed size in bytes.
         max_size: usize,
     },
 
     /// File appears to be binary.
     #[error("file appears to be binary: {path}")]
     BinaryFile {
+        /// Path to the binary file.
         path: PathBuf,
         /// Detected mime type if available.
         mime_type: Option<String>,
@@ -74,14 +48,18 @@ pub enum ReadFileError {
     /// Invalid line range requested.
     #[error("invalid line range: {start}..{end} (file has {total_lines} lines)")]
     InvalidLineRange {
+        /// Start line number.
         start: usize,
+        /// End line number.
         end: usize,
+        /// Total lines in the file.
         total_lines: usize,
     },
 
     /// Path is not allowed by security policy.
     #[error("path not allowed by security policy: {path}")]
     PathNotAllowed {
+        /// Path that was denied.
         path: PathBuf,
         /// Reason for denial.
         reason: String,
@@ -90,6 +68,7 @@ pub enum ReadFileError {
     /// Path is not a file.
     #[error("path is not a file: {path}")]
     NotAFile {
+        /// Path that is not a file.
         path: PathBuf,
         /// Actual type (directory, symlink, etc.).
         actual_type: String,
@@ -98,6 +77,7 @@ pub enum ReadFileError {
     /// Encoding error.
     #[error("encoding error in file: {path}")]
     EncodingError {
+        /// Path to the file with encoding issues.
         path: PathBuf,
         /// Position of encoding error.
         position: Option<usize>,
@@ -106,8 +86,11 @@ pub enum ReadFileError {
     /// Generic IO error.
     #[error("IO error reading {path}: {message}")]
     Io {
+        /// Path to the file that caused the IO error.
         path: PathBuf,
+        /// Error message from the IO operation.
         message: String,
+        /// Source IO error.
         #[source]
         source: std::io::Error,
     },
@@ -238,196 +221,3 @@ pub fn io_error_with_path(err: std::io::Error, path: PathBuf) -> ReadFileError {
         },
     }
 }
-```
-
-### 2. Error Logging Integration (src/read_file/logging.rs)
-
-```rust
-//! Logging utilities for read_file errors.
-
-use super::error::ReadFileError;
-use tracing::{error, warn, info, Level};
-use std::path::Path;
-
-/// Log a read_file error with appropriate level and context.
-pub fn log_read_error(err: &ReadFileError, operation_id: &str) {
-    let code = err.error_code();
-    let suggestion = err.recovery_suggestion();
-
-    match err {
-        ReadFileError::NotFound { path, .. } => {
-            warn!(
-                operation_id = %operation_id,
-                code = %code,
-                path = %path.display(),
-                "File not found"
-            );
-        }
-        ReadFileError::PermissionDenied { path, required, .. } => {
-            warn!(
-                operation_id = %operation_id,
-                code = %code,
-                path = %path.display(),
-                required = %required,
-                "Permission denied"
-            );
-        }
-        ReadFileError::TooLarge { path, actual_size, max_size, .. } => {
-            info!(
-                operation_id = %operation_id,
-                code = %code,
-                path = %path.display(),
-                actual_size = %actual_size,
-                max_size = %max_size,
-                suggestion = %suggestion,
-                "File too large"
-            );
-        }
-        ReadFileError::PathNotAllowed { path, reason, .. } => {
-            warn!(
-                operation_id = %operation_id,
-                code = %code,
-                path = %path.display(),
-                reason = %reason,
-                "Path not allowed by security policy"
-            );
-        }
-        ReadFileError::Io { path, message, .. } => {
-            error!(
-                operation_id = %operation_id,
-                code = %code,
-                path = %path.display(),
-                message = %message,
-                "IO error reading file"
-            );
-        }
-        _ => {
-            warn!(
-                operation_id = %operation_id,
-                code = %code,
-                error = %err,
-                "Read file error"
-            );
-        }
-    }
-}
-
-/// Audit log for successful reads (security).
-pub fn log_read_success(path: &Path, bytes_read: usize, operation_id: &str) {
-    info!(
-        operation_id = %operation_id,
-        path = %path.display(),
-        bytes_read = %bytes_read,
-        "File read successfully"
-    );
-}
-```
-
-### 3. Similar File Suggestion (src/read_file/suggest.rs)
-
-```rust
-//! File suggestion utilities for error messages.
-
-use std::path::Path;
-
-/// Find similar file names in the same directory.
-pub fn find_similar_files(path: &Path, max_suggestions: usize) -> Vec<String> {
-    let file_name = match path.file_name().and_then(|n| n.to_str()) {
-        Some(name) => name,
-        None => return Vec::new(),
-    };
-
-    let parent = match path.parent() {
-        Some(p) => p,
-        None => return Vec::new(),
-    };
-
-    let entries = match std::fs::read_dir(parent) {
-        Ok(e) => e,
-        Err(_) => return Vec::new(),
-    };
-
-    let mut candidates: Vec<(String, usize)> = entries
-        .filter_map(|e| e.ok())
-        .filter_map(|e| e.file_name().to_str().map(|s| s.to_string()))
-        .filter(|name| name != file_name)
-        .map(|name| {
-            let distance = levenshtein_distance(file_name, &name);
-            (name, distance)
-        })
-        .filter(|(_, distance)| *distance <= 3) // Only suggest if close enough
-        .collect();
-
-    candidates.sort_by_key(|(_, d)| *d);
-    candidates.truncate(max_suggestions);
-
-    candidates.into_iter().map(|(name, _)| name).collect()
-}
-
-/// Calculate Levenshtein distance between two strings.
-fn levenshtein_distance(a: &str, b: &str) -> usize {
-    let a_chars: Vec<char> = a.chars().collect();
-    let b_chars: Vec<char> = b.chars().collect();
-
-    let a_len = a_chars.len();
-    let b_len = b_chars.len();
-
-    if a_len == 0 {
-        return b_len;
-    }
-    if b_len == 0 {
-        return a_len;
-    }
-
-    let mut matrix = vec![vec![0usize; b_len + 1]; a_len + 1];
-
-    for i in 0..=a_len {
-        matrix[i][0] = i;
-    }
-    for j in 0..=b_len {
-        matrix[0][j] = j;
-    }
-
-    for i in 1..=a_len {
-        for j in 1..=b_len {
-            let cost = if a_chars[i - 1] == b_chars[j - 1] { 0 } else { 1 };
-            matrix[i][j] = (matrix[i - 1][j] + 1)
-                .min(matrix[i][j - 1] + 1)
-                .min(matrix[i - 1][j - 1] + cost);
-        }
-    }
-
-    matrix[a_len][b_len]
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_levenshtein() {
-        assert_eq!(levenshtein_distance("kitten", "sitting"), 3);
-        assert_eq!(levenshtein_distance("main.rs", "mian.rs"), 2);
-        assert_eq!(levenshtein_distance("test", "test"), 0);
-    }
-}
-```
-
----
-
-## Testing Requirements
-
-1. Each error type can be created and formatted
-2. Error codes are unique and consistent
-3. Recovery suggestions are helpful and accurate
-4. Error responses serialize correctly
-5. Similar file suggestion works with typos
-6. Logging outputs correct level and fields
-
----
-
-## Related Specs
-
-- Depends on: [032-read-file-impl.md](032-read-file-impl.md)
-- Next: [034-list-files-impl.md](034-list-files-impl.md)
-- Related: [048-primitives-audit.md](048-primitives-audit.md)
