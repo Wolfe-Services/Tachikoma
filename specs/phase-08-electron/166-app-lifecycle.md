@@ -26,16 +26,16 @@ Implement comprehensive application lifecycle management for the Electron applic
 
 ## Acceptance Criteria
 
-- [ ] Proper app ready initialization
-- [ ] Single instance enforcement
-- [ ] Graceful shutdown with cleanup
-- [ ] System suspend/resume handling
-- [ ] Before quit confirmation for unsaved changes
-- [ ] App restart functionality
-- [ ] State persistence on quit
-- [ ] Crash recovery on restart
-- [ ] Login item management (auto-start)
-- [ ] Dock badge and bounce on macOS
+- [x] Proper app ready initialization
+- [x] Single instance enforcement
+- [x] Graceful shutdown with cleanup
+- [x] System suspend/resume handling
+- [x] Before quit confirmation for unsaved changes
+- [x] App restart functionality
+- [x] State persistence on quit
+- [x] Crash recovery on restart
+- [x] Login item management (auto-start)
+- [x] Dock badge and bounce on macOS
 
 ---
 
