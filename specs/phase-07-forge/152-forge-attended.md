@@ -16,13 +16,13 @@ Implement attended mode for Forge sessions where a human operator can observe, i
 
 ## Acceptance Criteria
 
-- [ ] Pause/resume between rounds
-- [ ] Human feedback injection
-- [ ] Override model decisions
-- [ ] Skip/repeat rounds
-- [ ] Real-time progress display
-- [ ] Interactive conflict resolution
-- [ ] Force convergence option
+- [x] Pause/resume between rounds
+- [x] Human feedback injection
+- [x] Override model decisions
+- [x] Skip/repeat rounds
+- [x] Real-time progress display
+- [x] Interactive conflict resolution
+- [x] Force convergence option
 
 ---
 
