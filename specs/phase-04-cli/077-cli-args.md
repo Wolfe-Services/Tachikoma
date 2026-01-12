@@ -13,15 +13,15 @@ Implement comprehensive argument parsing patterns using clap derive macros, supp
 
 ## Acceptance Criteria
 
-- [ ] Positional arguments with validation
-- [ ] Optional and required flags
-- [ ] Arguments with default values
-- [ ] Environment variable fallbacks
-- [ ] Value hints for completion
-- [ ] Custom value parsers
-- [ ] Argument groups and conflicts
-- [ ] Repeated arguments (vectors)
-- [ ] Subcommand-specific arguments
+- [x] Positional arguments with validation
+- [x] Optional and required flags
+- [x] Arguments with default values
+- [x] Environment variable fallbacks
+- [x] Value hints for completion
+- [x] Custom value parsers
+- [x] Argument groups and conflicts
+- [x] Repeated arguments (vectors)
+- [x] Subcommand-specific arguments
 
 ## Implementation Details
 
