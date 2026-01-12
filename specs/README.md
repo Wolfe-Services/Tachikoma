@@ -56,7 +56,10 @@ Execute specs in numerical order. Each phase must complete before the next.
 ## Phase 2: The Five Primitives (031-050)
 | Spec | File | Keywords |
 |------|------|----------|
-| 031 | [Primitives Crate](phase-02-primitives/031-primitives-crate.md) | primitives, tools, five, core |
+| 031a | [Primitives Crate Setup](phase-02-primitives/031a-primitives-crate-setup.md) | primitives, crate, setup, features |
+| 031b | [Primitives Context](phase-02-primitives/031b-primitives-context.md) | primitives, context, config, paths |
+| 031c | [Primitives Results](phase-02-primitives/031c-primitives-results.md) | primitives, results, metadata, types |
+| 031d | [Primitives Errors](phase-02-primitives/031d-primitives-errors.md) | primitives, errors, thiserror |
 | 032 | [read_file Implementation](phase-02-primitives/032-read-file-impl.md) | read, file, contents, text |
 | 033 | [read_file Error Handling](phase-02-primitives/033-read-file-errors.md) | read, error, not-found, permission |
 | 034 | [list_files Implementation](phase-02-primitives/034-list-files-impl.md) | list, directory, files, entries |
@@ -80,7 +83,11 @@ Execute specs in numerical order. Each phase must complete before the next.
 ## Phase 3: Backend Abstraction Layer (051-075)
 | Spec | File | Keywords |
 |------|------|----------|
-| 051 | [Backend Trait](phase-03-backends/051-backend-trait.md) | backend, trait, interface, abstract |
+| 051a | [Backend Crate Setup](phase-03-backends/051a-backend-crate-setup.md) | backend, crate, setup |
+| 051b | [Backend Message Types](phase-03-backends/051b-backend-message-types.md) | backend, message, role, content |
+| 051c | [Backend Completion Types](phase-03-backends/051c-backend-completion-types.md) | backend, completion, request, response |
+| 051d | [Backend Trait](phase-03-backends/051d-backend-trait.md) | backend, trait, interface, abstract |
+| 051e | [Backend Stream Types](phase-03-backends/051e-backend-stream-types.md) | backend, stream, chunk, async |
 | 052 | [Backend Config Types](phase-03-backends/052-backend-config.md) | config, backend, settings, yaml |
 | 053 | [Model Role Abstraction](phase-03-backends/053-model-roles.md) | brain, think-tank, oracle, agentic |
 | 054 | [Tool Definition Types](phase-03-backends/054-tool-definitions.md) | tool, definition, schema, json |
@@ -133,7 +140,10 @@ Execute specs in numerical order. Each phase must complete before the next.
 ## Phase 5: Ralph Loop Runner (096-115)
 | Spec | File | Keywords |
 |------|------|----------|
-| 096 | [Loop Runner Core](phase-05-loop/096-loop-runner-core.md) | loop, runner, core, structure |
+| 096a | [Loop Crate Setup](phase-05-loop/096a-loop-crate-setup.md) | loop, crate, setup, id |
+| 096b | [Loop Config](phase-05-loop/096b-loop-config.md) | loop, config, settings, stop |
+| 096c | [Loop State](phase-05-loop/096c-loop-state.md) | loop, state, stats, context |
+| 096d | [Loop Runner](phase-05-loop/096d-loop-runner.md) | loop, runner, command, execute |
 | 097 | [Loop Iteration Logic](phase-05-loop/097-loop-iteration.md) | iteration, cycle, repeat, next |
 | 098 | [Prompt Loading](phase-05-loop/098-prompt-loading.md) | prompt, load, read, prompt.md |
 | 099 | [Prompt Templates](phase-05-loop/099-prompt-templates.md) | template, variable, substitute |
@@ -181,7 +191,10 @@ Execute specs in numerical order. Each phase must complete before the next.
 ## Phase 7: Spec Forge - Multi-Model Brainstorming (136-160)
 | Spec | File | Keywords |
 |------|------|----------|
-| 136 | [Forge Session Types](phase-07-forge/136-forge-session-types.md) | session, type, forge, struct |
+| 136a | [Forge Crate Setup](phase-07-forge/136a-forge-crate-setup.md) | forge, crate, setup |
+| 136b | [Forge Session Types](phase-07-forge/136b-forge-session-types.md) | forge, session, status, topic |
+| 136c | [Forge Round Types](phase-07-forge/136c-forge-round-types.md) | forge, round, draft, critique |
+| 136d | [Forge Participant Types](phase-07-forge/136d-forge-participant-types.md) | forge, participant, model, response |
 | 137 | [Forge Configuration](phase-07-forge/137-forge-config.md) | config, forge, settings, yaml |
 | 138 | [Forge Participants](phase-07-forge/138-forge-participants.md) | participant, model, backend, role |
 | 139 | [Forge Round Orchestration](phase-07-forge/139-forge-rounds.md) | round, orchestrate, sequence |

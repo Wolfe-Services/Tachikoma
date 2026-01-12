@@ -1,34 +1,3 @@
-# 014 - Configuration Core Types
-
-**Phase:** 1 - Core Common Crates
-**Spec ID:** 014
-**Status:** Complete
-**Dependencies:** 011-common-core-types
-**Estimated Context:** ~10% of Sonnet window
-
----
-
-## Objective
-
-Define the configuration types for `.tachikoma/config.yaml` including backend settings, loop parameters, and policies.
-
----
-
-## Acceptance Criteria
-
-- [x] TachikomaConfig root type
-- [x] BackendConfig with model roles
-- [x] LoopConfig with stop conditions
-- [x] PolicyConfig for guardrails
-- [x] Default implementations
-
----
-
-## Implementation Details
-
-### 1. Config Types (crates/tachikoma-common-config/src/types.rs)
-
-```rust
 //! Configuration types.
 
 use serde::{Deserialize, Serialize};
@@ -188,34 +157,3 @@ impl Default for ForgeConfig {
         }
     }
 }
-```
-
-### 2. Crate Setup (crates/tachikoma-common-config/Cargo.toml)
-
-```toml
-[package]
-name = "tachikoma-common-config"
-version.workspace = true
-edition.workspace = true
-license.workspace = true
-description = "Configuration types for Tachikoma"
-
-[dependencies]
-serde = { workspace = true, features = ["derive"] }
-```
-
----
-
-## Testing Requirements
-
-1. Default config has sensible values
-2. Config serializes to expected YAML
-3. Partial configs merge with defaults
-4. StopCondition enum parses correctly
-
----
-
-## Related Specs
-
-- Depends on: [011-common-core-types.md](011-common-core-types.md)
-- Next: [015-yaml-config-parsing.md](015-yaml-config-parsing.md)
