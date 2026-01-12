@@ -13,14 +13,14 @@ Implement a comprehensive help system for the CLI with consistent formatting, ex
 
 ## Acceptance Criteria
 
-- [ ] Consistent help formatting across commands
-- [ ] Command examples in help output
-- [ ] Long help with `--help` vs short help with `-h`
-- [ ] Subcommand help discovery
-- [ ] Context-sensitive help suggestions
-- [ ] Colorized help output
-- [ ] Help search functionality
-- [ ] Online documentation links
+- [x] Consistent help formatting across commands
+- [x] Command examples in help output
+- [x] Long help with `--help` vs short help with `-h`
+- [x] Subcommand help discovery
+- [x] Context-sensitive help suggestions
+- [x] Colorized help output
+- [x] Help search functionality
+- [x] Online documentation links
 
 ## Implementation Details
 
