@@ -16,14 +16,14 @@ Implement the iteration logic for the Ralph Loop - the core unit of work that ex
 
 ## Acceptance Criteria
 
-- [ ] `Iteration` struct with complete lifecycle
-- [ ] Pre-iteration hooks execution
-- [ ] Claude Code invocation with proper argument handling
-- [ ] Output capture and parsing
-- [ ] Progress detection logic
-- [ ] Post-iteration hooks execution
-- [ ] Iteration result aggregation
-- [ ] Timeout handling for long-running iterations
+- [x] `Iteration` struct with complete lifecycle
+- [x] Pre-iteration hooks execution
+- [x] Claude Code invocation with proper argument handling
+- [x] Output capture and parsing
+- [x] Progress detection logic
+- [x] Post-iteration hooks execution
+- [x] Iteration result aggregation
+- [x] Timeout handling for long-running iterations
 
 ---
 
