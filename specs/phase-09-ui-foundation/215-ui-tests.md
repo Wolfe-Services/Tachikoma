@@ -26,16 +26,16 @@ Implement comprehensive testing infrastructure for Tachikoma's UI components inc
 
 ## Acceptance Criteria
 
-- [ ] Vitest configuration for Svelte components
-- [ ] Testing utilities and helpers
-- [ ] Component unit tests
-- [ ] Accessibility testing with axe-core
-- [ ] Visual regression testing setup
-- [ ] Interaction testing
-- [ ] Store testing utilities
-- [ ] Mock utilities for Tauri IPC
-- [ ] Test coverage reporting
-- [ ] CI integration guidelines
+- [x] Vitest configuration for Svelte components
+- [x] Testing utilities and helpers
+- [x] Component unit tests
+- [x] Accessibility testing with axe-core
+- [x] Visual regression testing setup
+- [x] Interaction testing
+- [x] Store testing utilities
+- [x] Mock utilities for Tauri IPC
+- [x] Test coverage reporting
+- [x] CI integration guidelines
 
 ---
 
