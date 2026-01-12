@@ -107,7 +107,7 @@ pub struct ParseWarning {
     pub severity: WarningSeverity,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum WarningSeverity {
     Info,
     Warning,
