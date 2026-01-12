@@ -16,10 +16,10 @@ Implement automatic locale detection from system settings, environment variables
 
 ## Acceptance Criteria
 
-- [ ] Detect from LANG/LC_* environment variables
-- [ ] Detect from system settings (platform-specific)
-- [ ] User preference override
-- [ ] Fallback chain handling
+- [x] Detect from LANG/LC_* environment variables
+- [x] Detect from system settings (platform-specific)
+- [x] User preference override
+- [x] Fallback chain handling
 
 ---
 

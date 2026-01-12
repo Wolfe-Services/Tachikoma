@@ -1,6 +1,7 @@
 //! Internationalization support for Tachikoma.
 
 pub mod loader;
+pub mod detect;
 
 use std::collections::HashMap;
 use std::path::Path;
@@ -355,4 +356,8 @@ mod tests {
 // Re-exports for convenience
 pub use loader::{
     default_catalog, load_catalog, CatalogFormat, LoaderConfig, LazyLoader, LoaderStats,
+};
+
+pub use detect::{
+    detect_locale, detect_locale_with_override, locale_fallback_chain,
 };
