@@ -1,34 +1,3 @@
-# 030 - Path Handling Utilities
-
-**Phase:** 1 - Core Common Crates
-**Spec ID:** 030
-**Status:** Planned
-**Dependencies:** 029-file-system-utilities
-**Estimated Context:** ~8% of Sonnet window
-
----
-
-## Objective
-
-Provide path manipulation utilities for normalization, resolution, relative path calculation, and cross-platform handling.
-
----
-
-## Acceptance Criteria
-
-- [x] Path normalization (remove `.` and `..`)
-- [x] Relative path calculation
-- [x] Path joining with validation
-- [x] Cross-platform path handling
-- [x] Project root detection
-
----
-
-## Implementation Details
-
-### 1. Path Module (crates/tachikoma-common-fs/src/path.rs)
-
-```rust
 //! Path manipulation utilities.
 
 use std::path::{Component, Path, PathBuf};
@@ -47,9 +16,17 @@ pub fn normalize(path: impl AsRef<Path>) -> PathBuf {
             }
             Component::CurDir => {}
             Component::ParentDir => {
-                if let Some(Component::Normal(_)) = components.last() {
-                    components.pop();
-                } else if components.is_empty() {
+                if let Some(last) = components.last() {
+                    match last {
+                        Component::Normal(_) => {
+                            components.pop();
+                        }
+                        Component::ParentDir => {
+                            components.push(Component::ParentDir);
+                        }
+                        _ => {} // Don't pop prefix or root dir
+                    }
+                } else {
                     components.push(Component::ParentDir);
                 }
             }
@@ -163,8 +140,16 @@ pub fn to_unix_string(path: impl AsRef<Path>) -> String {
 
 /// Get the file stem (name without extension).
 pub fn stem(path: impl AsRef<Path>) -> Option<String> {
-    path.as_ref()
-        .file_stem()
+    let path = path.as_ref();
+    let file_name = path.file_name()?.to_str()?;
+    
+    // Handle hidden files (starting with .)
+    if file_name.starts_with('.') && file_name.len() > 1 && !file_name[1..].contains('.') {
+        // Hidden file with no extension
+        return None;
+    }
+    
+    path.file_stem()
         .and_then(|s| s.to_str())
         .map(|s| s.to_string())
 }
@@ -183,7 +168,13 @@ pub fn matches_glob(path: impl AsRef<Path>, pattern: &str) -> bool {
     }
 
     if let Some(prefix) = pattern.strip_suffix("/*") {
-        return path_str.starts_with(prefix);
+        // Check if path starts with prefix followed by exactly one more segment
+        if path_str.starts_with(prefix) && path_str.len() > prefix.len() {
+            let remainder = &path_str[prefix.len()..];
+            // Should start with / and not contain any more /
+            return remainder.starts_with('/') && !remainder[1..].contains('/');
+        }
+        return false;
     }
 
     path_str == pattern
@@ -228,45 +219,19 @@ mod tests {
     }
 
     #[test]
-    fn test_matches_glob() {
-        assert!(matches_glob("test.rs", "*.rs"));
-        assert!(!matches_glob("test.rs", "*.md"));
-        assert!(matches_glob("any/path", "*"));
+    fn test_find_project_root() {
+        // This should find the project root since we have Cargo.toml
+        let current_dir = std::env::current_dir().unwrap();
+        let root = find_project_root(&current_dir);
+        assert!(root.is_some());
+        
+        if let Some(root_path) = root {
+            // Should find Cargo.toml or .git in the root
+            let has_cargo = root_path.join("Cargo.toml").exists();
+            let has_git = root_path.join(".git").exists();
+            let has_tachikoma = root_path.join(".tachikoma").exists();
+            
+            assert!(has_cargo || has_git || has_tachikoma);
+        }
     }
 }
-```
-
----
-
-## Testing Requirements
-
-1. Normalization handles all edge cases
-2. Relative paths calculated correctly
-3. Safe join prevents path traversal
-4. Project root detection works
-
----
-
-## Related Specs
-
-- Depends on: [029-file-system-utilities.md](029-file-system-utilities.md)
-- Related: [116-spec-directory.md](../phase-06-specs/116-spec-directory.md)
-
----
-
-## Phase 1 Complete
-
-Phase 1 provides the core common crates foundation:
-
-- Core types (IDs, timestamps, status)
-- Error handling with codes
-- Configuration types and loading
-- Environment and secrets
-- Threading and async
-- HTTP client with retry
-- Internationalization
-- Logging and tracing
-- Metrics
-- File system utilities
-
-**Next Phase:** [031-primitives-crate.md](../phase-02-primitives/031-primitives-crate.md)

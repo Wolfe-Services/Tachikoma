@@ -1,5 +1,7 @@
 //! File system utilities for Tachikoma.
 
+pub mod path;
+
 use std::fs::{self, File};
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
