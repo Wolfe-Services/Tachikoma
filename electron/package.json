@@ -18,7 +18,18 @@
     "release": "electron-builder --publish always",
     "release:mac": "electron-builder --mac --publish always",
     "release:win": "electron-builder --win --publish always",
-    "release:linux": "electron-builder --linux --publish always"
+    "release:linux": "electron-builder --linux --publish always",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "vitest run --config vitest.config.electron.ts",
+    "test:unit:watch": "vitest --config vitest.config.electron.ts",
+    "test:unit:coverage": "vitest run --config vitest.config.electron.ts --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report",
+    "test:visual": "playwright test --grep=\"@visual\"",
+    "test:performance": "playwright test --grep=\"@performance\"",
+    "test:fixtures": "node scripts/test-fixtures.js"
   },
   "dependencies": {
     "@electron-toolkit/utils": "^4.0.0",
