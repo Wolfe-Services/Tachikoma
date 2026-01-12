@@ -16,12 +16,12 @@ Implement output generation for Forge sessions, including final document assembl
 
 ## Acceptance Criteria
 
-- [ ] Final document assembly from session
-- [ ] Metadata section generation
-- [ ] Audit trail with round history
-- [ ] Multiple export formats (MD, JSON, YAML, HTML)
-- [ ] Decision/dissent appendices
-- [ ] Template-based formatting
+- [x] Final document assembly from session
+- [x] Metadata section generation
+- [x] Audit trail with round history
+- [x] Multiple export formats (MD, JSON, YAML, HTML)
+- [x] Decision/dissent appendices
+- [x] Template-based formatting
 
 ---
 
