@@ -16,12 +16,12 @@ Implement critique collection from multiple models in parallel, with robust pars
 
 ## Acceptance Criteria
 
-- [ ] Parallel critique execution
-- [ ] Structured critique parsing
-- [ ] Fallback parsing for malformed responses
-- [ ] Critique aggregation and deduplication
-- [ ] Score normalization across models
-- [ ] Partial failure handling
+- [x] Parallel critique execution
+- [x] Structured critique parsing
+- [x] Fallback parsing for malformed responses
+- [x] Critique aggregation and deduplication
+- [x] Score normalization across models
+- [x] Partial failure handling
 
 ---
 
