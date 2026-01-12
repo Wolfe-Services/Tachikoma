@@ -16,13 +16,13 @@ Create a diff preview component that displays file changes in a readable format 
 
 ## Acceptance Criteria
 
-- [ ] Unified and split view modes
-- [ ] Syntax highlighting for changed content
-- [ ] Line numbers with add/remove indicators
-- [ ] Expand/collapse unchanged sections
-- [ ] Copy individual hunks
-- [ ] Navigate between hunks
-- [ ] File header with change summary
+- [x] Unified and split view modes
+- [x] Syntax highlighting for changed content
+- [x] Line numbers with add/remove indicators
+- [x] Expand/collapse unchanged sections
+- [x] Copy individual hunks
+- [x] Navigate between hunks
+- [x] File header with change summary
 
 ---
 
