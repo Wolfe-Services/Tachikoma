@@ -27,17 +27,17 @@ Implement a Terminal emulator component for Tachikoma that provides an interacti
 
 ## Acceptance Criteria
 
-- [ ] ANSI escape code rendering (colors, bold, etc.)
-- [ ] Command input with history
-- [ ] Scrollback buffer with configurable size
-- [ ] Copy/paste support
-- [ ] Selection and text highlighting
-- [ ] Multiple terminal tabs
-- [ ] Resize handling
-- [ ] Integration with backend PTY
-- [ ] Search within terminal output
-- [ ] Clear command support
-- [ ] Keyboard shortcuts (Ctrl+C, Ctrl+V, etc.)
+- [x] ANSI escape code rendering (colors, bold, etc.)
+- [x] Command input with history
+- [x] Scrollback buffer with configurable size
+- [x] Copy/paste support
+- [x] Selection and text highlighting
+- [x] Multiple terminal tabs
+- [x] Resize handling
+- [x] Integration with backend PTY
+- [x] Search within terminal output
+- [x] Clear command support
+- [x] Keyboard shortcuts (Ctrl+C, Ctrl+V, etc.)
 
 ---
 
