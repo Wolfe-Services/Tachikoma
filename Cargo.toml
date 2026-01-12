@@ -15,6 +15,13 @@ authors = ["Tachikoma Team"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/tachikoma-project/tachikoma"
 
+[workspace.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[workspace.lints.rustdoc]
+missing_docs = "warn"
+
 [workspace.dependencies]
 # Async runtime
 tokio = { version = "1.35", features = ["full"] }

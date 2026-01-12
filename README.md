@@ -1,60 +1,46 @@
 # Tachikoma
 
-[![CI](https://github.com/tachikoma-project/tachikoma/actions/workflows/ci.yml/badge.svg)](https://github.com/tachikoma-project/tachikoma/actions/workflows/ci.yml)
-[![Release](https://github.com/tachikoma-project/tachikoma/actions/workflows/release.yml/badge.svg)](https://github.com/tachikoma-project/tachikoma/actions/workflows/release.yml)
+[![CI](https://github.com/your-org/tachikoma/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/tachikoma/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE)
 
-**Agentic Coding Platform**
+> Your squad of tireless AI coders
 
-A powerful development environment that combines AI agents with modern tooling to create an intelligent, collaborative coding experience.
-
-## Overview
-
-Tachikoma is a Rust + Electron + Svelte application that provides:
-
-- **AI-Powered Development**: Intelligent code completion, generation, and review
-- **Collaborative Workflows**: Multi-agent coordination for complex tasks
-- **Integrated Toolchain**: Built-in testing, building, and deployment
-- **Extensible Architecture**: Plugin system for custom functionality
-
-## Architecture
-
-- **Backend**: Rust for performance-critical operations
-- **Frontend**: SvelteKit for modern, reactive UI
-- **Desktop**: Electron for cross-platform desktop experience
-- **AI Integration**: Multiple AI provider support with unified interfaces
+Tachikoma is an agentic coding platform that turns "big intentions" into
+small verified changes using the Ralph Wiggum Loop pattern.
 
 ## Quick Start
 
 ```bash
-# Install dependencies
+# Clone and install
+git clone https://github.com/your-org/tachikoma
+cd tachikoma
 npm install
 
-# Start development environment
+# Run development server
 npm run dev
-
-# Run tests
-npm test
 
 # Build for production
 npm run build
 ```
 
+## Documentation
+
+- [Getting Started](docs/getting-started.md)
+- [Architecture](docs/architecture.md)
+- [CLI Reference](docs/reference/cli.md)
+- [API Docs](docs/api/)
+
 ## Project Structure
 
 ```
 tachikoma/
-├── crates/          # Rust workspace crates
+├── crates/          # Rust backend crates
 ├── electron/        # Electron main process
 ├── web/             # SvelteKit frontend
-├── specs/           # Specification files
-├── scripts/         # Build and utility scripts
+├── specs/           # Specifications (THE PIN)
 └── docs/            # Documentation
 ```
 
-## Development
-
-See [AGENTS.md](AGENTS.md) for AI assistant instructions and development patterns.
-
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+Licensed under either of Apache License, Version 2.0 or MIT license at your option.

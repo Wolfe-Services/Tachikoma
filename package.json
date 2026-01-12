@@ -22,10 +22,15 @@
     "lint:web": "cd web && npm run lint && npm run check",
     "clean": "source ~/.cargo/env 2>/dev/null || true && cargo clean && rm -rf web/dist && rm -rf electron/dist && rm -rf electron/out",
     "package": "npm run build && cd electron && npm run package",
-    "install:all": "npm install && cd web && npm install && cd ../electron && npm install"
+    "install:all": "npm install && cd web && npm install && cd ../electron && npm install",
+    "docs": "npm run docs:rust && npm run docs:web",
+    "docs:rust": "source ~/.cargo/env 2>/dev/null || true && cargo doc --workspace --no-deps --document-private-items",
+    "docs:web": "cd web && npx typedoc",
+    "docs:serve": "npx serve docs"
   },
   "devDependencies": {
     "concurrently": "^8.2.0",
+    "serve": "^14.2.5",
     "wait-on": "^7.2.0"
   }
 }

@@ -1,0 +1,14 @@
+{
+  "entryPoints": ["src/lib/index.ts"],
+  "entryPointStrategy": "expand",
+  "out": "../docs/api/web",
+  "plugin": ["typedoc-plugin-markdown"],
+  "readme": "none",
+  "exclude": ["**/*.test.ts", "**/*.spec.ts", "**/node_modules/**"],
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "categorizeByGroup": true,
+  "categoryOrder": ["Stores", "Components", "Utils", "*"],
+  "includeVersion": true,
+  "sort": ["source-order"]
+}

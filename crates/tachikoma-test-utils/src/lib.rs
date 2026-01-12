@@ -1,4 +1,26 @@
 //! Test utilities for Tachikoma crates.
+//!
+//! This crate provides common testing utilities, macros, and helpers
+//! to streamline testing across the Tachikoma project.
+//!
+//! # Examples
+//!
+//! ```rust
+//! use tachikoma_test_utils::{temp_dir, temp_file, assert_ok};
+//! 
+//! // Create a temporary directory
+//! let dir = temp_dir();
+//! 
+//! // Create a temporary file
+//! let (_dir, path) = temp_file("test content");
+//! 
+//! // Use assertion macros
+//! let result: Result<i32, &str> = Ok(42);
+//! let value = assert_ok!(result);
+//! ```
+
+#![cfg_attr(docsrs, feature(doc_cfg))]
+#![warn(missing_docs)]
 
 use std::path::PathBuf;
 use tempfile::TempDir;
