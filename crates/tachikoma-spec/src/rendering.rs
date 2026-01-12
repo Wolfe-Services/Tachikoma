@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use handlebars::{Handlebars, Helper, HelperResult, Context, RenderContext as HbRenderContext, Output, Renderable};
+use handlebars::{Handlebars, Helper, HelperResult, Context, RenderContext as HbRenderContext, Output};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tokio::fs;
@@ -208,7 +208,7 @@ impl SpecRenderer {
     pub fn render(
         &self,
         template: &str,
-        context: &RenderContext,
+        context: &TemplateContext,
     ) -> Result<String, RenderError> {
         let result = self.handlebars.render(template, context)?;
         Ok(result)
