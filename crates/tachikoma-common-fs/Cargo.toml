@@ -1,0 +1,11 @@
+[package]
+name = "tachikoma-common-fs"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+thiserror.workspace = true
+tachikoma-common-core = { path = "../tachikoma-common-core" }
+
+[dev-dependencies]
+tempfile = "3.9"

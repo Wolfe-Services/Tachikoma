@@ -16,11 +16,11 @@ Provide file system utilities for safe file operations including atomic writes, 
 
 ## Acceptance Criteria
 
-- [ ] Atomic file writes
-- [ ] Safe directory creation
-- [ ] File read with encoding detection
-- [ ] Temporary file utilities
-- [ ] File permissions handling
+- [x] Atomic file writes
+- [x] Safe directory creation
+- [x] File read with encoding detection
+- [x] Temporary file utilities
+- [x] File permissions handling
 
 ---
 
