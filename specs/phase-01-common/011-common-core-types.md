@@ -16,12 +16,12 @@ Define the foundational types used across all Tachikoma crates: IDs, timestamps,
 
 ## Acceptance Criteria
 
-- [ ] `tachikoma-common-core` crate created
-- [ ] ID types with validation (MissionId, SpecId, etc.)
-- [ ] Timestamp wrapper with serialization
-- [ ] Common status enums
-- [ ] Serialize/Deserialize for all types
-- [ ] Display implementations
+- [x] `tachikoma-common-core` crate created
+- [x] ID types with validation (MissionId, SpecId, etc.)
+- [x] Timestamp wrapper with serialization
+- [x] Common status enums
+- [x] Serialize/Deserialize for all types
+- [x] Display implementations
 
 ---
 
