@@ -19,7 +19,7 @@ tachikoma-common-core = { workspace = true }
 tachikoma-common-config = { workspace = true }
 tachikoma-primitives = { workspace = true }
 
-clap = { version = "4.5", features = ["derive", "env", "string", "wrap_help"] }
+clap = { workspace = true, features = ["derive", "env", "string", "wrap_help"] }
 clap_complete = "4.5"
 tokio = { workspace = true }
 tracing = { workspace = true }
