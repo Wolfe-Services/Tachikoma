@@ -26,14 +26,14 @@ Implement a consistent spacing system for Tachikoma using a 4px base unit, provi
 
 ## Acceptance Criteria
 
-- [ ] 4px base unit spacing scale
-- [ ] Padding and margin utility classes
-- [ ] Gap utilities for flexbox/grid
-- [ ] Responsive spacing modifiers
-- [ ] Component-specific spacing tokens
-- [ ] Negative margin support
-- [ ] Spacing composition patterns
-- [ ] TypeScript spacing utilities
+- [x] 4px base unit spacing scale
+- [x] Padding and margin utility classes
+- [x] Gap utilities for flexbox/grid
+- [x] Responsive spacing modifiers
+- [x] Component-specific spacing tokens
+- [x] Negative margin support
+- [x] Spacing composition patterns
+- [x] TypeScript spacing utilities
 
 ---
 
