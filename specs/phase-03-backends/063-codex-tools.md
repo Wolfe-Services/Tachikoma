@@ -16,12 +16,12 @@ Implement tool/function calling support for the OpenAI/Codex backend, including 
 
 ## Acceptance Criteria
 
-- [ ] Convert `ToolDefinition` to OpenAI function format
-- [ ] Parse tool_calls from responses
-- [ ] Format tool results as messages
-- [ ] Support tool_choice parameter
-- [ ] Handle parallel tool calls
-- [ ] Streaming tool call accumulation
+- [x] Convert `ToolDefinition` to OpenAI function format
+- [x] Parse tool_calls from responses
+- [x] Format tool results as messages
+- [x] Support tool_choice parameter
+- [x] Handle parallel tool calls
+- [x] Streaming tool call accumulation
 
 ---
 
