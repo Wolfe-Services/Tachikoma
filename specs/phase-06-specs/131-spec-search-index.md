@@ -13,14 +13,14 @@ Implement a search indexing system for specifications that enables fast, full-te
 
 ## Acceptance Criteria
 
-- [ ] Full-text search across all spec content works
-- [ ] Field-specific search (title, section, code) works
-- [ ] Fuzzy matching handles typos
-- [ ] Faceted filtering by phase, status, etc. works
-- [ ] Index updates are incremental
-- [ ] Search results are relevance-ranked
-- [ ] Index persistence and recovery works
-- [ ] Index building is performant for large spec sets
+- [x] Full-text search across all spec content works
+- [x] Field-specific search (title, section, code) works
+- [x] Fuzzy matching handles typos
+- [x] Faceted filtering by phase, status, etc. works
+- [x] Index updates are incremental
+- [x] Search results are relevance-ranked
+- [x] Index persistence and recovery works
+- [x] Index building is performant for large spec sets
 
 ## Implementation Details
 
