@@ -16,14 +16,14 @@ Implement the template substitution system for prompts - replacing variables wit
 
 ## Acceptance Criteria
 
-- [ ] Variable substitution with `{{variable}}` syntax
-- [ ] Built-in variables (iteration, timestamp, etc.)
-- [ ] Conditional blocks with `{{#if}}`
-- [ ] Loop blocks with `{{#each}}`
-- [ ] Helper functions (date, uppercase, etc.)
-- [ ] Escaping mechanism for literal braces
-- [ ] Custom variable providers
-- [ ] Error handling for missing variables
+- [x] Variable substitution with `{{variable}}` syntax
+- [x] Built-in variables (iteration, timestamp, etc.)
+- [x] Conditional blocks with `{{#if}}`
+- [x] Loop blocks with `{{#each}}`
+- [x] Helper functions (date, uppercase, etc.)
+- [x] Escaping mechanism for literal braces
+- [x] Custom variable providers
+- [x] Error handling for missing variables
 
 ---
 
