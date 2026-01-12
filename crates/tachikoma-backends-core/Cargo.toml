@@ -1,0 +1,20 @@
+[package]
+name = "tachikoma-backends-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Core backend traits and types for Tachikoma LLM integration"
+
+[dependencies]
+tachikoma-common-core.workspace = true
+async-trait = "0.1"
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, features = ["sync"] }
+futures = "0.3"
+pin-project-lite = "0.2"
+tracing = "0.1"
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
