@@ -259,4 +259,41 @@ declare global {
   }
 }
 
+// Settings API interface
+export interface SettingsAPI {
+  // Basic config operations
+  getConfig: () => Promise<Record<string, unknown>>;
+  setConfig: (key: string, value: unknown) => Promise<void>;
+  resetConfig: () => Promise<void>;
+  
+  // Theme management
+  getThemes: () => Promise<string[]>;
+  setTheme: (theme: string) => Promise<void>;
+  
+  // Language management
+  getLanguages: () => Promise<Array<{ code: string; name: string }>>;
+  setLanguage: (code: string) => Promise<void>;
+  
+  // Import/Export
+  exportConfig: () => Promise<Record<string, unknown>>;
+  importConfig: (config: Record<string, unknown>) => Promise<void>;
+  validateConfig: (config: Record<string, unknown>) => Promise<{ valid: boolean; errors: string[] }>;
+  
+  // Settings categories
+  getCategories: () => Promise<Array<{ id: string; name: string; icon?: string }>>;
+  getCategorySettings: (category: string) => Promise<Record<string, unknown>>;
+  
+  // Settings change watching
+  onSettingChanged: (callback: (key: string, value: unknown, oldValue: unknown) => void) => () => void;
+  
+  // Keybinding management
+  getKeybindings: () => Promise<Record<string, string[]>>;
+  setKeybinding: (action: string, keys: string[]) => Promise<void>;
+  resetKeybindings: () => Promise<void>;
+  
+  // Plugin settings
+  getPluginSettings: (pluginId: string) => Promise<Record<string, unknown>>;
+  setPluginSetting: (pluginId: string, key: string, value: unknown) => Promise<void>;
+}
+
 export {};
