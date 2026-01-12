@@ -16,12 +16,12 @@ Implement tool calling support for the Claude backend, including tool definition
 
 ## Acceptance Criteria
 
-- [ ] Convert `ToolDefinition` to Claude API format
-- [ ] Parse tool_use content blocks from responses
-- [ ] Format tool results for continuation
-- [ ] Support tool_choice parameter
-- [ ] Handle streaming tool calls
-- [ ] Parallel tool call support
+- [x] Convert `ToolDefinition` to Claude API format
+- [x] Parse tool_use content blocks from responses
+- [x] Format tool results for continuation
+- [x] Support tool_choice parameter
+- [x] Handle streaming tool calls
+- [x] Parallel tool call support
 
 ---
 
