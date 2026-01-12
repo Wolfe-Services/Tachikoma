@@ -42,6 +42,12 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 # HTTP
 reqwest = { version = "0.11", features = ["json", "stream"] }
 
+# Async utilities
+futures-util = "0.3"
+
+# Bytes handling
+bytes = "1.5"
+
 # CLI
 clap = { version = "4.4", features = ["derive", "env"] }
 

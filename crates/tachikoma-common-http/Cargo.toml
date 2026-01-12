@@ -6,11 +6,14 @@ license.workspace = true
 description = "HTTP client utilities for Tachikoma"
 
 [dependencies]
-reqwest = { workspace = true, features = ["json", "gzip"] }
+reqwest = { workspace = true, features = ["json", "gzip", "stream"] }
 serde.workspace = true
+serde_json.workspace = true
 thiserror.workspace = true
 tokio = { workspace = true, features = ["time"] }
 tracing.workspace = true
+futures-util.workspace = true
+bytes.workspace = true
 
 [dev-dependencies]
 tokio-test.workspace = true

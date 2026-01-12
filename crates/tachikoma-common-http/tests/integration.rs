@@ -1,5 +1,16 @@
-use tachikoma_common_http::{HttpClient, HttpConfig, HttpError};
+use tachikoma_common_http::{
+    HttpClient, HttpConfig, HttpError, RequestBuilder, JsonBody, headers,
+    ResponseError,
+};
+use serde::{Serialize, Deserialize};
 use std::time::Duration;
+use std::error::Error;
+
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+struct TestPayload {
+    message: String,
+    value: i32,
+}
 
 #[tokio::test]
 async fn test_http_client_functionality() {
@@ -20,6 +31,104 @@ async fn test_http_client_functionality() {
     
     let custom_client = HttpClient::with_config(config).expect("Failed to create custom client");
     let _custom_inner = custom_client.inner();
+}
+
+#[tokio::test]
+async fn test_request_builder_integration() {
+    // Create a request builder with all features
+    let builder = RequestBuilder::new()
+        .base_url("https://httpbin.org")
+        .bearer_auth("test-token")
+        .json_content()
+        .header("Custom-Header", "test-value");
+    
+    // Test URL building
+    let url = builder.url("/json");
+    assert_eq!(url, "https://httpbin.org/json");
+    
+    // Test headers
+    let headers = builder.headers();
+    assert!(headers.contains_key(reqwest::header::AUTHORIZATION));
+    assert!(headers.contains_key(reqwest::header::CONTENT_TYPE));
+    assert!(headers.contains_key("Custom-Header"));
+    
+    // Test header values
+    let auth = headers.get(reqwest::header::AUTHORIZATION).unwrap();
+    assert_eq!(auth.to_str().unwrap(), "Bearer test-token");
+    
+    let content_type = headers.get(reqwest::header::CONTENT_TYPE).unwrap();
+    assert_eq!(content_type.to_str().unwrap(), headers::CONTENT_TYPE_JSON);
+    
+    let custom = headers.get("Custom-Header").unwrap();
+    assert_eq!(custom.to_str().unwrap(), "test-value");
+}
+
+#[test]
+fn test_json_body_functionality() {
+    let payload = TestPayload {
+        message: "Hello, World!".to_string(),
+        value: 42,
+    };
+    
+    let json_body = JsonBody(payload);
+    
+    // Test serialization methods
+    let string_result = json_body.to_string().unwrap();
+    assert!(string_result.contains("Hello, World!"));
+    assert!(string_result.contains("42"));
+    
+    let bytes_result = json_body.to_bytes().unwrap();
+    assert!(!bytes_result.is_empty());
+    
+    let pretty_result = json_body.to_string_pretty().unwrap();
+    assert!(pretty_result.contains("Hello, World!"));
+    assert!(pretty_result.len() > string_result.len()); // Pretty formatting adds whitespace
+}
+
+#[test]
+fn test_header_constants() {
+    // Verify all header constants are properly defined
+    assert_eq!(headers::CONTENT_TYPE_JSON, "application/json");
+    assert_eq!(headers::CONTENT_TYPE_SSE, "text/event-stream");
+    assert_eq!(headers::X_API_KEY, "x-api-key");
+    assert_eq!(headers::ANTHROPIC_VERSION, "anthropic-version");
+}
+
+#[test]
+fn test_response_error_types() {
+    // Create a mock JSON error
+    let json_error = serde_json::from_str::<TestPayload>("invalid json").unwrap_err();
+    
+    let parse_error = ResponseError::Parse {
+        status: 400,
+        body: "invalid json".to_string(),
+        source: json_error,
+    };
+    
+    // Test error display
+    let error_string = format!("{}", parse_error);
+    assert!(error_string.contains("failed to parse JSON"));
+    assert!(error_string.contains("status 400"));
+    
+    // Test error source chain
+    assert!(parse_error.source().is_some());
+}
+
+#[test]
+fn test_api_key_builder() {
+    let builder = RequestBuilder::new()
+        .api_key("test-api-key-123")
+        .header(headers::ANTHROPIC_VERSION, "2023-06-01");
+    
+    let headers = builder.headers();
+    
+    // Test API key header
+    let api_key = headers.get(headers::X_API_KEY).unwrap();
+    assert_eq!(api_key.to_str().unwrap(), "test-api-key-123");
+    
+    // Test Anthropic version header
+    let version = headers.get(headers::ANTHROPIC_VERSION).unwrap();
+    assert_eq!(version.to_str().unwrap(), "2023-06-01");
 }
 
 #[test]

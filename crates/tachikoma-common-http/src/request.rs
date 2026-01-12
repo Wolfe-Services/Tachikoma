@@ -1,34 +1,3 @@
-# 021 - HTTP Request/Response Types
-
-**Phase:** 1 - Core Common Crates
-**Spec ID:** 021
-**Status:** Planned
-**Dependencies:** 020-http-client-foundation
-**Estimated Context:** ~8% of Sonnet window
-
----
-
-## Objective
-
-Define common request and response types for HTTP APIs including headers, JSON body helpers, and streaming support.
-
----
-
-## Acceptance Criteria
-
-- [x] Request builder with headers
-- [x] JSON response parsing
-- [x] Streaming response support
-- [x] Common header constants
-- [x] Content-Type handling
-
----
-
-## Implementation Details
-
-### 1. Request Types (crates/tachikoma-common-http/src/request.rs)
-
-```rust
 //! HTTP request types and builders.
 
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
@@ -140,6 +109,13 @@ impl<T: Serialize> JsonBody<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serde::Serialize;
+
+    #[derive(Serialize)]
+    struct TestData {
+        message: String,
+        value: i32,
+    }
 
     #[test]
     fn test_request_builder_url() {
@@ -148,63 +124,103 @@ mod tests {
     }
 
     #[test]
+    fn test_request_builder_url_trailing_slash() {
+        let builder = RequestBuilder::new().base_url("https://api.example.com/");
+        assert_eq!(builder.url("/v1/test"), "https://api.example.com/v1/test");
+    }
+
+    #[test]
+    fn test_request_builder_no_base_url() {
+        let builder = RequestBuilder::new();
+        assert_eq!(builder.url("/v1/test"), "/v1/test");
+    }
+
+    #[test]
     fn test_bearer_auth() {
         let builder = RequestBuilder::new().bearer_auth("token123");
         let auth = builder.headers().get(AUTHORIZATION).unwrap();
         assert_eq!(auth.to_str().unwrap(), "Bearer token123");
     }
+
+    #[test]
+    fn test_api_key() {
+        let builder = RequestBuilder::new().api_key("key123");
+        let api_key = builder.headers().get(headers::X_API_KEY).unwrap();
+        assert_eq!(api_key.to_str().unwrap(), "key123");
+    }
+
+    #[test]
+    fn test_json_content() {
+        let builder = RequestBuilder::new().json_content();
+        let content_type = builder.headers().get(CONTENT_TYPE).unwrap();
+        assert_eq!(content_type.to_str().unwrap(), headers::CONTENT_TYPE_JSON);
+    }
+
+    #[test]
+    fn test_custom_header() {
+        let builder = RequestBuilder::new().header("Custom-Header", "custom-value");
+        let custom = builder.headers().get("Custom-Header").unwrap();
+        assert_eq!(custom.to_str().unwrap(), "custom-value");
+    }
+
+    #[test]
+    fn test_json_body_serialization() {
+        let test_data = TestData {
+            message: "hello".to_string(),
+            value: 42,
+        };
+        let json_body = JsonBody(test_data);
+        
+        let serialized = json_body.to_string().unwrap();
+        assert!(serialized.contains("\"message\":\"hello\""));
+        assert!(serialized.contains("\"value\":42"));
+    }
+
+    #[test]
+    fn test_json_body_bytes() {
+        let test_data = TestData {
+            message: "test".to_string(),
+            value: 123,
+        };
+        let json_body = JsonBody(test_data);
+        
+        let bytes = json_body.to_bytes().unwrap();
+        assert!(!bytes.is_empty());
+        
+        // Should be valid JSON
+        let parsed: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(parsed["message"], "test");
+        assert_eq!(parsed["value"], 123);
+    }
+
+    #[test]
+    fn test_header_constants() {
+        assert_eq!(headers::CONTENT_TYPE_JSON, "application/json");
+        assert_eq!(headers::CONTENT_TYPE_SSE, "text/event-stream");
+        assert_eq!(headers::X_API_KEY, "x-api-key");
+        assert_eq!(headers::ANTHROPIC_VERSION, "anthropic-version");
+    }
+
+    #[test]
+    fn test_builder_default() {
+        let builder1 = RequestBuilder::default();
+        let builder2 = RequestBuilder::new();
+        
+        // Both should have empty headers initially
+        assert_eq!(builder1.headers().len(), builder2.headers().len());
+    }
+
+    #[test]
+    fn test_builder_chaining() {
+        let builder = RequestBuilder::new()
+            .base_url("https://api.example.com")
+            .bearer_auth("token")
+            .json_content()
+            .header("Custom", "value");
+            
+        assert_eq!(builder.url("/test"), "https://api.example.com/test");
+        assert!(builder.headers().contains_key(AUTHORIZATION));
+        assert!(builder.headers().contains_key(CONTENT_TYPE));
+        assert!(builder.headers().contains_key("Custom"));
+    }
 }
-```
-
-### 2. Response Types (crates/tachikoma-common-http/src/response.rs)
-
-```rust
-//! HTTP response types.
-
-use serde::de::DeserializeOwned;
-
-/// Parse a JSON response.
-pub async fn parse_json<T: DeserializeOwned>(
-    response: reqwest::Response,
-) -> Result<T, ResponseError> {
-    let status = response.status();
-    let bytes = response.bytes().await.map_err(ResponseError::Read)?;
-
-    serde_json::from_slice(&bytes).map_err(|e| ResponseError::Parse {
-        status: status.as_u16(),
-        body: String::from_utf8_lossy(&bytes).to_string(),
-        source: e,
-    })
-}
-
-/// Response parsing errors.
-#[derive(Debug, thiserror::Error)]
-pub enum ResponseError {
-    #[error("failed to read response body: {0}")]
-    Read(#[source] reqwest::Error),
-
-    #[error("failed to parse JSON (status {status}): {source}")]
-    Parse {
-        status: u16,
-        body: String,
-        #[source]
-        source: serde_json::Error,
-    },
-}
-```
-
----
-
-## Testing Requirements
-
-1. Request builder constructs correct URLs
-2. Headers are properly formatted
-3. JSON responses parse correctly
-4. Parse errors include response body
-
----
-
-## Related Specs
-
-- Depends on: [020-http-client-foundation.md](020-http-client-foundation.md)
-- Next: [022-http-retry-logic.md](022-http-retry-logic.md)
