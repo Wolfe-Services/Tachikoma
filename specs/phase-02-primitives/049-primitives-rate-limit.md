@@ -16,12 +16,12 @@ Implement rate limiting for primitive operations to prevent resource exhaustion 
 
 ## Acceptance Criteria
 
-- [ ] Per-primitive rate limits
-- [ ] Global rate limits across all primitives
-- [ ] Token bucket algorithm implementation
-- [ ] Configurable limits
-- [ ] Backpressure support
-- [ ] Rate limit headers/metadata in responses
+- [x] Per-primitive rate limits
+- [x] Global rate limits across all primitives
+- [x] Token bucket algorithm implementation
+- [x] Configurable limits
+- [x] Backpressure support
+- [x] Rate limit headers/metadata in responses
 
 ---
 
