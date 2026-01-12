@@ -20,12 +20,18 @@ function createWindow(): void {
       sandbox: true,
       contextIsolation: true,
       nodeIntegration: false,
-      webSecurity: true
+      webSecurity: true,
+      devTools: is.dev
     }
   })
 
   mainWindow.on('ready-to-show', () => {
     mainWindow?.show()
+    
+    // Open DevTools in development
+    if (is.dev) {
+      mainWindow?.webContents.openDevTools()
+    }
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -47,6 +53,11 @@ app.whenReady().then(() => {
 
   // Register IPC handlers
   registerIpcHandlers()
+
+  // Enable remote debugging port for DevTools debugging
+  if (is.dev) {
+    app.commandLine.appendSwitch('remote-debugging-port', '9222')
+  }
 
   // Watch for shortcuts in dev
   app.on('browser-window-created', (_, window) => {

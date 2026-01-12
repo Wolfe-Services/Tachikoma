@@ -9,11 +9,20 @@ export default defineConfig({
 
   build: {
     target: 'esnext',
-    minify: 'esbuild'
+    minify: 'esbuild',
+    sourcemap: true
   },
 
   server: {
     port: 5173,
-    strictPort: true
+    strictPort: true,
+    hmr: {
+      port: 5173
+    }
+  },
+
+  // Enable source maps for development
+  css: {
+    devSourcemap: true
   }
 });

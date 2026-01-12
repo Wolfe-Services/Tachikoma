@@ -16,12 +16,12 @@ Configure hot module replacement, development scripts, and debugging tools for e
 
 ## Acceptance Criteria
 
-- [ ] HMR working for Svelte components
-- [ ] Electron main process restarts on changes
-- [ ] Concurrent dev server script
-- [ ] Source maps configured
-- [ ] Chrome DevTools accessible
-- [ ] Debug configurations for VS Code
+- [x] HMR working for Svelte components
+- [x] Electron main process restarts on changes
+- [x] Concurrent dev server script
+- [x] Source maps configured
+- [x] Chrome DevTools accessible
+- [x] Debug configurations for VS Code
 
 ---
 
