@@ -16,12 +16,12 @@ Define the configuration system for Forge sessions, including model selection, r
 
 ## Acceptance Criteria
 
-- [ ] `ForgeConfig` with all session parameters
-- [ ] `ModelConfig` for per-model settings
-- [ ] YAML configuration file support
-- [ ] Environment variable overrides
-- [ ] Validation for all config values
-- [ ] Default configurations for common use cases
+- [x] `ForgeConfig` with all session parameters
+- [x] `ModelConfig` for per-model settings
+- [x] YAML configuration file support
+- [x] Environment variable overrides
+- [x] Validation for all config values
+- [x] Default configurations for common use cases
 
 ---
 
