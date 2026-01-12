@@ -1,0 +1,31 @@
+[package]
+name = "tachikoma-spec"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+# Async runtime
+tokio = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error handling
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# File watching
+notify = "6.1"
+
+# Common utilities
+tachikoma-common-fs = { path = "../tachikoma-common-fs" }
+
+# Testing
+[dev-dependencies]
+tokio-test = { workspace = true }
+tempfile = "3.8"
