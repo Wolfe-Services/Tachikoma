@@ -26,16 +26,16 @@ Implement a flexible Input component for Tachikoma supporting various input type
 
 ## Acceptance Criteria
 
-- [ ] Multiple input types (text, email, password, number, search, url)
-- [ ] Three sizes (sm, md, lg)
-- [ ] Validation states (error, success)
-- [ ] Helper text and error messages
-- [ ] Left and right adornments (icons, text)
-- [ ] Password visibility toggle
-- [ ] Clearable input
-- [ ] Character count
-- [ ] Disabled and readonly states
-- [ ] Full keyboard and screen reader support
+- [x] Multiple input types (text, email, password, number, search, url)
+- [x] Three sizes (sm, md, lg)
+- [x] Validation states (error, success)
+- [x] Helper text and error messages
+- [x] Left and right adornments (icons, text)
+- [x] Password visibility toggle
+- [x] Clearable input
+- [x] Character count
+- [x] Disabled and readonly states
+- [x] Full keyboard and screen reader support
 
 ---
 
