@@ -13,15 +13,15 @@ Implement the `tachikoma init` command for scaffolding new Tachikoma projects wi
 
 ## Acceptance Criteria
 
-- [ ] Create project directory structure
-- [ ] Generate tachikoma.toml configuration
-- [ ] Create Cargo.toml for Rust projects
-- [ ] Support multiple project templates
-- [ ] Interactive wizard mode
-- [ ] Git repository initialization
-- [ ] .gitignore generation
-- [ ] Validate project name
-- [ ] Prevent overwriting existing projects
+- [x] Create project directory structure
+- [x] Generate tachikoma.toml configuration
+- [x] Create Cargo.toml for Rust projects
+- [x] Support multiple project templates
+- [x] Interactive wizard mode
+- [x] Git repository initialization
+- [x] .gitignore generation
+- [x] Validate project name
+- [x] Prevent overwriting existing projects
 
 ## Implementation Details
 
