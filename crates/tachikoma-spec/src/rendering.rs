@@ -208,7 +208,7 @@ impl SpecRenderer {
     pub fn render(
         &self,
         template: &str,
-        context: &TemplateContext,
+        context: &RenderContext,
     ) -> Result<String, RenderError> {
         let result = self.handlebars.render(template, context)?;
         Ok(result)
@@ -218,7 +218,7 @@ impl SpecRenderer {
     pub fn render_format(
         &self,
         template: &str,
-        context: &TemplateContext,
+        context: &RenderContext,
         format: OutputFormat,
     ) -> Result<String, RenderError> {
         let content = self.render(template, context)?;
