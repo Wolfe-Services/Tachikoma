@@ -16,12 +16,12 @@ Implement the Ollama backend for local LLM inference, including server detection
 
 ## Acceptance Criteria
 
-- [ ] `OllamaBackend` implementing `Backend` trait
-- [ ] Ollama server detection and connection
-- [ ] Health check and version detection
-- [ ] Chat API integration
-- [ ] Generate API integration
-- [ ] Streaming response support
+- [x] `OllamaBackend` implementing `Backend` trait
+- [x] Ollama server detection and connection
+- [x] Health check and version detection
+- [x] Chat API integration
+- [x] Generate API integration
+- [x] Streaming response support
 
 ---
 
