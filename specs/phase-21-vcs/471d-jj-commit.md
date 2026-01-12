@@ -1,9 +1,9 @@
-# 446d - jj Commit Operations
+# 471d - jj Commit Operations
 
 **Phase:** 21 - VCS Integration
-**Spec ID:** 446d
+**Spec ID:** 471d
 **Status:** Planned
-**Dependencies:** 446c-jj-status
+**Dependencies:** 471c-jj-status
 **Estimated Context:** ~3% of Sonnet window
 
 ---
@@ -141,5 +141,5 @@ impl JjRepo {
 
 ## Related Specs
 
-- Depends on: [446c-jj-status.md](446c-jj-status.md)
-- Next: [446e-jj-conflicts.md](446e-jj-conflicts.md)
+- Depends on: [471c-jj-status.md](471c-jj-status.md)
+- Next: [471e-jj-conflicts.md](471e-jj-conflicts.md)

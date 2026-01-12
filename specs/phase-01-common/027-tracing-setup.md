@@ -16,11 +16,11 @@ Configure distributed tracing with spans, instrumentation macros, and context pr
 
 ## Acceptance Criteria
 
-- [ ] Span creation and nesting
-- [ ] Instrumentation attributes
-- [ ] Context propagation across async
-- [ ] Span field recording
-- [ ] Performance-aware tracing
+- [x] Span creation and nesting
+- [x] Instrumentation attributes
+- [x] Context propagation across async
+- [x] Span field recording
+- [x] Performance-aware tracing
 
 ---
 

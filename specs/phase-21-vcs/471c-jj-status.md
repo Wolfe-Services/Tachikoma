@@ -1,9 +1,9 @@
-# 446c - jj Status Operations
+# 471c - jj Status Operations
 
 **Phase:** 21 - VCS Integration
-**Spec ID:** 446c
+**Spec ID:** 471c
 **Status:** Planned
-**Dependencies:** 446b-jj-repository
+**Dependencies:** 471b-jj-repository
 **Estimated Context:** ~3% of Sonnet window
 
 ---
@@ -134,5 +134,5 @@ fn parse_conflict_list(output: &str) -> Vec<Conflict> {
 
 ## Related Specs
 
-- Depends on: [446b-jj-repository.md](446b-jj-repository.md)
-- Next: [446d-jj-commit.md](446d-jj-commit.md)
+- Depends on: [471b-jj-repository.md](471b-jj-repository.md)
+- Next: [471d-jj-commit.md](471d-jj-commit.md)

@@ -1,7 +1,7 @@
-# 446a - VCS Crate Setup (jj-first)
+# 471a - VCS Crate Setup (jj-first)
 
 **Phase:** 21 - VCS Integration
-**Spec ID:** 446a
+**Spec ID:** 471a
 **Status:** Planned
 **Dependencies:** 011-common-core-types
 **Estimated Context:** ~4% of Sonnet window
@@ -233,5 +233,5 @@ pub struct VcsResult {
 
 ## Related Specs
 
-- Next: [446b-jj-repository.md](446b-jj-repository.md)
-- Git compat: [446e-git-compat.md](446e-git-compat.md)
+- Next: [471b-jj-repository.md](471b-jj-repository.md)
+- Git compat: [471e-git-compat.md](471e-git-compat.md)

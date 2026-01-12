@@ -1,9 +1,9 @@
-# 446b - jj Repository Detection
+# 471b - jj Repository Detection
 
 **Phase:** 21 - VCS Integration
-**Spec ID:** 446b
+**Spec ID:** 471b
 **Status:** Planned
-**Dependencies:** 446a-vcs-crate-setup
+**Dependencies:** 471a-vcs-crate-setup
 **Estimated Context:** ~3% of Sonnet window
 
 ---
@@ -165,5 +165,5 @@ pub enum JjError {
 
 ## Related Specs
 
-- Depends on: [446a-vcs-crate-setup.md](446a-vcs-crate-setup.md)
-- Next: [446c-jj-status.md](446c-jj-status.md)
+- Depends on: [471a-vcs-crate-setup.md](471a-vcs-crate-setup.md)
+- Next: [471c-jj-status.md](471c-jj-status.md)

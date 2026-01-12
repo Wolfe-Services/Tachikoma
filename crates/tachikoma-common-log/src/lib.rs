@@ -2,7 +2,6 @@
 
 use std::io;
 use std::path::PathBuf;
-use tracing::Level;
 use tracing_subscriber::{
     fmt::{self, format::FmtSpan},
     layer::SubscriberExt,
@@ -38,14 +37,14 @@ pub enum LogLevel {
     Error,
 }
 
-impl From<LogLevel> for Level {
+impl From<LogLevel> for tracing_subscriber::filter::LevelFilter {
     fn from(level: LogLevel) -> Self {
         match level {
-            LogLevel::Trace => Level::TRACE,
-            LogLevel::Debug => Level::DEBUG,
-            LogLevel::Info => Level::INFO,
-            LogLevel::Warn => Level::WARN,
-            LogLevel::Error => Level::ERROR,
+            LogLevel::Trace => tracing_subscriber::filter::LevelFilter::TRACE,
+            LogLevel::Debug => tracing_subscriber::filter::LevelFilter::DEBUG,
+            LogLevel::Info => tracing_subscriber::filter::LevelFilter::INFO,
+            LogLevel::Warn => tracing_subscriber::filter::LevelFilter::WARN,
+            LogLevel::Error => tracing_subscriber::filter::LevelFilter::ERROR,
         }
     }
 }
@@ -279,8 +278,11 @@ pub enum LogError {
     FileError(#[from] io::Error),
 }
 
-/// Convenience macros re-exported.
+/// Convenience macros re-exported from tracing.
 pub use tracing::{debug, error, info, trace, warn};
+
+/// Distributed tracing utilities.
+pub mod spans;
 
 #[cfg(test)]
 mod tests {
@@ -300,11 +302,12 @@ mod tests {
 
     #[test]
     fn test_log_level_from() {
-        assert_eq!(Level::from(LogLevel::Trace), Level::TRACE);
-        assert_eq!(Level::from(LogLevel::Debug), Level::DEBUG);
-        assert_eq!(Level::from(LogLevel::Info), Level::INFO);
-        assert_eq!(Level::from(LogLevel::Warn), Level::WARN);
-        assert_eq!(Level::from(LogLevel::Error), Level::ERROR);
+        use tracing_subscriber::filter::LevelFilter;
+        assert_eq!(LevelFilter::from(LogLevel::Trace), LevelFilter::TRACE);
+        assert_eq!(LevelFilter::from(LogLevel::Debug), LevelFilter::DEBUG);
+        assert_eq!(LevelFilter::from(LogLevel::Info), LevelFilter::INFO);
+        assert_eq!(LevelFilter::from(LogLevel::Warn), LevelFilter::WARN);
+        assert_eq!(LevelFilter::from(LogLevel::Error), LevelFilter::ERROR);
     }
 
     #[test]

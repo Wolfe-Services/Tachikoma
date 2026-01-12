@@ -23,6 +23,7 @@ Execute specs in numerical order. Each phase must complete before the next.
 | 003 | [Electron Shell](phase-00-setup/003-electron-shell.md) | electron, main, window, app |
 | 004 | [Svelte Integration](phase-00-setup/004-svelte-integration.md) | svelte, vite, renderer, frontend |
 | 005 | [IPC Bridge](phase-00-setup/005-ipc-bridge.md) | ipc, napi, native, binding |
+| 005b | [IPC Listener Fix](phase-00-setup/005b-ipc-listener-fix.md) | ipc, memory, leak, listener |
 | 006 | [Dev Tooling](phase-00-setup/006-dev-tooling.md) | hmr, reload, watch, development |
 | 007 | [Build System](phase-00-setup/007-build-system.md) | build, compile, bundle, production |
 | 008 | [Test Infrastructure](phase-00-setup/008-test-infrastructure.md) | test, jest, vitest, cargo-test |
@@ -76,6 +77,7 @@ Execute specs in numerical order. Each phase must complete before the next.
 | 045 | [code_search Formatting](phase-02-primitives/045-code-search-format.md) | format, display, output, pretty |
 | 046 | [Primitives Trait](phase-02-primitives/046-primitives-trait.md) | trait, interface, abstraction |
 | 047 | [Primitives Validation](phase-02-primitives/047-primitives-validation.md) | validate, sanitize, check, safe |
+| 047b | [Primitives Security Policy](phase-02-primitives/047b-primitives-security-policy.md) | security, bash, sandbox, policy |
 | 048 | [Primitives Audit](phase-02-primitives/048-primitives-audit.md) | audit, log, trace, record |
 | 049 | [Primitives Rate Limit](phase-02-primitives/049-primitives-rate-limit.md) | rate, limit, throttle, quota |
 | 050 | [Primitives Tests](phase-02-primitives/050-primitives-tests.md) | test, integration, unit, coverage |
@@ -563,9 +565,24 @@ Execute specs in numerical order. Each phase must complete before the next.
 | 449 | [Audit API](phase-20-audit/449-audit-api.md) | audit, api, endpoint, rest |
 | 450 | [Audit Tests](phase-20-audit/450-audit-tests.md) | test, audit, integration |
 
-## Phase 21: Git Integration (451-470)
+## Phase 21: VCS Integration - jj-first (451-471)
+
+**Note:** jj (Jujutsu) is the primary VCS for agentic coding. It offers superior conflict handling, concurrent edits, and easy undo/redo. Git compatibility is provided for remotes.
+
+**BUILD ORDER:** Run jj specs (471a-471i) FIRST, then git fallback specs (451-470).
+
 | Spec | File | Keywords |
 |------|------|----------|
+| 471a | [VCS Crate Setup](phase-21-vcs/471a-vcs-crate-setup.md) | vcs, jj, crate, setup |
+| 471b | [jj Repository](phase-21-vcs/471b-jj-repository.md) | jj, repo, detect, init |
+| 471c | [jj Status](phase-21-vcs/471c-jj-status.md) | jj, status, diff, changes |
+| 471d | [jj Commit](phase-21-vcs/471d-jj-commit.md) | jj, commit, describe, new |
+| 471e | [jj Conflicts](phase-21-vcs/471e-jj-conflicts.md) | jj, conflict, resolve, merge |
+| 471f | [jj Undo/Redo](phase-21-vcs/471f-jj-undo.md) | jj, undo, redo, operation |
+| 471g | [jj Branches](phase-21-vcs/471g-jj-branches.md) | jj, branch, create, track |
+| 471h | [Git Compatibility](phase-21-vcs/471h-git-compat.md) | jj, git, push, fetch, compat |
+| 471i | [VCS Tests](phase-21-vcs/471i-vcs-tests.md) | vcs, jj, test, integration |
+| 471j | [jj Conflict Introspection](phase-21-vcs/471j-jj-conflict-introspection.md) | jj, conflict, structured, api |
 | 451 | [Git Core Types](phase-21-git/451-git-core-types.md) | git, core, type, struct |
 | 452 | [Git Repository Detection](phase-21-git/452-git-detect.md) | git, detect, repository, find |
 | 453 | [Git Status Operations](phase-21-git/453-git-status.md) | git, status, changed, staged |
