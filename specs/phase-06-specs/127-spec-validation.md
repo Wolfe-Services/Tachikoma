@@ -13,14 +13,14 @@ Define comprehensive validation rules for specification documents. Validation en
 
 ## Acceptance Criteria
 
-- [ ] Required section validation works
-- [ ] Metadata field validation works
-- [ ] Reference validation (specs, patterns) works
-- [ ] Code block validation works
-- [ ] Custom validation rules are supported
-- [ ] Validation severity levels are respected
-- [ ] Batch validation is efficient
-- [ ] Validation reports are actionable
+- [x] Required section validation works
+- [x] Metadata field validation works
+- [x] Reference validation (specs, patterns) works
+- [x] Code block validation works
+- [x] Custom validation rules are supported
+- [x] Validation severity levels are respected
+- [x] Batch validation is efficient
+- [x] Validation reports are actionable
 
 ## Implementation Details
 
