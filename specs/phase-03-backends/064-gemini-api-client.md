@@ -16,12 +16,12 @@ Implement the Google Gemini API client that implements the `Backend` trait. This
 
 ## Acceptance Criteria
 
-- [ ] `GeminiBackend` implementing `Backend` trait
-- [ ] Generative Language API integration
-- [ ] Proper authentication handling
-- [ ] Request/response type mapping
-- [ ] Safety settings configuration
-- [ ] Streaming support
+- [x] `GeminiBackend` implementing `Backend` trait
+- [x] Generative Language API integration
+- [x] Proper authentication handling
+- [x] Request/response type mapping
+- [x] Safety settings configuration
+- [x] Streaming support
 
 ---
 
