@@ -26,15 +26,15 @@ Implement an Accordion component for Tachikoma with support for single and multi
 
 ## Acceptance Criteria
 
-- [ ] Single and multiple expansion modes
-- [ ] Animated expand/collapse
-- [ ] Custom trigger content
-- [ ] Icon customization
-- [ ] Disabled items
-- [ ] Controlled and uncontrolled modes
-- [ ] Keyboard navigation
-- [ ] Nested accordions support
-- [ ] WAI-ARIA compliant
+- [x] Single and multiple expansion modes
+- [x] Animated expand/collapse
+- [x] Custom trigger content
+- [x] Icon customization
+- [x] Disabled items
+- [x] Controlled and uncontrolled modes
+- [x] Keyboard navigation
+- [x] Nested accordions support
+- [x] WAI-ARIA compliant
 
 ---
 
