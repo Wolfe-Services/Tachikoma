@@ -16,14 +16,14 @@ Implement automatic reboot orchestration for the Ralph Loop - coordinating conte
 
 ## Acceptance Criteria
 
-- [ ] Automatic reboot on redline detection
-- [ ] Configurable reboot policies
-- [ ] Pre-reboot hooks execution
-- [ ] State preservation during reboot
-- [ ] Post-reboot hooks execution
-- [ ] Reboot rate limiting
-- [ ] Graceful vs immediate reboot modes
-- [ ] Reboot metrics and history
+- [x] Automatic reboot on redline detection
+- [x] Configurable reboot policies
+- [x] Pre-reboot hooks execution
+- [x] State preservation during reboot
+- [x] Post-reboot hooks execution
+- [x] Reboot rate limiting
+- [x] Graceful vs immediate reboot modes
+- [x] Reboot metrics and history
 
 ---
 
