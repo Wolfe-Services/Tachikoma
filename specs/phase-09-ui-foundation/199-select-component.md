@@ -26,16 +26,16 @@ Implement a customizable Select component for Tachikoma with support for single 
 
 ## Acceptance Criteria
 
-- [ ] Single and multiple selection modes
-- [ ] Searchable/filterable options
-- [ ] Custom option rendering
-- [ ] Grouped options support
-- [ ] Clear selection functionality
-- [ ] Loading state
-- [ ] Disabled options
-- [ ] Keyboard navigation (arrow keys, enter, escape)
-- [ ] Screen reader accessible
-- [ ] Portal-based dropdown positioning
+- [x] Single and multiple selection modes
+- [x] Searchable/filterable options
+- [x] Custom option rendering
+- [x] Grouped options support
+- [x] Clear selection functionality
+- [x] Loading state
+- [x] Disabled options
+- [x] Keyboard navigation (arrow keys, enter, escape)
+- [x] Screen reader accessible
+- [x] Portal-based dropdown positioning
 
 ---
 
