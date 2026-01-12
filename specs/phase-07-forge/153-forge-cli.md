@@ -16,13 +16,13 @@ Implement the command-line interface for Forge, allowing users to start, manage,
 
 ## Acceptance Criteria
 
-- [ ] `forge new` command to start sessions
-- [ ] `forge resume` command for continuation
-- [ ] `forge list` command for session listing
-- [ ] `forge show` command for session details
-- [ ] `forge export` command for output export
-- [ ] `--attended` flag for interactive mode
-- [ ] Progress display and status updates
+- [x] `forge new` command to start sessions
+- [x] `forge resume` command for continuation
+- [x] `forge list` command for session listing
+- [x] `forge show` command for session details
+- [x] `forge export` command for output export
+- [x] `--attended` flag for interactive mode
+- [x] Progress display and status updates
 
 ---
 
