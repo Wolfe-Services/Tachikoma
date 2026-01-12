@@ -16,12 +16,12 @@ Implement secure API key and organization handling for the OpenAI/Codex backend,
 
 ## Acceptance Criteria
 
-- [ ] Secure API key storage using `Secret<T>`
-- [ ] Environment variable loading (`OPENAI_API_KEY`)
-- [ ] Organization ID handling (`OPENAI_ORGANIZATION`)
-- [ ] Project-based API key support
-- [ ] Key validation before use
-- [ ] Azure OpenAI authentication support
+- [x] Secure API key storage using `Secret<T>`
+- [x] Environment variable loading (`OPENAI_API_KEY`)
+- [x] Organization ID handling (`OPENAI_ORGANIZATION`)
+- [x] Project-based API key support
+- [x] Key validation before use
+- [x] Azure OpenAI authentication support
 
 ---
 
