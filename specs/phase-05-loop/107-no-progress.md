@@ -16,14 +16,14 @@ Implement no-progress detection for the Ralph Loop - identifying when iterations
 
 ## Acceptance Criteria
 
-- [ ] Define progress indicators
-- [ ] Track progress across iterations
-- [ ] Configurable progress metrics
-- [ ] No-progress streak counter
-- [ ] Integration with stop conditions
-- [ ] Multiple detection strategies
-- [ ] Progress velocity tracking
-- [ ] Progress reporting
+- [x] Define progress indicators
+- [x] Track progress across iterations
+- [x] Configurable progress metrics
+- [x] No-progress streak counter
+- [x] Integration with stop conditions
+- [x] Multiple detection strategies
+- [x] Progress velocity tracking
+- [x] Progress reporting
 
 ---
 
