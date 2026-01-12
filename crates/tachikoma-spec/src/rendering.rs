@@ -502,14 +502,12 @@ fn if_eq_helper(
     let a = h.param(0).map(|v| v.value());
     let b = h.param(1).map(|v| v.value());
 
-    let template = if a == b {
-        h.template()
-    } else {
-        h.inverse()
-    };
-
-    if let Some(t) = template {
-        t.render(hb, ctx, rc, out)?;
+    if a == b {
+        if let Some(template) = h.template() {
+            template.render(hb, ctx, rc, out)?;
+        }
+    } else if let Some(inverse) = h.inverse() {
+        inverse.render(hb, ctx, rc, out)?;
     }
 
     Ok(())
