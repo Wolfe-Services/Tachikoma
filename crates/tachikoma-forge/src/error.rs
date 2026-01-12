@@ -22,4 +22,7 @@ pub enum ForgeError {
     
     #[error("Template error: {0}")]
     Template(String),
+    
+    #[error("Configuration error: {0}")]
+    Config(String),
 }
