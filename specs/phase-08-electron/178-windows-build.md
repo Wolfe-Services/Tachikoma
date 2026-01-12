@@ -26,16 +26,16 @@ Configure and optimize the Windows build process for Tachikoma, including NSIS i
 
 ## Acceptance Criteria
 
-- [ ] NSIS installer with custom UI
-- [ ] Portable executable option
-- [ ] Microsoft Store (MSIX) package
-- [ ] Authenticode code signing
-- [ ] Windows Defender SmartScreen compatibility
-- [ ] Start menu and desktop shortcuts
-- [ ] File associations and protocol handlers
-- [ ] Windows notification integration
-- [ ] Taskbar jump list support
-- [ ] ARM64 Windows support
+- [x] NSIS installer with custom UI
+- [x] Portable executable option
+- [x] Microsoft Store (MSIX) package
+- [x] Authenticode code signing
+- [x] Windows Defender SmartScreen compatibility
+- [x] Start menu and desktop shortcuts
+- [x] File associations and protocol handlers
+- [x] Windows notification integration
+- [x] Taskbar jump list support
+- [x] ARM64 Windows support
 
 ---
 
