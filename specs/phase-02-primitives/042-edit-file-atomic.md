@@ -16,12 +16,12 @@ Implement atomic write operations for `edit_file` to ensure file integrity durin
 
 ## Acceptance Criteria
 
-- [ ] Atomic write using temp file + rename
-- [ ] Preserve file permissions
-- [ ] Preserve file ownership (where possible)
-- [ ] Handle cross-filesystem writes
-- [ ] Implement file locking for concurrent access
-- [ ] Rollback support on failure
+- [x] Atomic write using temp file + rename
+- [x] Preserve file permissions
+- [x] Preserve file ownership (where possible)
+- [x] Handle cross-filesystem writes
+- [x] Implement file locking for concurrent access
+- [x] Rollback support on failure
 
 ---
 
