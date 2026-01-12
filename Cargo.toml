@@ -50,6 +50,9 @@ bytes = "1.5"
 
 # CLI
 clap = { version = "4.4", features = ["derive", "env"] }
+url = "2.5"
+semver = "1.0"
+glob = "0.3"
 
 # Date/Time
 chrono = { version = "0.4", features = ["serde"] }
