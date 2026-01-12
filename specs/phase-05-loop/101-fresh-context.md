@@ -16,14 +16,14 @@ Implement fresh context creation for the Ralph Loop - the process of starting a 
 
 ## Acceptance Criteria
 
-- [ ] Fresh context creates new session
-- [ ] Essential state is preserved across reboots
-- [ ] Context handoff message generation
-- [ ] Configurable state preservation rules
-- [ ] Clean termination of old session
-- [ ] Metrics tracking for reboots
-- [ ] Hooks for pre/post reboot actions
-- [ ] Warm-up prompt support
+- [x] Fresh context creates new session
+- [x] Essential state is preserved across reboots
+- [x] Context handoff message generation
+- [x] Configurable state preservation rules
+- [x] Clean termination of old session
+- [x] Metrics tracking for reboots
+- [x] Hooks for pre/post reboot actions
+- [x] Warm-up prompt support
 
 ---
 
