@@ -13,14 +13,14 @@ Implement a linting system for specifications that goes beyond validation to enf
 
 ## Acceptance Criteria
 
-- [ ] Style rules for formatting are enforced
-- [ ] Consistency rules across specs work
-- [ ] Auto-fix is available for common issues
-- [ ] Linting is configurable per-project
-- [ ] CI/CD integration is supported
-- [ ] Incremental linting is efficient
-- [ ] Custom lint rules can be added
-- [ ] Lint results include fix suggestions
+- [x] Style rules for formatting are enforced
+- [x] Consistency rules across specs work
+- [x] Auto-fix is available for common issues
+- [x] Linting is configurable per-project
+- [x] CI/CD integration is supported
+- [x] Incremental linting is efficient
+- [x] Custom lint rules can be added
+- [x] Lint results include fix suggestions
 
 ## Implementation Details
 
