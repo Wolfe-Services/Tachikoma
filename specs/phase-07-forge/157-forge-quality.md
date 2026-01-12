@@ -16,12 +16,12 @@ Implement quality metrics tracking for Forge sessions, providing visibility into
 
 ## Acceptance Criteria
 
-- [ ] Quality score tracking over rounds
-- [ ] Critique score aggregation
-- [ ] Quality dimension breakdown
-- [ ] Improvement trend analysis
-- [ ] Quality gates/thresholds
-- [ ] Quality report generation
+- [x] Quality score tracking over rounds
+- [x] Critique score aggregation
+- [x] Quality dimension breakdown
+- [x] Improvement trend analysis
+- [x] Quality gates/thresholds
+- [x] Quality report generation
 
 ---
 
