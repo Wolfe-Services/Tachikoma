@@ -246,32 +246,33 @@ fn highlight_match(line: &str, pattern: &str) -> String {
     let lower_line = line.to_lowercase();
     let lower_pattern = pattern.to_lowercase();
     
-    if let Some(pos) = lower_line.find(&lower_pattern) {
-        let mut result = String::new();
-        let mut last_end = 0;
-        let mut search_from = 0;
+    let mut result = String::new();
+    let mut last_end = 0;
+    let mut search_from = 0;
+    
+    while let Some(match_pos) = lower_line[search_from..].find(&lower_pattern) {
+        let actual_pos = search_from + match_pos;
+        let match_end = actual_pos + pattern.len();
         
-        while let Some(match_pos) = lower_line[search_from..].find(&lower_pattern) {
-            let actual_pos = search_from + match_pos;
-            let match_end = actual_pos + pattern.len();
-            
-            // Add text before match
-            result.push_str(&line[last_end..actual_pos]);
-            
-            // Add highlighted match
-            result.push_str(&format!("{}{}{}", match_color, &line[actual_pos..match_end], reset));
-            
-            last_end = match_end;
-            search_from = match_end;
-        }
+        // Add text before match
+        result.push_str(&line[last_end..actual_pos]);
         
-        // Add remaining text
-        result.push_str(&line[last_end..]);
-        return result;
+        // Add highlighted match (preserve original casing)
+        result.push_str(&format!("{}{}{}", match_color, &line[actual_pos..match_end], reset));
+        
+        last_end = match_end;
+        search_from = match_end;
     }
     
-    // If no matches found, return original line
-    line.to_string()
+    // Add remaining text
+    result.push_str(&line[last_end..]);
+    
+    // If no matches were found, return the original line
+    if last_end == 0 {
+        return line.to_string();
+    }
+    
+    result
 }
 
 /// JSON formatting.
