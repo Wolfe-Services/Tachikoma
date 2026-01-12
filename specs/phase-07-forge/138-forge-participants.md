@@ -16,13 +16,13 @@ Implement participant management for Forge sessions, including model selection, 
 
 ## Acceptance Criteria
 
-- [ ] `ParticipantManager` for model coordination
-- [ ] Provider-agnostic API client trait
-- [ ] Anthropic, OpenAI, and Google client implementations
-- [ ] Role-based model selection
-- [ ] Rate limiting and quota management
-- [ ] Health checking for providers
-- [ ] Graceful fallback on provider failure
+- [x] `ParticipantManager` for model coordination
+- [x] Provider-agnostic API client trait
+- [x] Anthropic, OpenAI, and Google client implementations
+- [x] Role-based model selection
+- [x] Rate limiting and quota management
+- [x] Health checking for providers
+- [x] Graceful fallback on provider failure
 
 ---
 
