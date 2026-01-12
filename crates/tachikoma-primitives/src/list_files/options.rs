@@ -35,6 +35,8 @@ pub struct ListFilesOptions {
     pub sort_by: SortBy,
     /// Reverse sort order.
     pub reverse: bool,
+    /// Enable recursive directory traversal.
+    pub recursive: bool,
 }
 
 impl ListFilesOptions {
@@ -95,6 +97,12 @@ impl ListFilesOptions {
     /// Reverse sort order.
     pub fn reversed(mut self) -> Self {
         self.reverse = true;
+        self
+    }
+
+    /// Enable recursive directory traversal.
+    pub fn recursive(mut self) -> Self {
+        self.recursive = true;
         self
     }
 }

@@ -1,35 +1,3 @@
-# 035 - List Files Recursive Walking
-
-**Phase:** 2 - Five Primitives
-**Spec ID:** 035
-**Status:** Planned
-**Dependencies:** 034-list-files-impl
-**Estimated Context:** ~10% of Sonnet window
-
----
-
-## Objective
-
-Extend `list_files` with recursive directory walking using the `walkdir` crate, with depth limits and gitignore support.
-
----
-
-## Acceptance Criteria
-
-- [x] Recursive directory traversal
-- [x] Maximum depth limit enforcement
-- [x] Gitignore pattern support
-- [x] Symlink handling (follow or skip)
-- [x] Progress callbacks for large directories
-- [x] Memory-efficient streaming iteration
-
----
-
-## Implementation Details
-
-### 1. Recursive Walker (src/list_files/recursive.rs)
-
-```rust
 //! Recursive directory walking implementation.
 
 use crate::{
@@ -63,6 +31,8 @@ pub struct RecursiveOptions {
     pub include_dirs: bool,
     /// Include hidden files.
     pub include_hidden: bool,
+    /// Progress callback frequency (call every N entries).
+    pub progress_callback_frequency: Option<usize>,
 }
 
 impl Default for RecursiveOptions {
@@ -82,6 +52,7 @@ impl Default for RecursiveOptions {
             max_results: Some(10000),
             include_dirs: false,
             include_hidden: false,
+            progress_callback_frequency: Some(1000), // Every 1000 entries by default
         }
     }
 }
@@ -139,15 +110,41 @@ impl RecursiveOptions {
         self.include_hidden = true;
         self
     }
+
+    /// Set progress callback frequency.
+    pub fn progress_frequency(mut self, frequency: usize) -> Self {
+        self.progress_callback_frequency = Some(frequency);
+        self
+    }
+
+    /// Disable progress callbacks.
+    pub fn no_progress_callbacks(mut self) -> Self {
+        self.progress_callback_frequency = None;
+        self
+    }
 }
 
-/// List files recursively.
+/// List files recursively with optional progress callback.
 #[instrument(skip(ctx), fields(path = %path, op_id = %ctx.operation_id))]
 pub async fn list_files_recursive(
     ctx: &PrimitiveContext,
     path: &str,
     options: RecursiveOptions,
 ) -> PrimitiveResult<ListFilesResult> {
+    list_files_recursive_with_callback(ctx, path, options, None::<fn(usize, &Path)>).await
+}
+
+/// List files recursively with optional progress callback.
+#[instrument(skip(ctx, progress_callback), fields(path = %path, op_id = %ctx.operation_id))]
+pub async fn list_files_recursive_with_callback<F>(
+    ctx: &PrimitiveContext,
+    path: &str,
+    options: RecursiveOptions,
+    mut progress_callback: Option<F>,
+) -> PrimitiveResult<ListFilesResult>
+where
+    F: FnMut(usize, &Path) + Send,
+{
     let start = Instant::now();
 
     let resolved_path = ctx.resolve_path(path);
@@ -181,26 +178,14 @@ pub async fn list_files_recursive(
         .collect();
 
     // Configure walker
-    let mut walker = WalkDir::new(&resolved_path)
+    let walker = WalkDir::new(&resolved_path)
         .max_depth(options.max_depth)
         .follow_links(options.follow_symlinks);
-
-    if !options.include_hidden {
-        walker = walker.into_iter()
-            .filter_entry(|e| !is_hidden(e))
-            .collect::<Vec<_>>()
-            .into_iter()
-            .collect();
-    }
 
     // Collect entries
     let mut entries = Vec::new();
     let mut truncated = false;
     let max_results = options.max_results.unwrap_or(usize::MAX);
-
-    let walker = WalkDir::new(&resolved_path)
-        .max_depth(options.max_depth)
-        .follow_links(options.follow_symlinks);
 
     for entry_result in walker {
         let entry = match entry_result {
@@ -262,12 +247,29 @@ pub async fn list_files_recursive(
             .and_then(|e| e.to_str())
             .map(|s| s.to_string());
 
+        let modified = entry
+            .metadata()
+            .ok()
+            .and_then(|m| m.modified().ok())
+            .and_then(|time| time.duration_since(std::time::UNIX_EPOCH).ok())
+            .map(|duration| duration.as_secs());
+
         entries.push(FileEntry {
             path: entry_path,
             is_dir,
             size,
             extension,
+            modified,
         });
+
+        // Call progress callback if configured
+        if let Some(freq) = options.progress_callback_frequency {
+            if entries.len() % freq == 0 {
+                if let Some(ref mut callback) = progress_callback {
+                    callback(entries.len(), entry.path());
+                }
+            }
+        }
 
         // Check limit
         if entries.len() >= max_results {
@@ -317,7 +319,10 @@ fn should_ignore(path: &Path, patterns: &HashSet<String>) -> bool {
 
 /// Simple pattern matching.
 fn matches_pattern(name: &str, pattern: &str) -> bool {
-    if pattern.starts_with('*') {
+    if pattern.starts_with('*') && pattern.ends_with('*') {
+        let inner = &pattern[1..pattern.len() - 1];
+        name.contains(inner)
+    } else if pattern.starts_with('*') {
         let suffix = &pattern[1..];
         name.ends_with(suffix)
     } else if pattern.ends_with('*') {
@@ -349,10 +354,114 @@ fn load_gitignore_patterns(root: &Path) -> HashSet<String> {
 
 /// Iterator for streaming results.
 pub struct RecursiveIterator {
-    walker: Box<dyn Iterator<Item = walkdir::Result<DirEntry>> + Send>,
+    walker: walkdir::IntoIter,
     options: RecursiveOptions,
     ignore_patterns: HashSet<String>,
     count: usize,
+    ctx: PrimitiveContext,
+    base_path: PathBuf,
+}
+
+impl RecursiveIterator {
+    /// Create a new recursive iterator.
+    pub fn new(
+        ctx: PrimitiveContext, 
+        path: &Path, 
+        options: RecursiveOptions
+    ) -> PrimitiveResult<Self> {
+        let gitignore_patterns = if options.use_gitignore {
+            load_gitignore_patterns(path)
+        } else {
+            HashSet::new()
+        };
+
+        let all_ignore: HashSet<_> = options
+            .ignore_patterns
+            .iter()
+            .cloned()
+            .chain(gitignore_patterns)
+            .collect();
+
+        let walker = WalkDir::new(path)
+            .max_depth(options.max_depth)
+            .follow_links(options.follow_symlinks)
+            .into_iter();
+
+        Ok(Self {
+            walker,
+            options,
+            ignore_patterns: all_ignore,
+            count: 0,
+            ctx,
+            base_path: path.to_path_buf(),
+        })
+    }
+
+    fn process_entry(&self, entry: DirEntry) -> Option<FileEntry> {
+        // Skip root
+        if entry.path() == self.base_path {
+            return None;
+        }
+
+        if !self.options.include_hidden && is_hidden(&entry) {
+            return None;
+        }
+
+        if should_ignore(entry.path(), &self.ignore_patterns) {
+            return None;
+        }
+
+        let is_dir = entry.file_type().is_dir();
+        if !self.options.include_dirs && is_dir {
+            return None;
+        }
+
+        // Extension filter
+        if let Some(ref ext) = self.options.extension {
+            if !is_dir {
+                let file_ext = entry
+                    .path()
+                    .extension()
+                    .and_then(|e| e.to_str())
+                    .map(|s| s.to_lowercase());
+                if file_ext.as_deref() != Some(ext.to_lowercase().as_str()) {
+                    return None;
+                }
+            }
+        }
+
+        // Check path allowed
+        let entry_path = entry.path().to_path_buf();
+        if !self.ctx.is_path_allowed(&entry_path) {
+            return None;
+        }
+
+        let size = if is_dir {
+            None
+        } else {
+            entry.metadata().ok().map(|m| m.len())
+        };
+
+        let extension = entry_path
+            .extension()
+            .and_then(|e| e.to_str())
+            .map(|s| s.to_string());
+
+        let modified = entry
+            .metadata()
+            .ok()
+            .and_then(|m| m.modified().ok())
+            .and_then(|time| time.duration_since(std::time::UNIX_EPOCH).ok())
+            .map(|duration| duration.as_secs());
+
+        Some(FileEntry {
+            path: entry_path,
+            is_dir,
+            size,
+            extension,
+            modified,
+        })
+    }
 }
 
 impl Iterator for RecursiveIterator {
@@ -376,30 +485,6 @@ impl Iterator for RecursiveIterator {
             }
         }
         None
-    }
-}
-
-impl RecursiveIterator {
-    fn process_entry(&self, entry: DirEntry) -> Option<FileEntry> {
-        if !self.options.include_hidden && is_hidden(&entry) {
-            return None;
-        }
-
-        if should_ignore(entry.path(), &self.ignore_patterns) {
-            return None;
-        }
-
-        let is_dir = entry.file_type().is_dir();
-        if !self.options.include_dirs && is_dir {
-            return None;
-        }
-
-        Some(FileEntry {
-            path: entry.path().to_path_buf(),
-            is_dir,
-            size: if is_dir { None } else { entry.metadata().ok().map(|m| m.len()) },
-            extension: entry.path().extension().and_then(|e| e.to_str()).map(|s| s.to_string()),
-        })
     }
 }
 
@@ -462,25 +547,100 @@ mod tests {
         assert!(!names.contains(&"ignored.txt"));
         assert!(!names.contains(&"test.log"));
     }
+
+    #[tokio::test]
+    async fn test_recursive_symlinks() {
+        let dir = tempdir().unwrap();
+        write(dir.path().join("real.txt"), "content").unwrap();
+        
+        // Create a symlink (skip on Windows if it fails)
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::symlink;
+            if symlink(dir.path().join("real.txt"), dir.path().join("link.txt")).is_ok() {
+                let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+                
+                // Don't follow symlinks
+                let opts = RecursiveOptions::new();
+                let result = list_files_recursive(&ctx, ".", opts).await.unwrap();
+                // Should include both real.txt and link.txt (symlink itself, not target)
+                assert_eq!(result.entries.len(), 2); 
+                
+                // Follow symlinks - same result because we see both the link and the original
+                let opts = RecursiveOptions::new().follow_symlinks();
+                let result = list_files_recursive(&ctx, ".", opts).await.unwrap();
+                assert_eq!(result.entries.len(), 2);
+            }
+        }
+        
+        #[cfg(not(unix))]
+        {
+            // On non-Unix systems, just test basic functionality
+            let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+            let opts = RecursiveOptions::new();
+            let result = list_files_recursive(&ctx, ".", opts).await.unwrap();
+            assert_eq!(result.entries.len(), 1); // Only real.txt
+        }
+    }
+
+    #[tokio::test]
+    async fn test_recursive_max_results() {
+        let dir = tempdir().unwrap();
+        for i in 0..100 {
+            write(dir.path().join(format!("file{:03}.txt", i)), "content").unwrap();
+        }
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        let opts = RecursiveOptions::new().max_results(50);
+        let result = list_files_recursive(&ctx, ".", opts).await.unwrap();
+
+        assert_eq!(result.entries.len(), 50);
+        assert!(result.truncated);
+    }
+
+    #[tokio::test]
+    async fn test_recursive_iterator() {
+        let dir = tempdir().unwrap();
+        write(dir.path().join("a.txt"), "a").unwrap();
+        create_dir_all(dir.path().join("sub")).unwrap();
+        write(dir.path().join("sub/b.txt"), "b").unwrap();
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        let opts = RecursiveOptions::new().depth(10);
+        let mut iter = RecursiveIterator::new(ctx, dir.path(), opts).unwrap();
+
+        let mut count = 0;
+        while let Some(entry_result) = iter.next() {
+            assert!(entry_result.is_ok());
+            count += 1;
+        }
+        
+        assert_eq!(count, 2); // a.txt and sub/b.txt
+    }
+
+    #[tokio::test]
+    async fn test_recursive_progress_callback() {
+        let dir = tempdir().unwrap();
+        // Create multiple files to trigger progress callbacks
+        for i in 0..15 {
+            write(dir.path().join(format!("file{:02}.txt", i)), "content").unwrap();
+        }
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        let opts = RecursiveOptions::new().progress_frequency(5); // Every 5 files
+        
+        let mut progress_calls = Vec::new();
+        let callback = |count: usize, path: &Path| {
+            progress_calls.push((count, path.to_path_buf()));
+        };
+        
+        let result = list_files_recursive_with_callback(&ctx, ".", opts, Some(callback)).await.unwrap();
+        
+        assert_eq!(result.entries.len(), 15);
+        // Should have been called at counts 5, 10, 15
+        assert_eq!(progress_calls.len(), 3);
+        assert_eq!(progress_calls[0].0, 5);
+        assert_eq!(progress_calls[1].0, 10);
+        assert_eq!(progress_calls[2].0, 15);
+    }
 }
-```
-
----
-
-## Testing Requirements
-
-1. Recursive traversal finds nested files
-2. Depth limit is enforced
-3. Gitignore patterns are respected
-4. Hidden files are excluded by default
-5. Symlinks are handled according to options
-6. Large directories don't cause memory issues
-7. Maximum results limit works
-
----
-
-## Related Specs
-
-- Depends on: [034-list-files-impl.md](034-list-files-impl.md)
-- Next: [036-bash-exec-core.md](036-bash-exec-core.md)
-- Related: [043-code-search-core.md](043-code-search-core.md)

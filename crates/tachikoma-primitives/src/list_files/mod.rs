@@ -1,8 +1,10 @@
 //! List files primitive implementation.
 
 mod options;
+mod recursive;
 
 pub use options::{ListFilesOptions, SortBy};
+pub use recursive::{list_files_recursive, list_files_recursive_with_callback, RecursiveIterator, RecursiveOptions};
 
 use crate::{
     context::PrimitiveContext,
@@ -74,6 +76,32 @@ pub async fn list_files(
         return Err(PrimitiveError::Validation {
             message: format!("Path is not a directory: {:?}", resolved_path),
         });
+    }
+
+    // Check if recursive mode is enabled
+    if options.recursive {
+        // Convert to recursive options
+        let mut recursive_opts = recursive::RecursiveOptions::new()
+            .include_hidden()  // Respect include_hidden setting
+            .include_dirs();   // Respect include_dirs setting
+            
+        if !options.include_hidden {
+            recursive_opts.include_hidden = false;
+        }
+        
+        if !options.include_dirs {
+            recursive_opts.include_dirs = false;
+        }
+        
+        if let Some(ext) = &options.extension {
+            recursive_opts = recursive_opts.extension(ext);
+        }
+        
+        if let Some(limit) = options.limit {
+            recursive_opts = recursive_opts.max_results(limit);
+        }
+        
+        return recursive::list_files_recursive(ctx, path, recursive_opts).await;
     }
 
     // Read directory entries
@@ -514,5 +542,33 @@ mod tests {
             }
             _ => panic!("Expected permission, not found, or path not allowed error"),
         }
+    }
+
+    #[tokio::test]
+    async fn test_list_files_recursive_option() {
+        let dir = tempdir().unwrap();
+        write(dir.path().join("a.txt"), "a").unwrap();
+        create_dir(dir.path().join("subdir")).unwrap();
+        write(dir.path().join("subdir/b.txt"), "b").unwrap();
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        
+        // Non-recursive - should only see a.txt
+        let opts = ListFilesOptions::new();
+        let result = list_files(&ctx, ".", Some(opts)).await.unwrap();
+        assert_eq!(result.entries.len(), 1);
+        assert!(result.entries[0].path.file_name().unwrap().to_str().unwrap() == "a.txt");
+        
+        // Recursive - should see both a.txt and subdir/b.txt
+        let opts = ListFilesOptions::new().recursive();
+        let result = list_files(&ctx, ".", Some(opts)).await.unwrap();
+        assert_eq!(result.entries.len(), 2);
+        
+        let names: Vec<_> = result.entries.iter()
+            .filter_map(|e| e.path.file_name())
+            .filter_map(|n| n.to_str())
+            .collect();
+        assert!(names.contains(&"a.txt"));
+        assert!(names.contains(&"b.txt"));
     }
 }

@@ -30,4 +30,4 @@ pub use result::{ExecutionMetadata, ReadFileResult, ListFilesResult, FileEntry};
 pub use read_file::{read_file, ReadFileOptions};
 
 #[cfg(feature = "list-files")]
-pub use list_files::{list_files, ListFilesOptions, SortBy};
+pub use list_files::{list_files, ListFilesOptions, SortBy, list_files_recursive, list_files_recursive_with_callback, RecursiveOptions, RecursiveIterator};
