@@ -16,12 +16,12 @@ Implement parsing of ripgrep's JSON output format to extract structured search r
 
 ## Acceptance Criteria
 
-- [ ] Parse all ripgrep JSON message types
-- [ ] Extract match data with line/column
-- [ ] Handle context lines in output
-- [ ] Parse submatches for highlighting
-- [ ] Handle multi-line matches
-- [ ] Robust error handling for malformed JSON
+- [x] Parse all ripgrep JSON message types
+- [x] Extract match data with line/column
+- [x] Handle context lines in output
+- [x] Parse submatches for highlighting
+- [x] Handle multi-line matches
+- [x] Robust error handling for malformed JSON
 
 ---
 
