@@ -13,14 +13,14 @@ Implement comprehensive testing infrastructure for the CLI, including unit tests
 
 ## Acceptance Criteria
 
-- [ ] Unit tests for all CLI components
-- [ ] Integration tests for all commands
-- [ ] Snapshot tests for output formatting
-- [ ] Test utilities for CLI testing
-- [ ] Mock infrastructure for backends/tools
-- [ ] CI test configuration
-- [ ] Test coverage reporting
-- [ ] Performance benchmarks
+- [x] Unit tests for all CLI components
+- [x] Integration tests for all commands
+- [x] Snapshot tests for output formatting
+- [x] Test utilities for CLI testing
+- [x] Mock infrastructure for backends/tools
+- [x] CI test configuration
+- [x] Test coverage reporting
+- [x] Performance benchmarks
 
 ## Implementation Details
 
