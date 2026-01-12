@@ -26,14 +26,14 @@ Implement a shadow and elevation system for Tachikoma that creates visual hierar
 
 ## Acceptance Criteria
 
-- [ ] Shadow scale (sm, md, lg, xl, 2xl)
-- [ ] Tachikoma blue glow effects
-- [ ] Elevation levels for UI layers
-- [ ] Focus ring shadows
-- [ ] Card and modal shadows
-- [ ] Dark theme optimized shadows
-- [ ] Performance-optimized CSS
-- [ ] Svelte shadow components
+- [x] Shadow scale (sm, md, lg, xl, 2xl)
+- [x] Tachikoma blue glow effects
+- [x] Elevation levels for UI layers
+- [x] Focus ring shadows
+- [x] Card and modal shadows
+- [x] Dark theme optimized shadows
+- [x] Performance-optimized CSS
+- [x] Svelte shadow components
 
 ---
 
