@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use handlebars::{Handlebars, Helper, HelperResult, Context, RenderContext as HbRenderContext, Output};
+use handlebars::{Handlebars, Helper, HelperResult, Context, RenderContext as HbRenderContext, Output, Renderable};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tokio::fs;
@@ -325,7 +325,7 @@ impl SpecRenderer {
     pub async fn render_to_file(
         &self,
         template: &str,
-        context: &TemplateContext,
+        context: &RenderContext,
         output_path: &Path,
         format: OutputFormat,
     ) -> Result<PathBuf, RenderError> {
@@ -492,11 +492,11 @@ fn pluralize_helper(
     Ok(())
 }
 
-fn if_eq_helper<'a>(
-    h: &Helper<'a>,
-    hb: &'a Handlebars<'a>,
-    ctx: &'a Context,
-    rc: &mut HbRenderContext<'a, 'a>,
+fn if_eq_helper(
+    h: &Helper,
+    hb: &Handlebars,
+    ctx: &Context,
+    rc: &mut HbRenderContext,
     out: &mut dyn Output,
 ) -> HelperResult {
     let a = h.param(0).map(|v| v.value());
