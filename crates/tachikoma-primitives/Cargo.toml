@@ -1,0 +1,33 @@
+[package]
+name = "tachikoma-primitives"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Core primitives for Tachikoma agent operations"
+
+[features]
+default = ["all"]
+all = ["read-file", "list-files", "bash", "edit-file", "code-search"]
+read-file = []
+list-files = ["dep:walkdir"]
+bash = ["dep:tokio"]
+edit-file = []
+code-search = ["dep:serde_json"]
+
+[dependencies]
+tachikoma-common-core.workspace = true
+
+async-trait = "0.1"
+serde = { workspace = true, features = ["derive"] }
+thiserror.workspace = true
+tracing.workspace = true
+uuid = { version = "1.6", features = ["v4"] }
+
+# Optional dependencies
+walkdir = { version = "2.4", optional = true }
+tokio = { workspace = true, features = ["process", "time"], optional = true }
+serde_json = { workspace = true, optional = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
+tempfile = "3.9"

@@ -1,35 +1,3 @@
-# 032 - Read File Implementation
-
-**Phase:** 2 - Five Primitives
-**Spec ID:** 032
-**Status:** Planned
-**Dependencies:** 031-primitives-crate
-**Estimated Context:** ~8% of Sonnet window
-
----
-
-## Objective
-
-Implement the `read_file` primitive that reads file contents with support for line ranges, size limits, and encoding detection.
-
----
-
-## Acceptance Criteria
-
-- [x] Read entire file contents
-- [x] Support line range selection (start_line, end_line)
-- [x] Enforce maximum file size limit
-- [x] Handle binary file detection
-- [x] Return file metadata (size, truncated status)
-- [x] Proper UTF-8 handling with lossy fallback
-
----
-
-## Implementation Details
-
-### 1. Read File Module (src/read_file/mod.rs)
-
-```rust
 //! Read file primitive implementation.
 
 mod options;
@@ -114,8 +82,8 @@ pub async fn read_file(
     let file_size = file_metadata.len() as usize;
     let max_size = options.max_size.unwrap_or(ctx.config.max_file_size);
 
-    // Check size limit
-    if file_size > max_size && options.start_line.is_none() {
+    // Check size limit - only fail if using default max_size and no line range
+    if file_size > max_size && options.max_size.is_none() && options.start_line.is_none() {
         return Err(PrimitiveError::FileTooLarge {
             size: file_size,
             max: max_size,
@@ -156,7 +124,7 @@ fn read_file_content(
     }
 
     // Read entire file
-    let mut reader = BufReader::new(file);
+    let reader = BufReader::new(file);
     let mut buffer = Vec::with_capacity(max_size.min(1024 * 1024));
     let mut truncated = false;
 
@@ -268,76 +236,92 @@ mod tests {
 
         assert!(matches!(result, Err(PrimitiveError::FileNotFound { .. })));
     }
+
+    #[tokio::test]
+    async fn test_read_file_truncation() {
+        let dir = tempdir().unwrap();
+        let file_path = dir.path().join("large.txt");
+        let large_content = "x".repeat(200);
+        write(&file_path, &large_content).unwrap();
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        let opts = ReadFileOptions::new().max_size(100);
+        let result = read_file(&ctx, "large.txt", Some(opts)).await.unwrap();
+
+        assert!(result.truncated);
+        assert_eq!(result.content.len(), 100);
+        assert_eq!(result.size, 200); // Original file size
+    }
+
+    #[tokio::test]
+    async fn test_read_file_max_size() {
+        let dir = tempdir().unwrap();
+        let file_path = dir.path().join("large.txt");
+        let large_content = "x".repeat(1000);
+        write(&file_path, &large_content).unwrap();
+
+        let mut ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        ctx.config.max_file_size = 100;
+        
+        // Should fail with FileTooLarge when reading entire file
+        let result = read_file(&ctx, "large.txt", None).await;
+        assert!(matches!(result, Err(PrimitiveError::FileTooLarge { .. })));
+        
+        // But should work with custom max_size option that is larger
+        let opts = ReadFileOptions::new().max_size(1500);
+        let result = read_file(&ctx, "large.txt", Some(opts)).await.unwrap();
+        assert!(!result.truncated);
+        assert_eq!(result.content.len(), 1000);
+    }
+
+    #[tokio::test]
+    async fn test_read_file_binary_detection() {
+        let dir = tempdir().unwrap();
+        let file_path = dir.path().join("binary.bin");
+        // Create a binary file with null bytes
+        write(&file_path, &[0u8, 1u8, 2u8, 0u8, 255u8]).unwrap();
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        let result = read_file(&ctx, "binary.bin", None).await.unwrap();
+
+        assert_eq!(result.content, "[Binary file]");
+        assert!(!result.truncated);
+    }
+
+    #[tokio::test]
+    async fn test_read_file_utf8_lossy() {
+        let dir = tempdir().unwrap();
+        let file_path = dir.path().join("invalid_utf8.txt");
+        // Create file with invalid UTF-8
+        let invalid_utf8 = vec![0x48, 0x65, 0x6C, 0x6C, 0x6F, 0xFF, 0x21]; // "Hello" + invalid byte + "!"
+        std::fs::write(&file_path, invalid_utf8).unwrap();
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        let result = read_file(&ctx, "invalid_utf8.txt", None).await.unwrap();
+
+        assert!(result.content.starts_with("Hello"));
+        assert!(result.content.contains("�")); // Replacement character for invalid UTF-8
+    }
+
+    #[tokio::test]
+    async fn test_read_file_path_not_allowed() {
+        let ctx = PrimitiveContext::new(PathBuf::from("/"));
+        let result = read_file(&ctx, "/etc/passwd", None).await;
+
+        assert!(matches!(result, Err(PrimitiveError::PathNotAllowed { .. })));
+    }
+
+    #[tokio::test]
+    async fn test_read_file_metadata() {
+        let dir = tempdir().unwrap();
+        let file_path = dir.path().join("test.txt");
+        write(&file_path, "Hello").unwrap();
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        let result = read_file(&ctx, "test.txt", None).await.unwrap();
+
+        assert_eq!(result.metadata.primitive, "read_file");
+        assert!(!result.metadata.operation_id.is_empty());
+        assert!(result.metadata.duration.as_nanos() > 0);
+    }
 }
-```
-
-### 2. Read File Options (src/read_file/options.rs)
-
-```rust
-//! Options for read_file primitive.
-
-/// Options for reading a file.
-#[derive(Debug, Clone, Default)]
-pub struct ReadFileOptions {
-    /// Starting line number (1-indexed).
-    pub start_line: Option<usize>,
-    /// Ending line number (1-indexed, inclusive).
-    pub end_line: Option<usize>,
-    /// Maximum size to read in bytes.
-    pub max_size: Option<usize>,
-    /// Include line numbers in output.
-    pub show_line_numbers: bool,
-}
-
-impl ReadFileOptions {
-    /// Create new default options.
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    /// Set line range to read.
-    pub fn lines(mut self, start: usize, end: usize) -> Self {
-        self.start_line = Some(start);
-        self.end_line = Some(end);
-        self
-    }
-
-    /// Set start line only.
-    pub fn from_line(mut self, start: usize) -> Self {
-        self.start_line = Some(start);
-        self
-    }
-
-    /// Set maximum size.
-    pub fn max_size(mut self, size: usize) -> Self {
-        self.max_size = Some(size);
-        self
-    }
-
-    /// Include line numbers in output.
-    pub fn with_line_numbers(mut self) -> Self {
-        self.show_line_numbers = true;
-        self
-    }
-}
-```
-
----
-
-## Testing Requirements
-
-1. Read entire file returns correct content
-2. Line range selection works correctly
-3. Large files are properly truncated
-4. Binary files are detected and handled
-5. File not found returns appropriate error
-6. Permission denied returns appropriate error
-7. UTF-8 lossy conversion handles invalid sequences
-
----
-
-## Related Specs
-
-- Depends on: [031-primitives-crate.md](031-primitives-crate.md)
-- Next: [033-read-file-errors.md](033-read-file-errors.md)
-- Used by: Agent loop for file reading operations
