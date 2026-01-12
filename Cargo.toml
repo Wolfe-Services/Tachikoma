@@ -43,7 +43,10 @@ chrono = { version = "0.4", features = ["serde"] }
 
 # Testing
 proptest = "1.4"
-insta = "1.34"
+insta = { version = "1.34", features = ["yaml"] }
+test-case = "3.3"
+mockall = "0.12"
+tokio-test = "0.4"
 
 # NAPI for Electron binding
 napi = "2.14"

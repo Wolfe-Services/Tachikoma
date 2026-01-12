@@ -16,12 +16,12 @@ Set up testing infrastructure for Rust (cargo test, proptest), TypeScript (Vites
 
 ## Acceptance Criteria
 
-- [ ] Rust unit tests configured
-- [ ] Rust property-based tests with proptest
-- [ ] Vitest configured for Svelte components
-- [ ] Test utilities and helpers created
-- [ ] Coverage reporting configured
-- [ ] Test scripts in package.json
+- [x] Rust unit tests configured
+- [x] Rust property-based tests with proptest
+- [x] Vitest configured for Svelte components
+- [x] Test utilities and helpers created
+- [x] Coverage reporting configured
+- [x] Test scripts in package.json
 
 ---
 

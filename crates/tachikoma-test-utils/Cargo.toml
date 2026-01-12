@@ -1,0 +1,11 @@
+[package]
+name = "tachikoma-test-utils"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+tempfile = "3.9"
+tokio = { workspace = true, features = ["rt", "macros"] }
+
+[dev-dependencies]
+proptest.workspace = true
