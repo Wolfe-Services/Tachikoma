@@ -2,7 +2,7 @@
 
 **Phase:** 1 - Core Common Crates
 **Spec ID:** 018
-**Status:** Planned
+**Status:** Complete
 **Dependencies:** 011-common-core-types
 **Estimated Context:** ~8% of Sonnet window
 
@@ -16,11 +16,11 @@ Provide thread management utilities including named thread spawning, thread-loca
 
 ## Acceptance Criteria
 
-- [ ] Named thread spawning
-- [ ] Thread-local storage helpers
-- [ ] Scoped thread patterns
-- [ ] Shutdown coordination
-- [ ] Panic handling
+- [x] Named thread spawning
+- [x] Thread-local storage helpers
+- [x] Scoped thread patterns
+- [x] Shutdown coordination
+- [x] Panic handling
 
 ---
 
