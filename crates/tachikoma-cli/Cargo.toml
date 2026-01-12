@@ -48,3 +48,11 @@ reqwest = { workspace = true }
 assert_cmd = "2.0"
 predicates = "3.1"
 tempfile = "3.14"
+mockito = "1.4"
+diff = "0.1"
+criterion = "0.5"
+tachikoma-test-utils = { workspace = true }
+
+[[bench]]
+name = "cli_benchmarks"
+harness = false
