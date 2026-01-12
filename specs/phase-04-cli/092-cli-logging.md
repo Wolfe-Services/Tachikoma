@@ -13,14 +13,14 @@ Implement logging integration for the CLI, connecting the tracing framework with
 
 ## Acceptance Criteria
 
-- [ ] Log level control via CLI flags (-v, -vv, -vvv)
-- [ ] Quiet mode suppresses non-error logs
-- [ ] Log output to file
-- [ ] JSON log format option
-- [ ] Color-coded log levels
-- [ ] Integration with tracing spans
-- [ ] Progress indicator compatibility
-- [ ] Debug mode with full traces
+- [x] Log level control via CLI flags (-v, -vv, -vvv)
+- [x] Quiet mode suppresses non-error logs
+- [x] Log output to file
+- [x] JSON log format option
+- [x] Color-coded log levels
+- [x] Integration with tracing spans
+- [x] Progress indicator compatibility
+- [x] Debug mode with full traces
 
 ## Implementation Details
 
