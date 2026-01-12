@@ -53,10 +53,7 @@ impl ManpagesCommand {
         match &self.command {
             Some(name) => {
                 let subcmd = find_subcommand(cmd, name)
-                    .ok_or_else(|| CliError::NotFound {
-                        resource: "command".to_string(),
-                        name: name.clone(),
-                    })?;
+                    .ok_or_else(|| CliError::not_found("command", name))?;
                 self.render_man_page(subcmd, &mut io::stdout())?;
             }
             None => {
