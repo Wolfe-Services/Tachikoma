@@ -1,0 +1,45 @@
+# Tachikoma Japanese Translation
+# Copyright (C) 2024 Tachikoma Team
+# This file is distributed under the same license as the Tachikoma package.
+
+msgid ""
+msgstr ""
+"Project-Id-Version: Tachikoma 0.1.0\n"
+"Report-Msgid-Bugs-To: bugs@tachikoma.dev\n"
+"POT-Creation-Date: 2024-01-01 12:00+0000\n"
+"PO-Revision-Date: 2024-01-01 12:00+0000\n"
+"Last-Translator: Tachikoma Team\n"
+"Language-Team: Japanese\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/main.rs:42
+msgid "app.welcome"
+msgstr "Tachikomaへようこそ！"
+
+#: src/main.rs:43
+msgid "app.goodbye"
+msgstr "さようなら！"
+
+#: src/user.rs:12
+msgid "user.greeting"
+msgstr "こんにちは、{name}さん！"
+
+#: src/mission.rs:25
+msgid "mission.started"
+msgstr "ミッション開始"
+
+#: src/mission.rs:26
+msgid "mission.completed"
+msgstr "ミッション完了"
+
+#: src/mission.rs:30
+msgid "mission.error"
+msgstr "ミッションエラー: {error}"
+
+# Japanese doesn't have plural forms like English
+#: src/stats.rs:15
+msgid "stats.file_count"
+msgstr "{count}個のファイルを処理しました"

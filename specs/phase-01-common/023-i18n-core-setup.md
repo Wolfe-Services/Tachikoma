@@ -16,11 +16,11 @@ Set up internationalization infrastructure using gettext for Rust with message c
 
 ## Acceptance Criteria
 
-- [ ] gettext integration for Rust
-- [ ] Message catalog structure (.po/.mo)
-- [ ] Locale type with parsing
-- [ ] Translation macros
-- [ ] Fallback handling
+- [x] gettext integration for Rust
+- [x] Message catalog structure (.po/.mo)
+- [x] Locale type with parsing
+- [x] Translation macros
+- [x] Fallback handling
 
 ---
 
