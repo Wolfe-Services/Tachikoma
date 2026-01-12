@@ -16,12 +16,12 @@ Define the types and structures for tool/function definitions that can be provid
 
 ## Acceptance Criteria
 
-- [ ] `ToolDefinition` struct for describing tools
-- [ ] JSON Schema support for parameters
-- [ ] `ToolParameter` types for common parameter patterns
-- [ ] Builder pattern for tool construction
-- [ ] Serialization to provider-specific formats
-- [ ] Validation of tool definitions
+- [x] `ToolDefinition` struct for describing tools
+- [x] JSON Schema support for parameters
+- [x] `ToolParameter` types for common parameter patterns
+- [x] Builder pattern for tool construction
+- [x] Serialization to provider-specific formats
+- [x] Validation of tool definitions
 
 ---
 
