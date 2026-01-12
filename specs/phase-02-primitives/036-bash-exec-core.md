@@ -16,12 +16,12 @@ Implement the `bash` primitive for executing shell commands with proper process 
 
 ## Acceptance Criteria
 
-- [ ] Execute bash commands asynchronously
-- [ ] Capture stdout and stderr separately
-- [ ] Support working directory specification
-- [ ] Environment variable injection
-- [ ] Command sanitization and validation
-- [ ] Process cleanup on cancellation
+- [x] Execute bash commands asynchronously
+- [x] Capture stdout and stderr separately
+- [x] Support working directory specification
+- [x] Environment variable injection
+- [x] Command sanitization and validation
+- [x] Process cleanup on cancellation
 
 ---
 
