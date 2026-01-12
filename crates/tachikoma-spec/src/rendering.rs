@@ -27,7 +27,7 @@ impl OutputFormat {
 
 /// Template rendering context
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RenderContext {
+pub struct TemplateContext {
     /// Spec metadata
     #[serde(flatten)]
     pub spec: SpecContext,
@@ -208,7 +208,7 @@ impl SpecRenderer {
     pub fn render(
         &self,
         template: &str,
-        context: &RenderContext,
+        context: &TemplateContext,
     ) -> Result<String, RenderError> {
         let result = self.handlebars.render(template, context)?;
         Ok(result)
@@ -218,7 +218,7 @@ impl SpecRenderer {
     pub fn render_format(
         &self,
         template: &str,
-        context: &RenderContext,
+        context: &TemplateContext,
         format: OutputFormat,
     ) -> Result<String, RenderError> {
         let content = self.render(template, context)?;
