@@ -13,13 +13,13 @@ Implement comprehensive JSON output mode for all CLI commands, enabling machine-
 
 ## Acceptance Criteria
 
-- [ ] `--format json` flag produces valid JSON output
-- [ ] All commands support JSON output mode
-- [ ] JSON schemas documented for each output type
-- [ ] Pretty-printed JSON by default, compact with `--compact`
-- [ ] NDJSON (newline-delimited JSON) for streaming output
-- [ ] Error output as structured JSON
-- [ ] Consistent field naming conventions
+- [x] `--format json` flag produces valid JSON output
+- [x] All commands support JSON output mode
+- [x] JSON schemas documented for each output type
+- [x] Pretty-printed JSON by default, compact with `--compact`
+- [x] NDJSON (newline-delimited JSON) for streaming output
+- [x] Error output as structured JSON
+- [x] Consistent field naming conventions
 
 ## Implementation Details
 
