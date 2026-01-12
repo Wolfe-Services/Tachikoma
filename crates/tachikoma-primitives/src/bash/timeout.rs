@@ -65,6 +65,8 @@ pub async fn bash_with_timeout(
     match result {
         Ok(Ok((exit_code, stdout, stderr))) => {
             let duration = start.elapsed();
+            let stdout_len = stdout.len();
+            let stderr_len = stderr.len();
             debug!("Command completed in {:?}", duration);
 
             Ok(BashResult {
@@ -72,6 +74,10 @@ pub async fn bash_with_timeout(
                 stdout,
                 stderr,
                 timed_out: false,
+                stdout_truncated: false,
+                stderr_truncated: false,
+                stdout_total_bytes: stdout_len,
+                stderr_total_bytes: stderr_len,
                 metadata: ExecutionMetadata {
                     duration,
                     operation_id: ctx.operation_id.clone(),
@@ -91,12 +97,18 @@ pub async fn bash_with_timeout(
             kill_process_tree(pid).await;
 
             let duration = start.elapsed();
+            let partial_stdout_len = partial_stdout.len();
+            let partial_stderr_len = partial_stderr.len();
 
             Ok(BashResult {
                 exit_code: -1,
                 stdout: partial_stdout,
                 stderr: partial_stderr,
                 timed_out: true,
+                stdout_truncated: false,
+                stderr_truncated: false,
+                stdout_total_bytes: partial_stdout_len,
+                stderr_total_bytes: partial_stderr_len,
                 metadata: ExecutionMetadata {
                     duration,
                     operation_id: ctx.operation_id.clone(),

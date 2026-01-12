@@ -71,8 +71,34 @@ pub struct BashResult {
     pub stderr: String,
     /// Whether the command timed out.
     pub timed_out: bool,
+    /// Whether stdout was truncated.
+    pub stdout_truncated: bool,
+    /// Whether stderr was truncated.
+    pub stderr_truncated: bool,
+    /// Total stdout bytes before truncation.
+    pub stdout_total_bytes: usize,
+    /// Total stderr bytes before truncation.
+    pub stderr_total_bytes: usize,
     /// Execution metadata.
     pub metadata: ExecutionMetadata,
+}
+
+impl BashResult {
+    /// Combine stdout and stderr.
+    pub fn combined_output(&self) -> String {
+        if self.stderr.is_empty() {
+            self.stdout.clone()
+        } else if self.stdout.is_empty() {
+            self.stderr.clone()
+        } else {
+            format!("{}\n{}", self.stdout, self.stderr)
+        }
+    }
+
+    /// Check if any output was truncated.
+    pub fn is_output_truncated(&self) -> bool {
+        self.stdout_truncated || self.stderr_truncated
+    }
 }
 
 /// Result of an edit_file operation.

@@ -1,5 +1,6 @@
 //! Options for bash command execution.
 
+use super::output::OutputConfig;
 use std::collections::HashMap;
 use std::time::Duration;
 
@@ -18,6 +19,10 @@ pub struct BashOptions {
     pub blocked_commands: Vec<String>,
     /// Maximum output size in bytes.
     pub max_output_size: usize,
+    /// Output configuration.
+    pub output_config: OutputConfig,
+    /// Whether to stream output in real-time.
+    pub stream_output: bool,
 }
 
 impl Default for BashOptions {
@@ -35,6 +40,8 @@ impl Default for BashOptions {
                 "> /dev/sd".to_string(),
             ],
             max_output_size: 10 * 1024 * 1024,
+            output_config: OutputConfig::default(),
+            stream_output: false,
         }
     }
 }
@@ -90,6 +97,42 @@ impl BashOptions {
     /// Set max output size.
     pub fn max_output(mut self, size: usize) -> Self {
         self.max_output_size = size;
+        self
+    }
+
+    /// Configure output options.
+    pub fn output_config(mut self, config: OutputConfig) -> Self {
+        self.output_config = config;
+        self
+    }
+
+    /// Set max stdout size.
+    pub fn max_stdout(mut self, size: usize) -> Self {
+        self.output_config.max_stdout = size;
+        self
+    }
+
+    /// Set max stderr size.
+    pub fn max_stderr(mut self, size: usize) -> Self {
+        self.output_config.max_stderr = size;
+        self
+    }
+
+    /// Enable/disable ANSI stripping.
+    pub fn strip_ansi(mut self, strip: bool) -> Self {
+        self.output_config.strip_ansi = strip;
+        self
+    }
+
+    /// Enable/disable output trimming.
+    pub fn trim_output(mut self, trim: bool) -> Self {
+        self.output_config.trim_output = trim;
+        self
+    }
+
+    /// Enable streaming output.
+    pub fn stream_output(mut self) -> Self {
+        self.stream_output = true;
         self
     }
 }
