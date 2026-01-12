@@ -1,12 +1,14 @@
 //! Command module organization and shared traits.
 
 mod backends;
+mod completions;
 mod config;
 mod doctor;
 mod init;
 mod tools;
 
 pub use backends::BackendsCommand;
+pub use completions::CompletionsCommand;
 pub use config::ConfigCommand;
 pub use doctor::DoctorCommand;
 pub use init::InitCommand;
