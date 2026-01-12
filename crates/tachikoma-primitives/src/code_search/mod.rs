@@ -1,8 +1,10 @@
 //! Code search primitive using ripgrep.
 
+mod format;
 mod options;
 mod parser;
 
+pub use format::{FormatConfig, OutputFormat, format_results, format_summary};
 pub use options::CodeSearchOptions;
 pub use parser::{RipgrepMatch, RipgrepOutput};
 
