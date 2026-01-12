@@ -5,6 +5,8 @@ use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
+use tokio::sync::mpsc;
+
 use crate::output::color::{ColorMode, Styled, Color};
 
 /// Spinner animation frames
@@ -489,6 +491,74 @@ impl Drop for MultiProgressHandle {
     }
 }
 
+impl Drop for MultiProgressHandle {
+    fn drop(&mut self) {
+        self.running.store(false, Ordering::SeqCst);
+        if let Some(thread) = self.thread.take() {
+            let _ = thread.join();
+        }
+    }
+}
+
+/// Async-compatible progress updates
+pub struct AsyncProgress {
+    tx: mpsc::Sender<ProgressUpdate>,
+}
+
+pub enum ProgressUpdate {
+    Inc(u64),
+    Set(u64),
+    Message(String),
+    Finish,
+}
+
+impl AsyncProgress {
+    pub async fn inc(&self) {
+        let _ = self.tx.send(ProgressUpdate::Inc(1)).await;
+    }
+
+    pub async fn inc_by(&self, n: u64) {
+        let _ = self.tx.send(ProgressUpdate::Inc(n)).await;
+    }
+
+    pub async fn set(&self, value: u64) {
+        let _ = self.tx.send(ProgressUpdate::Set(value)).await;
+    }
+
+    pub async fn message(&self, msg: impl Into<String>) {
+        let _ = self.tx.send(ProgressUpdate::Message(msg.into())).await;
+    }
+
+    pub async fn finish(&self) {
+        let _ = self.tx.send(ProgressUpdate::Finish).await;
+    }
+}
+
+/// Create an async progress bar
+pub fn async_progress(total: u64) -> (AsyncProgress, impl std::future::Future<Output = ()>) {
+    let (tx, mut rx) = mpsc::channel(100);
+
+    let progress = AsyncProgress { tx };
+
+    let runner = async move {
+        let mut bar = ProgressBar::new(total);
+
+        while let Some(update) = rx.recv().await {
+            match update {
+                ProgressUpdate::Inc(n) => bar.inc_by(n),
+                ProgressUpdate::Set(v) => bar.set(v),
+                ProgressUpdate::Message(m) => bar.set_message(m),
+                ProgressUpdate::Finish => {
+                    bar.finish();
+                    break;
+                }
+            }
+        }
+    };
+
+    (progress, runner)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -563,5 +633,38 @@ mod tests {
 
         assert_eq!(spinner.frames, SPINNER_LINE);
         assert_eq!(spinner.interval, Duration::from_millis(50));
+    }
+
+    #[tokio::test]
+    async fn test_async_progress() {
+        let (progress, runner) = async_progress(100);
+        
+        // Spawn the runner
+        let handle = tokio::spawn(runner);
+        
+        // Send some updates
+        progress.inc().await;
+        progress.inc_by(5).await;
+        progress.set(50).await;
+        progress.message("Testing...".to_string()).await;
+        progress.finish().await;
+        
+        // Wait for completion
+        handle.await.unwrap();
+    }
+
+    #[test]
+    fn test_progress_update_enum() {
+        let update = ProgressUpdate::Inc(5);
+        matches!(update, ProgressUpdate::Inc(5));
+        
+        let update = ProgressUpdate::Set(100);
+        matches!(update, ProgressUpdate::Set(100));
+        
+        let update = ProgressUpdate::Message("test".to_string());
+        matches!(update, ProgressUpdate::Message(_));
+        
+        let update = ProgressUpdate::Finish;
+        matches!(update, ProgressUpdate::Finish);
     }
 }
