@@ -1,0 +1,37 @@
+app-id: io.tachikoma.app
+runtime: org.freedesktop.Platform
+runtime-version: '23.08'
+sdk: org.freedesktop.Sdk
+base: org.electronjs.Electron2.BaseApp
+base-version: '23.08'
+command: tachikoma
+separate-locales: false
+
+finish-args:
+  - --share=ipc
+  - --share=network
+  - --socket=x11
+  - --socket=wayland
+  - --socket=pulseaudio
+  - --device=dri
+  - --filesystem=home
+  - --filesystem=xdg-documents
+  - --filesystem=xdg-download
+  - --filesystem=/tmp
+  - --talk-name=org.freedesktop.Notifications
+  - --talk-name=org.freedesktop.secrets
+  - --talk-name=org.gnome.SessionManager
+  - --env=ELECTRON_TRASH=gio
+
+modules:
+  - name: tachikoma
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 tachikoma -t /app/bin/
+      - install -Dm644 tachikoma.desktop /app/share/applications/io.tachikoma.app.desktop
+      - install -Dm644 tachikoma.svg /app/share/icons/hicolor/scalable/apps/io.tachikoma.app.svg
+      - install -Dm644 tachikoma-mime.xml /app/share/mime/packages/io.tachikoma.app.xml
+    sources:
+      - type: archive
+        url: https://github.com/tachikoma/releases/download/v${VERSION}/Tachikoma-${VERSION}-linux-x64.tar.gz
+        sha256: ${SHA256}

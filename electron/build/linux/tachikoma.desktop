@@ -1,0 +1,17 @@
+[Desktop Entry]
+Name=Tachikoma
+GenericName=Development Environment
+Comment=Modern development environment for building applications
+Exec=tachikoma %F
+Icon=tachikoma
+Type=Application
+Categories=Development;IDE;
+Keywords=development;code;editor;ide;programming;
+StartupNotify=true
+StartupWMClass=tachikoma
+MimeType=application/x-tachikoma;x-scheme-handler/tachikoma;
+Actions=new-window;
+
+[Desktop Action new-window]
+Name=New Window
+Exec=tachikoma --new-window

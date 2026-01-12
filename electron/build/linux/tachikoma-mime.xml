@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-tachikoma">
+    <comment>Tachikoma Project</comment>
+    <comment xml:lang="en">Tachikoma Project File</comment>
+    <icon name="application-x-tachikoma"/>
+    <glob pattern="*.tachi"/>
+    <glob pattern="*.tachikoma"/>
+  </mime-type>
+</mime-info>
