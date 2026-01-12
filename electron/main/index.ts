@@ -13,6 +13,8 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import { registerIpcHandlers } from './ipc-handlers';
 import { Logger } from './logger';
 import { configManager } from './config';
+import { registerProtocolSchemes, setupProtocolHandlers, protocolManager } from './protocol';
+import { configureSessionProtocols } from './protocol/session';
 
 const logger = new Logger('main');
 
@@ -23,6 +25,9 @@ if (!configManager.get('hardwareAcceleration')) {
 
 // Security: Enable sandbox for all renderers
 app.enableSandbox();
+
+// Register protocol schemes before app ready
+registerProtocolSchemes();
 
 class TachikomaApp {
   private mainWindow: BrowserWindow | null = null;
@@ -187,7 +192,8 @@ class TachikomaApp {
     this.configureSession();
 
     // Setup protocol handlers
-    this.setupProtocolHandlers();
+    setupProtocolHandlers();
+    configureSessionProtocols();
 
     // Setup crash reporter
     this.setupCrashReporter();
