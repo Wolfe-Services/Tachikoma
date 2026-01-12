@@ -26,16 +26,16 @@ Implement comprehensive crash reporting for both main and renderer processes, ca
 
 ## Acceptance Criteria
 
-- [ ] Capture crashes in main process
-- [ ] Capture crashes in renderer process
-- [ ] Capture uncaught exceptions
-- [ ] Capture unhandled promise rejections
-- [ ] Generate minidump files
-- [ ] Collect diagnostic information (system info, app state)
-- [ ] Optional remote crash reporting
-- [ ] Local crash log storage
-- [ ] User consent for crash reporting
-- [ ] Crash history viewing
+- [x] Capture crashes in main process
+- [x] Capture crashes in renderer process
+- [x] Capture uncaught exceptions
+- [x] Capture unhandled promise rejections
+- [x] Generate minidump files
+- [x] Collect diagnostic information (system info, app state)
+- [x] Optional remote crash reporting
+- [x] Local crash log storage
+- [x] User consent for crash reporting
+- [x] Crash history viewing
 
 ---
 
