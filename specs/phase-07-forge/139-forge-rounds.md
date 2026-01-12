@@ -16,13 +16,13 @@ Implement the core round orchestration engine that drives Forge sessions through
 
 ## Acceptance Criteria
 
-- [ ] `ForgeOrchestrator` as the main execution engine
-- [ ] State machine for round progression
-- [ ] Support for all round types (draft, critique, synthesis, refinement)
-- [ ] Pause/resume capability for attended mode
-- [ ] Error recovery with round retry
-- [ ] Event emission for progress tracking
-- [ ] Timeout handling per round
+- [x] `ForgeOrchestrator` as the main execution engine
+- [x] State machine for round progression
+- [x] Support for all round types (draft, critique, synthesis, refinement)
+- [x] Pause/resume capability for attended mode
+- [x] Error recovery with round retry
+- [x] Event emission for progress tracking
+- [x] Timeout handling per round
 
 ---
 
