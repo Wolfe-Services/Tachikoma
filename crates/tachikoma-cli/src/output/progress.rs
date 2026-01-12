@@ -491,15 +491,6 @@ impl Drop for MultiProgressHandle {
     }
 }
 
-impl Drop for MultiProgressHandle {
-    fn drop(&mut self) {
-        self.running.store(false, Ordering::SeqCst);
-        if let Some(thread) = self.thread.take() {
-            let _ = thread.join();
-        }
-    }
-}
-
 /// Async-compatible progress updates
 pub struct AsyncProgress {
     tx: mpsc::Sender<ProgressUpdate>,
