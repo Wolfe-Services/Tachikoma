@@ -24,7 +24,8 @@ describe('ContextMeter', () => {
       const usage = createMockUsage({ usagePercent: 42.7 });
       render(ContextMeter, { usage });
       
-      await tick();
+      // Wait for animation to complete
+      await new Promise(resolve => setTimeout(resolve, 450));
       expect(screen.getByText('43%')).toBeInTheDocument(); // Rounded
     });
 
@@ -32,7 +33,8 @@ describe('ContextMeter', () => {
       const usage = createMockUsage({ usagePercent: 60 });
       const { container } = render(ContextMeter, { usage });
       
-      await tick();
+      // Wait for animation to complete
+      await new Promise(resolve => setTimeout(resolve, 450));
       const fillBar = container.querySelector('.context-meter__fill');
       expect(fillBar).toHaveStyle({ width: '60%' });
     });
