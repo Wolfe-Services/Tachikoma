@@ -16,13 +16,13 @@ Create a progress display component that shows real-time mission execution progr
 
 ## Acceptance Criteria
 
-- [ ] Visual progress bar with percentage
-- [ ] Step counter (current/total)
-- [ ] Current action description
-- [ ] Elapsed and estimated time display
-- [ ] Animated transitions for progress updates
-- [ ] Compact and expanded view modes
-- [ ] Accessible progress announcements
+- [x] Visual progress bar with percentage
+- [x] Step counter (current/total)
+- [x] Current action description
+- [x] Elapsed and estimated time display
+- [x] Animated transitions for progress updates
+- [x] Compact and expanded view modes
+- [x] Accessible progress announcements
 
 ---
 
