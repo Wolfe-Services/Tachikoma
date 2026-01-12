@@ -218,7 +218,7 @@ impl SpecRenderer {
     pub fn render_format(
         &self,
         template: &str,
-        context: &RenderContext,
+        context: &TemplateContext,
         format: OutputFormat,
     ) -> Result<String, RenderError> {
         let content = self.render(template, context)?;
@@ -325,7 +325,7 @@ impl SpecRenderer {
     pub async fn render_to_file(
         &self,
         template: &str,
-        context: &RenderContext,
+        context: &TemplateContext,
         output_path: &Path,
         format: OutputFormat,
     ) -> Result<PathBuf, RenderError> {
@@ -347,7 +347,7 @@ fn checkbox_helper(
     h: &Helper,
     _: &Handlebars,
     _: &Context,
-    _: &mut RenderContext,
+    _: &mut HbRenderContext,
     out: &mut dyn Output,
 ) -> HelperResult {
     let checked = h.param(0)
@@ -362,7 +362,7 @@ fn progress_bar_helper(
     h: &Helper,
     _: &Handlebars,
     _: &Context,
-    _: &mut RenderContext,
+    _: &mut HbRenderContext,
     out: &mut dyn Output,
 ) -> HelperResult {
     let percentage = h.param(0)
