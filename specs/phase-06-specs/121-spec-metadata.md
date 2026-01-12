@@ -13,14 +13,14 @@ Define comprehensive metadata extraction and management for specification docume
 
 ## Acceptance Criteria
 
-- [ ] All standard metadata fields are extracted
-- [ ] Custom metadata fields are supported
-- [ ] Computed fields (age, staleness, complexity) work
-- [ ] Relationship metadata (dependencies, dependents) is built
-- [ ] Metadata is serializable for caching
-- [ ] Metadata updates trigger appropriate events
-- [ ] Bulk metadata extraction is efficient
-- [ ] Metadata schema is versioned
+- [x] All standard metadata fields are extracted
+- [x] Custom metadata fields are supported
+- [x] Computed fields (age, staleness, complexity) work
+- [x] Relationship metadata (dependencies, dependents) is built
+- [x] Metadata is serializable for caching
+- [x] Metadata updates trigger appropriate events
+- [x] Bulk metadata extraction is efficient
+- [x] Metadata schema is versioned
 
 ## Implementation Details
 
