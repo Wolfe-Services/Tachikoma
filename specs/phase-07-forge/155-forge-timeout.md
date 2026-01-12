@@ -16,12 +16,12 @@ Implement comprehensive timeout handling for Forge sessions, including per-round
 
 ## Acceptance Criteria
 
-- [ ] Per-round timeout enforcement
-- [ ] Session-level time limit
-- [ ] Graceful timeout recovery
-- [ ] Timeout event notification
-- [ ] Configurable timeout values
-- [ ] Extension mechanism for attended mode
+- [x] Per-round timeout enforcement
+- [x] Session-level time limit
+- [x] Graceful timeout recovery
+- [x] Timeout event notification
+- [x] Configurable timeout values
+- [x] Extension mechanism for attended mode
 
 ---
 
