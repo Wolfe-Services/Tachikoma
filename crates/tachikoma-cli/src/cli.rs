@@ -5,7 +5,9 @@ use std::path::PathBuf;
 use clap::{ArgAction, ColorChoice, Parser, Subcommand, ValueHint};
 
 use crate::commands::{
-    BackendsCommand, ConfigCommand, DoctorCommand, InitCommand, ToolsCommand,
+    BackendsCommand, BuildCommand, ConfigCommand, DevCommand, DoctorCommand, 
+    FmtCommand, InitCommand, LintCommand, PromptsCommand, RunCommand,
+    TestCommand, ToolsCommand, WorkflowsCommand,
 };
 use crate::error::CliError;
 
@@ -95,14 +97,32 @@ pub enum OutputFormat {
 /// Available subcommands
 #[derive(Debug, Subcommand)]
 pub enum Command {
+    // === Project Management ===
+
     /// Initialize a new Tachikoma project
+    #[command(visible_alias = "new")]
     Init(InitCommand),
+
+    /// Run an agent or workflow
+    Run(RunCommand),
+
+    /// Build the project
+    Build(BuildCommand),
+
+    /// Run tests
+    Test(TestCommand),
+
+    // === Configuration ===
 
     /// Manage configuration
     Config(ConfigCommand),
 
+    // === System ===
+
     /// Check system health and dependencies
     Doctor(DoctorCommand),
+
+    // === Resources ===
 
     /// Manage MCP tools
     Tools(ToolsCommand),
@@ -110,9 +130,32 @@ pub enum Command {
     /// Manage AI backends
     Backends(BackendsCommand),
 
+    /// Manage prompts
+    Prompts(PromptsCommand),
+
+    /// Manage workflows
+    Workflows(WorkflowsCommand),
+
+    // === Development ===
+
+    /// Start development server
+    Dev(DevCommand),
+
+    /// Format code and configurations
+    Fmt(FmtCommand),
+
+    /// Lint code and configurations
+    Lint(LintCommand),
+
+    // === Utilities ===
+
     /// Generate shell completions
     #[command(hide = true)]
     Completions(CompletionsCommand),
+
+    /// Generate man pages
+    #[command(hide = true)]
+    Manpages(ManpagesCommand),
 }
 
 /// Shell completions generation
@@ -121,6 +164,14 @@ pub struct CompletionsCommand {
     /// Shell to generate completions for
     #[arg(value_enum)]
     pub shell: clap_complete::Shell,
+}
+
+/// Generate man pages
+#[derive(Debug, Parser)]
+pub struct ManpagesCommand {
+    /// Directory to output man pages
+    #[arg(short, long, default_value = "man")]
+    pub output: PathBuf,
 }
 
 impl Cli {
