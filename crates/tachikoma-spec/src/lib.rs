@@ -30,4 +30,5 @@ pub use progress::*;
 pub use readme::*;
 pub use templates::*;
 pub use validation::*;
+pub use versioning::*;
 pub use watcher::*;
