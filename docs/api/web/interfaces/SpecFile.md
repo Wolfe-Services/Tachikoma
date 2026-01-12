@@ -6,7 +6,7 @@
 
 # Interface: SpecFile
 
-Defined in: [ipc/types.ts:58](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L58)
+Defined in: [ipc/types.ts:58](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L58)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [ipc/types.ts:58](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **path**: `string`
 
-Defined in: [ipc/types.ts:59](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L59)
+Defined in: [ipc/types.ts:59](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L59)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [ipc/types.ts:59](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **name**: `string`
 
-Defined in: [ipc/types.ts:60](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L60)
+Defined in: [ipc/types.ts:60](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L60)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [ipc/types.ts:60](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **type**: `"spec"` \| `"plan"` \| `"readme"`
 
-Defined in: [ipc/types.ts:61](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L61)
+Defined in: [ipc/types.ts:61](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L61)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [ipc/types.ts:61](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **status**: `"complete"` \| `"planned"` \| `"in_progress"`
 
-Defined in: [ipc/types.ts:62](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L62)
+Defined in: [ipc/types.ts:62](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L62)

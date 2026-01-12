@@ -6,7 +6,7 @@
 
 # Interface: TachikomaConfig
 
-Defined in: [ipc/types.ts:72](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L72)
+Defined in: [ipc/types.ts:72](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L72)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [ipc/types.ts:72](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **backend**: `object`
 
-Defined in: [ipc/types.ts:73](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L73)
+Defined in: [ipc/types.ts:73](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L73)
 
 #### brain
 
@@ -30,7 +30,7 @@ Defined in: [ipc/types.ts:73](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **loop**: `object`
 
-Defined in: [ipc/types.ts:77](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L77)
+Defined in: [ipc/types.ts:77](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L77)
 
 #### maxIterations
 

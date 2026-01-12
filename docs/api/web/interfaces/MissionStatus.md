@@ -6,7 +6,7 @@
 
 # Interface: MissionStatus
 
-Defined in: [ipc/types.ts:49](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L49)
+Defined in: [ipc/types.ts:49](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L49)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [ipc/types.ts:49](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **id**: `string`
 
-Defined in: [ipc/types.ts:50](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L50)
+Defined in: [ipc/types.ts:50](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L50)
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: [ipc/types.ts:50](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **state**: `"error"` \| `"idle"` \| `"running"` \| `"paused"` \| `"complete"`
 
-Defined in: [ipc/types.ts:51](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L51)
+Defined in: [ipc/types.ts:51](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L51)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [ipc/types.ts:51](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **progress**: `number`
 
-Defined in: [ipc/types.ts:52](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L52)
+Defined in: [ipc/types.ts:52](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L52)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [ipc/types.ts:52](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **currentStep**: `string`
 
-Defined in: [ipc/types.ts:53](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L53)
+Defined in: [ipc/types.ts:53](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L53)
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: [ipc/types.ts:53](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **startedAt**: `string`
 
-Defined in: [ipc/types.ts:54](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L54)
+Defined in: [ipc/types.ts:54](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L54)
 
 ***
 
@@ -54,4 +54,4 @@ Defined in: [ipc/types.ts:54](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **contextUsage**: `number`
 
-Defined in: [ipc/types.ts:55](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L55)
+Defined in: [ipc/types.ts:55](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L55)

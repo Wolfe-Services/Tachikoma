@@ -6,7 +6,7 @@
 
 # Interface: IpcChannels
 
-Defined in: [ipc/types.ts:4](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L4)
+Defined in: [ipc/types.ts:4](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L4)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [ipc/types.ts:4](https://github.com/DwGitmo/Tachikoma/blob/a721b2776
 
 > **mission:start**: `object`
 
-Defined in: [ipc/types.ts:6](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L6)
+Defined in: [ipc/types.ts:6](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L6)
 
 #### request
 
@@ -46,7 +46,7 @@ Defined in: [ipc/types.ts:6](https://github.com/DwGitmo/Tachikoma/blob/a721b2776
 
 > **mission:stop**: `object`
 
-Defined in: [ipc/types.ts:10](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L10)
+Defined in: [ipc/types.ts:10](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L10)
 
 #### request
 
@@ -70,7 +70,7 @@ Defined in: [ipc/types.ts:10](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **mission:status**: `object`
 
-Defined in: [ipc/types.ts:14](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L14)
+Defined in: [ipc/types.ts:14](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L14)
 
 #### request
 
@@ -90,7 +90,7 @@ Defined in: [ipc/types.ts:14](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **spec:list**: `object`
 
-Defined in: [ipc/types.ts:20](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L20)
+Defined in: [ipc/types.ts:20](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L20)
 
 #### request
 
@@ -110,7 +110,7 @@ Defined in: [ipc/types.ts:20](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **spec:read**: `object`
 
-Defined in: [ipc/types.ts:24](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L24)
+Defined in: [ipc/types.ts:24](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L24)
 
 #### request
 
@@ -138,7 +138,7 @@ Defined in: [ipc/types.ts:24](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **config:get**: `object`
 
-Defined in: [ipc/types.ts:30](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L30)
+Defined in: [ipc/types.ts:30](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L30)
 
 #### request
 
@@ -158,7 +158,7 @@ Defined in: [ipc/types.ts:30](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **config:set**: `object`
 
-Defined in: [ipc/types.ts:34](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L34)
+Defined in: [ipc/types.ts:34](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L34)
 
 #### request
 

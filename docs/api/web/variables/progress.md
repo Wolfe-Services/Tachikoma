@@ -8,4 +8,4 @@
 
 > `const` **progress**: `Readable`\<`number`\>
 
-Defined in: [stores/mission.ts:61](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/stores/mission.ts#L61)
+Defined in: [stores/mission.ts:61](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/stores/mission.ts#L61)

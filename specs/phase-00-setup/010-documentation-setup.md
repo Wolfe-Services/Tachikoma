@@ -16,11 +16,11 @@ Configure documentation generation for Rust (rustdoc), TypeScript (TypeDoc), and
 
 ## Acceptance Criteria
 
-- [ ] Rustdoc configured with workspace settings
-- [ ] TypeDoc configured for web/
-- [ ] docs/ folder structure created
-- [ ] Documentation scripts in package.json
-- [ ] README badges and links
+- [x] Rustdoc configured with workspace settings
+- [x] TypeDoc configured for web/
+- [x] docs/ folder structure created
+- [x] Documentation scripts in package.json
+- [x] README badges and links
 
 ---
 

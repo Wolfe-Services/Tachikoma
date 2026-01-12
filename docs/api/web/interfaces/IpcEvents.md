@@ -6,7 +6,7 @@
 
 # Interface: IpcEvents
 
-Defined in: [ipc/types.ts:41](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L41)
+Defined in: [ipc/types.ts:41](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L41)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [ipc/types.ts:41](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **mission:progress**: `object`
 
-Defined in: [ipc/types.ts:42](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L42)
+Defined in: [ipc/types.ts:42](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L42)
 
 #### missionId
 
@@ -34,7 +34,7 @@ Defined in: [ipc/types.ts:42](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **mission:log**: `object`
 
-Defined in: [ipc/types.ts:43](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L43)
+Defined in: [ipc/types.ts:43](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L43)
 
 #### missionId
 
@@ -54,7 +54,7 @@ Defined in: [ipc/types.ts:43](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **mission:complete**: `object`
 
-Defined in: [ipc/types.ts:44](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L44)
+Defined in: [ipc/types.ts:44](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L44)
 
 #### missionId
 
@@ -74,7 +74,7 @@ Defined in: [ipc/types.ts:44](https://github.com/DwGitmo/Tachikoma/blob/a721b277
 
 > **mission:error**: `object`
 
-Defined in: [ipc/types.ts:45](https://github.com/DwGitmo/Tachikoma/blob/a721b2776b07d9315755397b2c957e097f38c1b0/web/src/lib/ipc/types.ts#L45)
+Defined in: [ipc/types.ts:45](https://github.com/DwGitmo/Tachikoma/blob/e91ef3d0907335fcbe422629c419d70314ca9f13/web/src/lib/ipc/types.ts#L45)
 
 #### missionId
 
