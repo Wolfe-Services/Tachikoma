@@ -16,13 +16,13 @@ Create mission control components that provide start, pause, resume, abort, and 
 
 ## Acceptance Criteria
 
-- [ ] Start button to begin mission execution
-- [ ] Pause/Resume toggle for running missions
-- [ ] Abort button with confirmation dialog
-- [ ] Restart option for completed/failed missions
-- [ ] State-appropriate button visibility
-- [ ] Keyboard shortcuts for controls
-- [ ] Loading states during transitions
+- [x] Start button to begin mission execution
+- [x] Pause/Resume toggle for running missions
+- [x] Abort button with confirmation dialog
+- [x] Restart option for completed/failed missions
+- [x] State-appropriate button visibility
+- [x] Keyboard shortcuts for controls
+- [x] Loading states during transitions
 
 ---
 
