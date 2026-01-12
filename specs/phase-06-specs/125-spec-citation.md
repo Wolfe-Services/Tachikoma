@@ -13,14 +13,14 @@ Implement a citation system for referencing specs in code, documentation, and co
 
 ## Acceptance Criteria
 
-- [ ] Multiple citation formats are supported
-- [ ] Citations are parsed from code comments
-- [ ] Citations are validated against spec index
-- [ ] Citation coverage reports are generated
-- [ ] Broken citations are detected
-- [ ] Citations support section-level references
-- [ ] IDE integration provides citation hints
-- [ ] Citation index is searchable
+- [x] Multiple citation formats are supported
+- [x] Citations are parsed from code comments
+- [x] Citations are validated against spec index
+- [x] Citation coverage reports are generated
+- [x] Broken citations are detected
+- [x] Citations support section-level references
+- [x] IDE integration provides citation hints
+- [x] Citation index is searchable
 
 ## Implementation Details
 
