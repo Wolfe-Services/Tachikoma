@@ -198,9 +198,13 @@ impl QualityTracker {
         ] {
             let (issue_count, priority_sum) = dimension_counts.get(&dim).copied().unwrap_or((0, 0));
 
-            // Score: 100 - (issues * 10), weighted by priority
+            // Score: 100 - (issues weighted by priority)
+            // Lower priority numbers (1,2,3) are more important, so they should reduce score more
             let weighted_issues = if issue_count > 0 {
-                issue_count as f64 * (priority_sum as f64 / issue_count as f64)
+                let avg_priority = priority_sum as f64 / issue_count as f64;
+                // Invert priority so lower numbers (more important) have higher weight
+                let priority_weight = 4.0 - avg_priority; // 1->3, 2->2, 3->1
+                issue_count as f64 * priority_weight
             } else {
                 0.0
             };
