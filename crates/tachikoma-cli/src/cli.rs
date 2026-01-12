@@ -5,9 +5,8 @@ use std::path::PathBuf;
 use clap::{ArgAction, ColorChoice, Parser, Subcommand, ValueHint};
 
 use crate::commands::{
-    BackendsCommand, BuildCommand, ConfigCommand, DevCommand, DoctorCommand, 
-    FmtCommand, InitCommand, LintCommand, PromptsCommand, RunCommand,
-    TestCommand, ToolsCommand, WorkflowsCommand,
+    BackendsCommand, ConfigCommand, DoctorCommand, 
+    InitCommand, ToolsCommand, CompletionsCommand,
 };
 use crate::error::CliError;
 
