@@ -16,12 +16,12 @@ Implement synthesis prompt construction that guides the synthesizer model to mer
 
 ## Acceptance Criteria
 
-- [ ] Synthesis prompt incorporating all critiques
-- [ ] Conflict identification guidance
-- [ ] Change tracking instructions
-- [ ] Weighted suggestion prioritization
-- [ ] Context-efficient critique summarization
-- [ ] Structured output format for synthesis
+- [x] Synthesis prompt incorporating all critiques
+- [x] Conflict identification guidance
+- [x] Change tracking instructions
+- [x] Weighted suggestion prioritization
+- [x] Context-efficient critique summarization
+- [x] Structured output format for synthesis
 
 ---
 
