@@ -16,12 +16,12 @@ Define comprehensive integration tests for the backend abstraction layer, includ
 
 ## Acceptance Criteria
 
-- [ ] Mock backend for testing
-- [ ] Unit tests for all components
-- [ ] Integration tests for each provider
-- [ ] End-to-end streaming tests
-- [ ] Tool calling tests
-- [ ] Error handling tests
+- [x] Mock backend for testing
+- [x] Unit tests for all components
+- [x] Integration tests for each provider
+- [x] End-to-end streaming tests
+- [x] Tool calling tests
+- [x] Error handling tests
 
 ---
 
