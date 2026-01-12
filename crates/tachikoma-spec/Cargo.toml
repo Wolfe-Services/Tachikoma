@@ -9,7 +9,7 @@ repository.workspace = true
 
 [dependencies]
 # Async runtime
-tokio = { workspace = true }
+tokio = { workspace = true, features = ["fs", "io-util"] }
 
 # Serialization
 serde = { workspace = true }
@@ -21,6 +21,13 @@ anyhow = { workspace = true }
 
 # File watching
 notify = "6.1"
+
+# Template engine
+handlebars = "5.1"
+regex = "1.10"
+
+# Date handling
+chrono = { version = "0.4", features = ["serde"] }
 
 # Common utilities
 tachikoma-common-fs = { path = "../tachikoma-common-fs" }
