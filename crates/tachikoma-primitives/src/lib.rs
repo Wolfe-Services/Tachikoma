@@ -27,6 +27,9 @@ pub mod bash;
 #[cfg(feature = "edit-file")]
 pub mod edit_file;
 
+#[cfg(feature = "code-search")]
+pub mod code_search;
+
 // Re-exports
 pub use context::{PrimitiveConfig, PrimitiveContext};
 pub use error::{PrimitiveError, PrimitiveResult};
