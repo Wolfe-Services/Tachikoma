@@ -11,32 +11,62 @@ use tracing::{debug, warn};
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum RipgrepMessage {
     Begin {
-        path: RipgrepText,
+        data: BeginData,
     },
     #[serde(rename = "match")]
     Match {
-        path: RipgrepText,
-        lines: RipgrepText,
-        line_number: u64,
-        absolute_offset: u64,
-        submatches: Vec<Submatch>,
+        data: MatchData,
     },
     Context {
-        path: RipgrepText,
-        lines: RipgrepText,
-        line_number: u64,
-        absolute_offset: u64,
-        submatches: Vec<Submatch>,
+        data: ContextData,
     },
     End {
-        path: RipgrepText,
-        binary_offset: Option<u64>,
-        stats: FileStats,
+        data: EndData,
     },
     Summary {
-        elapsed_total: ElapsedTime,
-        stats: SummaryStats,
+        data: SummaryData,
     },
+}
+
+/// Begin data.
+#[derive(Debug, Deserialize)]
+pub struct BeginData {
+    pub path: RipgrepText,
+}
+
+/// Match data.
+#[derive(Debug, Deserialize)]
+pub struct MatchData {
+    pub path: RipgrepText,
+    pub lines: RipgrepText,
+    pub line_number: u64,
+    pub absolute_offset: u64,
+    pub submatches: Vec<Submatch>,
+}
+
+/// Context data.
+#[derive(Debug, Deserialize)]
+pub struct ContextData {
+    pub path: RipgrepText,
+    pub lines: RipgrepText,
+    pub line_number: u64,
+    pub absolute_offset: u64,
+    pub submatches: Vec<Submatch>,
+}
+
+/// End data.
+#[derive(Debug, Deserialize)]
+pub struct EndData {
+    pub path: RipgrepText,
+    pub binary_offset: Option<u64>,
+    pub stats: FileStats,
+}
+
+/// Summary data.
+#[derive(Debug, Deserialize)]
+pub struct SummaryData {
+    pub elapsed_total: ElapsedTime,
+    pub stats: SummaryStats,
 }
 
 /// Text content from ripgrep.
@@ -221,13 +251,13 @@ pub fn parse_ripgrep_output(
         };
 
         match message {
-            RipgrepMessage::Begin { path } => {
-                debug!("Starting file: {:?}", path.text);
-                let file_path = PathBuf::from(&path.text);
+            RipgrepMessage::Begin { data } => {
+                debug!("Starting file: {:?}", data.path.text);
+                let file_path = PathBuf::from(&data.path.text);
                 context_map.insert(file_path.clone(), ContextAccumulator::new());
                 multi_line_buffer.insert(file_path, Vec::new());
             }
-            RipgrepMessage::Match { path, lines, line_number, submatches, .. } => {
+            RipgrepMessage::Match { data } => {
                 total_count += 1;
 
                 if matches.len() >= max_matches {
@@ -235,20 +265,20 @@ pub fn parse_ripgrep_output(
                     continue;
                 }
 
-                let file_path = PathBuf::from(&path.text);
+                let file_path = PathBuf::from(&data.path.text);
 
                 // Get or create context accumulator
                 let context_acc = context_map.entry(file_path.clone()).or_insert_with(ContextAccumulator::new);
-                context_acc.set_match_line(line_number as usize);
+                context_acc.set_match_line(data.line_number as usize);
 
                 // Handle multi-line matches
                 let buffer = multi_line_buffer.entry(file_path.clone()).or_insert_with(Vec::new);
-                buffer.push((line_number as usize, lines.text.clone()));
+                buffer.push((data.line_number as usize, data.lines.text.clone()));
 
                 // Process submatches for column and highlighting
-                let (column, match_start, match_end, matched_text) = if let Some(submatch) = submatches.first() {
+                let (column, match_start, match_end, matched_text) = if let Some(submatch) = data.submatches.first() {
                     // Calculate column from byte offset to character offset
-                    let line_text = &lines.text;
+                    let line_text = &data.lines.text;
                     let byte_start = submatch.start;
                     let byte_end = submatch.end;
 
@@ -276,7 +306,7 @@ pub fn parse_ripgrep_output(
                     let matched_text = submatch.matched.text.clone();
                     (column, char_start, char_end, matched_text)
                 } else {
-                    (1, 0, lines.text.len(), lines.text.clone())
+                    (1, 0, data.lines.text.len(), data.lines.text.clone())
                 };
 
                 // Get accumulated context
@@ -290,12 +320,12 @@ pub fn parse_ripgrep_output(
                 let line_content = if buffer.len() > 1 {
                     buffer.iter().map(|(_, content)| content.clone()).collect::<Vec<_>>().join("\n")
                 } else {
-                    lines.text.trim_end().to_string()
+                    data.lines.text.trim_end().to_string()
                 };
 
                 matches.push(SearchMatch {
                     path: file_path.clone(),
-                    line_number: line_number as usize,
+                    line_number: data.line_number as usize,
                     column,
                     line_content,
                     context_before,
@@ -307,16 +337,16 @@ pub fn parse_ripgrep_output(
                 // Recreate context accumulator for this file
                 context_map.insert(file_path, ContextAccumulator::new());
             }
-            RipgrepMessage::Context { path, lines, line_number, .. } => {
-                let file_path = PathBuf::from(&path.text);
+            RipgrepMessage::Context { data } => {
+                let file_path = PathBuf::from(&data.path.text);
                 let acc = context_map.entry(file_path).or_insert_with(ContextAccumulator::new);
-                acc.add_context(line_number as usize, lines.text.trim_end().to_string());
+                acc.add_context(data.line_number as usize, data.lines.text.trim_end().to_string());
             }
-            RipgrepMessage::End { .. } => {
-                debug!("File processing complete");
+            RipgrepMessage::End { data } => {
+                debug!("File processing complete for: {:?}", data.path.text);
             }
-            RipgrepMessage::Summary { stats, .. } => {
-                debug!("Search complete: {} matches in {} files", stats.matches, stats.searches);
+            RipgrepMessage::Summary { data } => {
+                debug!("Search complete: {} matches in {} files", data.stats.matches, data.stats.searches);
                 break;
             }
         }
@@ -333,23 +363,42 @@ mod tests {
     fn test_parse_match_message() {
         let json = r#"{"type":"match","data":{"path":{"text":"test.rs"},"lines":{"text":"fn main() {"},"line_number":1,"absolute_offset":0,"submatches":[{"match":{"text":"main"},"start":3,"end":7}]}}"#;
 
-        // Note: Actual ripgrep JSON format is different, this tests our parser structure
         let result: Result<RipgrepMessage, _> = serde_json::from_str(json);
-        assert!(result.is_err()); // This will fail because actual format is different
+        assert!(result.is_ok());
+        
+        match result.unwrap() {
+            RipgrepMessage::Match { data } => {
+                assert_eq!(data.path.text, "test.rs");
+                assert_eq!(data.lines.text, "fn main() {");
+                assert_eq!(data.line_number, 1);
+                assert_eq!(data.submatches.len(), 1);
+                assert_eq!(data.submatches[0].matched.text, "main");
+                assert_eq!(data.submatches[0].start, 3);
+                assert_eq!(data.submatches[0].end, 7);
+            }
+            _ => panic!("Expected Match message"),
+        }
     }
 
     #[test]
     fn test_parse_actual_ripgrep_format() {
-        // Real ripgrep JSON format
-        let json_output = r#"{"type":"match","data":{"path":{"text":"test.rs"},"lines":{"text":"fn main() {"},"line_number":1,"absolute_offset":0,"submatches":[{"match":{"text":"main"},"start":3,"end":7}]}}"#;
+        // Real ripgrep JSON format with a match
+        let json_output = r#"{"type":"begin","data":{"path":{"text":"test.rs"}}}
+{"type":"match","data":{"path":{"text":"test.rs"},"lines":{"text":"fn main() {}\n"},"line_number":1,"absolute_offset":0,"submatches":[{"match":{"text":"main"},"start":3,"end":7}]}}
+{"type":"end","data":{"path":{"text":"test.rs"},"binary_offset":null,"stats":{"elapsed":{"secs":0,"nanos":46042,"human":"0.000046s"},"searches":1,"searches_with_match":1,"bytes_searched":13,"bytes_printed":243,"matched_lines":1,"matches":1}}}
+{"data":{"elapsed_total":{"human":"0.000508s","nanos":507667,"secs":0},"stats":{"bytes_printed":243,"bytes_searched":13,"elapsed":{"human":"0.000046s","nanos":46042,"secs":0},"matched_lines":1,"matches":1,"searches":1,"searches_with_match":1}},"type":"summary"}"#;
 
-        // This tests that our current implementation can handle the basic case
         let (matches, total_count, truncated) = parse_ripgrep_output(json_output, 100).unwrap();
 
-        // Since the JSON format doesn't exactly match ripgrep, this may not parse correctly
-        // The test ensures we handle malformed JSON gracefully
-        assert_eq!(total_count, 0); // Should be 0 because JSON doesn't parse
+        assert_eq!(total_count, 1);
+        assert_eq!(matches.len(), 1);
         assert!(!truncated);
+        
+        let match_result = &matches[0];
+        assert_eq!(match_result.path.to_string_lossy(), "test.rs");
+        assert_eq!(match_result.line_number, 1);
+        assert_eq!(match_result.column, 4); // 'm' in "main" is at column 4 (1-indexed)
+        assert_eq!(match_result.line_content, "fn main() {}");
     }
 
     #[test]
@@ -446,9 +495,10 @@ mod tests {
         // Test that we properly handle truncation
         let json_lines = vec![
             r#"{"type":"begin","data":{"path":{"text":"test.rs"}}}"#,
-            r#"{"type":"match","data":{"path":{"text":"test.rs"},"lines":{"text":"match1"},"line_number":1,"absolute_offset":0,"submatches":[]}}"#,
-            r#"{"type":"match","data":{"path":{"text":"test.rs"},"lines":{"text":"match2"},"line_number":2,"absolute_offset":10,"submatches":[]}}"#,
-            r#"{"type":"summary","data":{"elapsed_total":{"human":"0.001s","nanos":1000000,"secs":0},"stats":{"elapsed":{"human":"0.001s","nanos":1000000,"secs":0},"searches":1,"searches_with_match":1,"bytes_searched":100,"bytes_printed":50,"matched_lines":2,"matches":2}}}"#,
+            r#"{"type":"match","data":{"path":{"text":"test.rs"},"lines":{"text":"match1\n"},"line_number":1,"absolute_offset":0,"submatches":[{"match":{"text":"match1"},"start":0,"end":6}]}}"#,
+            r#"{"type":"match","data":{"path":{"text":"test.rs"},"lines":{"text":"match2\n"},"line_number":2,"absolute_offset":10,"submatches":[{"match":{"text":"match2"},"start":0,"end":6}]}}"#,
+            r#"{"type":"end","data":{"path":{"text":"test.rs"},"binary_offset":null,"stats":{"elapsed":{"secs":0,"nanos":1000000,"human":"0.001s"},"searches":1,"searches_with_match":1,"bytes_searched":100,"bytes_printed":50,"matched_lines":2,"matches":2}}}"#,
+            r#"{"data":{"elapsed_total":{"human":"0.001s","nanos":1000000,"secs":0},"stats":{"elapsed":{"human":"0.001s","nanos":1000000,"secs":0},"searches":1,"searches_with_match":1,"bytes_searched":100,"bytes_printed":50,"matched_lines":2,"matches":2}},"type":"summary"}"#,
         ];
 
         let output = json_lines.join("\n");
