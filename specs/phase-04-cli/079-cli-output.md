@@ -13,14 +13,14 @@ Implement a flexible output formatting system that supports multiple output mode
 
 ## Acceptance Criteria
 
-- [ ] Output trait for consistent formatting
-- [ ] Text output with human-readable formatting
-- [ ] Table output for structured data
-- [ ] Support for output redirection detection
-- [ ] Streaming output for long-running operations
-- [ ] Width-aware formatting for terminals
-- [ ] Quiet mode support
-- [ ] Output buffering options
+- [x] Output trait for consistent formatting
+- [x] Text output with human-readable formatting
+- [x] Table output for structured data
+- [x] Support for output redirection detection
+- [x] Streaming output for long-running operations
+- [x] Width-aware formatting for terminals
+- [x] Quiet mode support
+- [x] Output buffering options
 
 ## Implementation Details
 
