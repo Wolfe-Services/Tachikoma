@@ -16,13 +16,13 @@ Implement the `code_search` primitive using ripgrep for fast regex search across
 
 ## Acceptance Criteria
 
-- [ ] Execute ripgrep with regex patterns
-- [ ] File type filtering (--type)
-- [ ] Glob pattern filtering (--glob)
-- [ ] Context lines (before/after)
-- [ ] Respect gitignore by default
-- [ ] Maximum results limit
-- [ ] Parse ripgrep JSON output
+- [x] Execute ripgrep with regex patterns
+- [x] File type filtering (--type)
+- [x] Glob pattern filtering (--glob)
+- [x] Context lines (before/after)
+- [x] Respect gitignore by default
+- [x] Maximum results limit
+- [x] Parse ripgrep JSON output
 
 ---
 
