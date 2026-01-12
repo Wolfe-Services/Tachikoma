@@ -1,6 +1,6 @@
 use tachikoma_common_http::{
     HttpClient, HttpConfig, HttpError, RequestBuilder, JsonBody, headers,
-    ResponseError,
+    ResponseError, RetryPolicy, RetryableError,
 };
 use serde::{Serialize, Deserialize};
 use std::time::Duration;
@@ -169,4 +169,121 @@ fn test_error_display() {
     let client_error_string = format!("{}", client_error);
     assert!(client_error_string.contains("404"));
     assert!(client_error_string.contains("client error"));
+}
+
+#[tokio::test]
+async fn test_retry_with_http_errors() {
+    // Test retry behavior with different HTTP error types
+    let _policy = RetryPolicy {
+        max_attempts: 3,
+        initial_delay: Duration::from_millis(1),
+        jitter: false,
+        ..Default::default()
+    };
+
+    // Test retryable errors
+    let timeout_error = HttpError::Timeout;
+    assert!(timeout_error.is_retryable());
+
+    let rate_limit_error = HttpError::RateLimited { retry_after: Some(Duration::from_secs(1)) };
+    assert!(rate_limit_error.is_retryable());
+    assert_eq!(rate_limit_error.retry_after(), Some(Duration::from_secs(1)));
+
+    let server_error = HttpError::ServerError { status: 500, body: "Internal Server Error".to_string() };
+    assert!(server_error.is_retryable());
+
+    let server_error_502 = HttpError::ServerError { status: 502, body: "Bad Gateway".to_string() };
+    assert!(server_error_502.is_retryable());
+
+    // Test non-retryable errors
+    let client_error = HttpError::ClientError { status: 400, body: "Bad Request".to_string() };
+    assert!(!client_error.is_retryable());
+
+    let not_found_error = HttpError::ClientError { status: 404, body: "Not Found".to_string() };
+    assert!(!not_found_error.is_retryable());
+}
+
+#[tokio::test]
+async fn test_retry_policy_configurations() {
+    // Test default policy
+    let default_policy = RetryPolicy::default();
+    assert_eq!(default_policy.max_attempts, 3);
+    assert_eq!(default_policy.initial_delay, Duration::from_millis(500));
+    assert_eq!(default_policy.max_delay, Duration::from_secs(30));
+    assert_eq!(default_policy.multiplier, 2.0);
+    assert!(default_policy.jitter);
+
+    // Test no retry policy
+    let no_retry = RetryPolicy::no_retry();
+    assert_eq!(no_retry.max_attempts, 1);
+
+    // Test aggressive policy
+    let aggressive = RetryPolicy::aggressive();
+    assert_eq!(aggressive.max_attempts, 5);
+    assert_eq!(aggressive.initial_delay, Duration::from_millis(100));
+    assert_eq!(aggressive.max_delay, Duration::from_secs(60));
+}
+
+#[tokio::test]
+async fn test_exponential_backoff_behavior() {
+    let policy = RetryPolicy {
+        max_attempts: 5,
+        initial_delay: Duration::from_millis(10),
+        multiplier: 2.0,
+        jitter: false,
+        ..Default::default()
+    };
+
+    // Test exponential progression
+    assert_eq!(policy.delay_for_attempt(0), Duration::ZERO);
+    assert_eq!(policy.delay_for_attempt(1), Duration::from_millis(10));
+    assert_eq!(policy.delay_for_attempt(2), Duration::from_millis(20));
+    assert_eq!(policy.delay_for_attempt(3), Duration::from_millis(40));
+    assert_eq!(policy.delay_for_attempt(4), Duration::from_millis(80));
+}
+
+#[tokio::test]
+async fn test_jitter_prevention_of_thundering_herd() {
+    let policy = RetryPolicy {
+        initial_delay: Duration::from_millis(100),
+        multiplier: 2.0,
+        jitter: true,
+        ..Default::default()
+    };
+
+    // Collect multiple delay calculations for the same attempt
+    let mut delays = Vec::new();
+    for _ in 0..10 {
+        delays.push(policy.delay_for_attempt(1));
+    }
+
+    // Verify all delays are within expected range (100ms to 125ms with 25% jitter)
+    for delay in &delays {
+        assert!(*delay >= Duration::from_millis(100));
+        assert!(*delay <= Duration::from_millis(125));
+    }
+
+    // Verify there's actually variation (very unlikely all 10 would be exactly the same)
+    let first_delay = delays[0];
+    let has_variation = delays.iter().any(|&d| d != first_delay);
+    assert!(has_variation, "Jitter should introduce variation in delays");
+}
+
+#[tokio::test] 
+async fn test_rate_limit_header_parsing() {
+    // Test rate limit error with retry-after
+    let rate_limit_with_delay = HttpError::RateLimited {
+        retry_after: Some(Duration::from_secs(30))
+    };
+    assert_eq!(rate_limit_with_delay.retry_after(), Some(Duration::from_secs(30)));
+
+    // Test rate limit error without retry-after
+    let rate_limit_no_delay = HttpError::RateLimited {
+        retry_after: None
+    };
+    assert_eq!(rate_limit_no_delay.retry_after(), None);
+
+    // Test other errors don't have retry_after
+    let timeout_error = HttpError::Timeout;
+    assert_eq!(timeout_error.retry_after(), None);
 }

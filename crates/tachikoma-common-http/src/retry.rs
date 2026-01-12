@@ -1,34 +1,3 @@
-# 022 - HTTP Retry Logic
-
-**Phase:** 1 - Core Common Crates
-**Spec ID:** 022
-**Status:** Planned
-**Dependencies:** 020-http-client-foundation
-**Estimated Context:** ~8% of Sonnet window
-
----
-
-## Objective
-
-Implement retry logic with exponential backoff for transient HTTP errors, rate limiting, and configurable retry policies.
-
----
-
-## Acceptance Criteria
-
-- [x] Exponential backoff implementation
-- [x] Jitter to prevent thundering herd
-- [x] Configurable max retries
-- [x] Rate limit header parsing
-- [x] Retry-able error detection
-
----
-
-## Implementation Details
-
-### 1. Retry Module (crates/tachikoma-common-http/src/retry.rs)
-
-```rust
 //! HTTP retry logic with exponential backoff.
 
 use std::time::Duration;
@@ -156,12 +125,12 @@ pub trait RetryableError {
 
 impl RetryableError for super::HttpError {
     fn is_retryable(&self) -> bool {
-        matches!(
-            self,
-            super::HttpError::Timeout
-                | super::HttpError::RateLimited { .. }
-                | super::HttpError::ServerError { status, .. } if *status >= 500
-        )
+        match self {
+            super::HttpError::Timeout => true,
+            super::HttpError::RateLimited { .. } => true,
+            super::HttpError::ServerError { status, .. } => *status >= 500,
+            _ => false,
+        }
     }
 
     fn retry_after(&self) -> Option<Duration> {
@@ -231,6 +200,85 @@ mod tests {
         assert_eq!(attempts, 3);
     }
 
+    #[tokio::test]
+    async fn test_no_retry_for_non_retryable_error() {
+        let policy = RetryPolicy::default();
+
+        let mut attempts = 0;
+        let result: Result<i32, TestError> = with_retry(&policy, || {
+            attempts += 1;
+            async move {
+                Err(TestError { retryable: false })
+            }
+        })
+        .await;
+
+        assert!(result.is_err());
+        assert_eq!(attempts, 1);
+    }
+
+    #[tokio::test]
+    async fn test_retry_with_rate_limit() {
+        let policy = RetryPolicy {
+            max_attempts: 2,
+            initial_delay: Duration::from_millis(1),
+            jitter: false,
+            ..Default::default()
+        };
+
+        let mut attempts = 0;
+        let result = with_retry(&policy, || {
+            attempts += 1;
+            async move {
+                if attempts < 2 {
+                    Err(TestError { retryable: true })
+                } else {
+                    Ok("success")
+                }
+            }
+        })
+        .await;
+
+        assert_eq!(result.unwrap(), "success");
+        assert_eq!(attempts, 2);
+    }
+
+    #[test]
+    fn test_jitter_adds_randomness() {
+        let policy = RetryPolicy {
+            initial_delay: Duration::from_millis(100),
+            multiplier: 2.0,
+            jitter: true,
+            ..Default::default()
+        };
+
+        // With jitter, delays should vary
+        let delay1 = policy.delay_for_attempt(1);
+        let delay2 = policy.delay_for_attempt(1);
+        
+        // Both should be at least the base delay (100ms)
+        assert!(delay1 >= Duration::from_millis(100));
+        assert!(delay2 >= Duration::from_millis(100));
+        
+        // And at most 125% of base delay (100ms + 25% jitter)
+        assert!(delay1 <= Duration::from_millis(125));
+        assert!(delay2 <= Duration::from_millis(125));
+    }
+
+    #[test]
+    fn test_no_retry_policy() {
+        let policy = RetryPolicy::no_retry();
+        assert_eq!(policy.max_attempts, 1);
+    }
+
+    #[test]
+    fn test_aggressive_policy() {
+        let policy = RetryPolicy::aggressive();
+        assert_eq!(policy.max_attempts, 5);
+        assert_eq!(policy.initial_delay, Duration::from_millis(100));
+        assert_eq!(policy.max_delay, Duration::from_secs(60));
+    }
+
     #[derive(Debug)]
     struct TestError {
         retryable: bool,
@@ -242,27 +290,3 @@ mod tests {
         }
     }
 }
-```
-
-### 2. Add Dependencies
-
-```toml
-[dependencies]
-rand = "0.8"
-```
-
----
-
-## Testing Requirements
-
-1. Backoff delays increase exponentially
-2. Jitter adds randomness to delays
-3. Max delay is respected
-4. Non-retryable errors fail immediately
-
----
-
-## Related Specs
-
-- Depends on: [020-http-client-foundation.md](020-http-client-foundation.md)
-- Next: [023-i18n-core-setup.md](023-i18n-core-setup.md)
