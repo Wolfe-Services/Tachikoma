@@ -31,6 +31,7 @@ pub use parsing::*;
 pub use pattern_link::*;
 pub use progress::*;
 pub use readme::*;
+pub use rendering::*;
 pub use search_api::*;
 pub use search_index::*;
 pub use templates::*;
