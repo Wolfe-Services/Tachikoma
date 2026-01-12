@@ -1,10 +1,14 @@
 //! Bash command execution primitive.
 
+mod cancel;
 mod options;
 mod sanitize;
+mod timeout;
 
+pub use cancel::{CancellationToken, CancellationWatcher};
 pub use options::BashOptions;
 pub use sanitize::CommandValidator;
+pub use timeout::{bash_with_timeout, TimeoutCommand};
 
 use crate::{
     context::PrimitiveContext,
@@ -12,10 +16,11 @@ use crate::{
     result::{BashResult, ExecutionMetadata},
 };
 use std::process::Stdio;
-use std::time::Instant;
+use std::time::{Duration, Instant};
 use tokio::io::AsyncReadExt;
-use tokio::process::Command;
-use tracing::{debug, instrument};
+use tokio::process::{Child, Command};
+use tokio::time::timeout;
+use tracing::{debug, instrument, warn};
 
 /// Maximum output size (10 MB).
 const MAX_OUTPUT_SIZE: usize = 10 * 1024 * 1024;
@@ -90,6 +95,18 @@ pub async fn bash(
         .stderr(Stdio::piped())
         .kill_on_drop(true);
 
+    // On Unix, create new process group for proper cleanup
+    #[cfg(unix)]
+    {
+        unsafe {
+            cmd.pre_exec(|| {
+                // Create new process group
+                libc::setpgid(0, 0);
+                Ok(())
+            });
+        }
+    }
+
     // Set environment variables
     if options.clear_env {
         cmd.env_clear();
@@ -150,38 +167,121 @@ async fn execute_without_timeout(
 /// Execute command with timeout.
 async fn execute_with_timeout(
     mut child: tokio::process::Child,
-    timeout: std::time::Duration,
+    timeout_duration: std::time::Duration,
 ) -> PrimitiveResult<(i32, String, String, bool)> {
-    // Extract streams before creating futures
-    let stdout = child.stdout.take();
-    let stderr = child.stderr.take();
+    let pid = child.id();
 
-    let output_future = read_output(stdout, stderr);
+    // Execute with timeout
+    let result = timeout(timeout_duration, execute_and_capture(&mut child)).await;
 
-    // Race the timeout against the command completion
-    let result = tokio::select! {
-        output_result = output_future => {
-            match output_result {
-                Ok((stdout_content, stderr_content)) => {
-                    // Output read successfully, wait for process
-                    match child.wait().await {
-                        Ok(status) => Ok((status.code().unwrap_or(-1), stdout_content, stderr_content, false)),
-                        Err(e) => Err(PrimitiveError::Io(e)),
-                    }
-                }
-                Err(e) => Err(e),
-            }
+    match result {
+        Ok(Ok((exit_code, stdout, stderr))) => {
+            Ok((exit_code, stdout, stderr, false))
         }
-        _ = tokio::time::sleep(timeout) => {
-            // Kill the process
-            let _ = child.kill().await;
-            
-            // Return timeout result
-            Ok((-1, String::new(), format!("Command timed out after {:?}", timeout), true))
+        Ok(Err(e)) => Err(e),
+        Err(_) => {
+            // Timeout occurred
+            warn!("Command timed out after {:?}", timeout_duration);
+
+            // Capture partial output before killing
+            let (partial_stdout, partial_stderr) = capture_partial_output(&mut child).await;
+
+            // Kill the process gracefully
+            kill_process_tree(pid).await;
+
+            Ok((-1, partial_stdout, partial_stderr, true))
         }
+    }
+}
+
+/// Execute command and capture output.
+async fn execute_and_capture(child: &mut Child) -> PrimitiveResult<(i32, String, String)> {
+    let mut stdout = child.stdout.take();
+    let mut stderr = child.stderr.take();
+
+    let stdout_task = async {
+        let mut buf = Vec::new();
+        if let Some(ref mut out) = stdout {
+            out.read_to_end(&mut buf).await?;
+        }
+        Ok::<_, std::io::Error>(String::from_utf8_lossy(&buf).into_owned())
     };
 
-    result
+    let stderr_task = async {
+        let mut buf = Vec::new();
+        if let Some(ref mut err) = stderr {
+            err.read_to_end(&mut buf).await?;
+        }
+        Ok::<_, std::io::Error>(String::from_utf8_lossy(&buf).into_owned())
+    };
+
+    let status_task = child.wait();
+
+    let (stdout_result, stderr_result, status) =
+        tokio::join!(stdout_task, stderr_task, status_task);
+
+    let stdout = stdout_result.map_err(PrimitiveError::Io)?;
+    let stderr = stderr_result.map_err(PrimitiveError::Io)?;
+    let status = status.map_err(PrimitiveError::Io)?;
+
+    Ok((status.code().unwrap_or(-1), stdout, stderr))
+}
+
+/// Capture any available output without blocking.
+async fn capture_partial_output(child: &mut Child) -> (String, String) {
+    let mut stdout_buf = Vec::new();
+    let mut stderr_buf = Vec::new();
+
+    // Try to read available data with a short timeout
+    let capture_timeout = Duration::from_millis(100);
+
+    if let Some(ref mut stdout) = child.stdout {
+        let _ = timeout(capture_timeout, stdout.read_to_end(&mut stdout_buf)).await;
+    }
+
+    if let Some(ref mut stderr) = child.stderr {
+        let _ = timeout(capture_timeout, stderr.read_to_end(&mut stderr_buf)).await;
+    }
+
+    (
+        String::from_utf8_lossy(&stdout_buf).into_owned(),
+        String::from_utf8_lossy(&stderr_buf).into_owned(),
+    )
+}
+
+/// Kill a process and its children.
+async fn kill_process_tree(pid: Option<u32>) {
+    let Some(pid) = pid else {
+        return;
+    };
+
+    #[cfg(unix)]
+    {
+        use nix::sys::signal::{kill, Signal};
+        use nix::unistd::Pid;
+
+        let pgid = Pid::from_raw(-(pid as i32)); // Negative PID = process group
+
+        // First, try SIGTERM
+        debug!("Sending SIGTERM to process group {}", pid);
+        let _ = kill(pgid, Signal::SIGTERM);
+
+        // Wait for grace period
+        tokio::time::sleep(Duration::from_secs(5)).await;
+
+        // Then SIGKILL if still running
+        debug!("Sending SIGKILL to process group {}", pid);
+        let _ = kill(pgid, Signal::SIGKILL);
+    }
+
+    #[cfg(windows)]
+    {
+        // On Windows, use taskkill to kill process tree
+        let _ = Command::new("taskkill")
+            .args(["/PID", &pid.to_string(), "/T", "/F"])
+            .output()
+            .await;
+    }
 }
 
 /// Read stdout and stderr concurrently.

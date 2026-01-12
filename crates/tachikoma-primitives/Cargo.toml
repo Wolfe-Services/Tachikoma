@@ -26,6 +26,11 @@ uuid = { version = "1.6", features = ["v4"] }
 # Optional dependencies
 walkdir = { version = "2.4", optional = true }
 tokio = { workspace = true, features = ["process", "time"], optional = true }
+
+# Unix-specific dependencies for process control
+[target.'cfg(unix)'.dependencies]
+nix = { version = "0.28", features = ["signal", "process"] }
+libc = "0.2"
 serde_json = { workspace = true, optional = true }
 
 [dev-dependencies]

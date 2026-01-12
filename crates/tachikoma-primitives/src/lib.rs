@@ -36,7 +36,7 @@ pub use read_file::{read_file, ReadFileOptions};
 pub use list_files::{list_files, ListFilesOptions, SortBy, list_files_recursive, list_files_recursive_with_callback, RecursiveOptions, RecursiveIterator};
 
 #[cfg(feature = "bash")]
-pub use bash::{bash, bash_success, bash_sequence, BashOptions};
+pub use bash::{bash, bash_success, bash_sequence, bash_with_timeout, BashOptions, TimeoutCommand, CancellationToken, CancellationWatcher};
 
 #[cfg(test)]
 mod tests {
