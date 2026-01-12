@@ -1,0 +1,35 @@
+[package]
+name = "tachikoma-cli"
+version.workspace = true
+edition.workspace = true
+authors = ["Tachikoma Contributors"]
+description = "CLI for Tachikoma AI Agent Development Framework"
+license.workspace = true
+readme = "README.md"
+repository.workspace = true
+keywords = ["ai", "agent", "cli", "mcp"]
+categories = ["command-line-utilities", "development-tools"]
+
+[[bin]]
+name = "tachikoma"
+path = "src/main.rs"
+
+[dependencies]
+tachikoma-common-core = { workspace = true }
+tachikoma-common-config = { workspace = true }
+tachikoma-primitives = { workspace = true }
+
+clap = { version = "4.5", features = ["derive", "env", "string", "wrap_help"] }
+clap_complete = "4.5"
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+assert_cmd = "2.0"
+predicates = "3.1"
+tempfile = "3.14"
