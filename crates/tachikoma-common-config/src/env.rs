@@ -1,34 +1,3 @@
-# 016 - Environment Variables
-
-**Phase:** 1 - Core Common Crates
-**Spec ID:** 016
-**Status:** Planned
-**Dependencies:** 014-config-core-types
-**Estimated Context:** ~8% of Sonnet window
-
----
-
-## Objective
-
-Implement environment variable handling with dotenv support, typed access, and secure handling of sensitive values.
-
----
-
-## Acceptance Criteria
-
-- [x] Load `.env` files (dev, prod)
-- [x] Typed environment variable access
-- [x] Secure API key retrieval
-- [x] Validation of required variables
-- [x] Documentation of all env vars
-
----
-
-## Implementation Details
-
-### 1. Environment Module (crates/tachikoma-common-config/src/env.rs)
-
-```rust
 //! Environment variable handling.
 
 use std::env;
@@ -199,28 +168,138 @@ mod tests {
         assert_eq!(Environment::get_bool("TEST_BOOL"), Some(false));
         env::remove_var("TEST_BOOL");
     }
+
+    #[test]
+    fn test_api_key_backend_mapping() {
+        // Test known backend mappings
+        env::set_var(vars::ANTHROPIC_API_KEY, "test-claude-key");
+        env::set_var(vars::OPENAI_API_KEY, "test-openai-key");
+        env::set_var(vars::GOOGLE_API_KEY, "test-google-key");
+
+        assert_eq!(ApiKeys::for_backend("claude"), Some("test-claude-key".to_string()));
+        assert_eq!(ApiKeys::for_backend("anthropic"), Some("test-claude-key".to_string()));
+        assert_eq!(ApiKeys::for_backend("codex"), Some("test-openai-key".to_string()));
+        assert_eq!(ApiKeys::for_backend("openai"), Some("test-openai-key".to_string()));
+        assert_eq!(ApiKeys::for_backend("gemini"), Some("test-google-key".to_string()));
+        assert_eq!(ApiKeys::for_backend("google"), Some("test-google-key".to_string()));
+        assert_eq!(ApiKeys::for_backend("unknown"), None);
+
+        // Cleanup
+        env::remove_var(vars::ANTHROPIC_API_KEY);
+        env::remove_var(vars::OPENAI_API_KEY);
+        env::remove_var(vars::GOOGLE_API_KEY);
+    }
+
+    #[test]
+    fn test_required_validation() {
+        // Clean slate
+        env::remove_var(vars::ANTHROPIC_API_KEY);
+        env::remove_var(vars::OPENAI_API_KEY);
+
+        // Should fail with missing key
+        let result = ApiKeys::validate_required(&["claude"]);
+        assert!(result.is_err());
+        
+        // Set key and retry
+        env::set_var(vars::ANTHROPIC_API_KEY, "test-key");
+        let result = ApiKeys::validate_required(&["claude"]);
+        assert!(result.is_ok());
+
+        // Cleanup
+        env::remove_var(vars::ANTHROPIC_API_KEY);
+    }
+
+    #[test]
+    fn test_environment_mode_detection() {
+        // Test default (development)
+        env::remove_var(vars::NODE_ENV);
+        assert!(Environment::is_development());
+        assert!(!Environment::is_production());
+
+        // Test explicit development
+        env::set_var(vars::NODE_ENV, "development");
+        assert!(Environment::is_development());
+        assert!(!Environment::is_production());
+
+        // Test production
+        env::set_var(vars::NODE_ENV, "production");
+        assert!(!Environment::is_development());
+        assert!(Environment::is_production());
+
+        // Cleanup
+        env::remove_var(vars::NODE_ENV);
+    }
+
+    #[test]
+    fn test_integer_parsing() {
+        env::set_var("TEST_INT", "42");
+        let val: Result<Option<i32>, _> = Environment::get_int("TEST_INT");
+        assert_eq!(val.unwrap(), Some(42));
+
+        env::set_var("TEST_INT", "invalid");
+        let val: Result<Option<i32>, _> = Environment::get_int("TEST_INT");
+        assert!(val.is_err());
+
+        env::remove_var("TEST_INT");
+        let val: Result<Option<i32>, _> = Environment::get_int("TEST_INT");
+        assert_eq!(val.unwrap(), None);
+
+        env::remove_var("TEST_INT");
+    }
+
+    #[test]
+    fn test_environment_init() {
+        // Test that Environment::init() doesn't fail even without .env files
+        let result = Environment::init();
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_all_variable_names_are_defined() {
+        // Ensure all constants are properly defined
+        assert!(!vars::ANTHROPIC_API_KEY.is_empty());
+        assert!(!vars::OPENAI_API_KEY.is_empty());
+        assert!(!vars::GOOGLE_API_KEY.is_empty());
+        assert!(!vars::TACHIKOMA_CONFIG_PATH.is_empty());
+        assert!(!vars::TACHIKOMA_LOG_LEVEL.is_empty());
+        assert!(!vars::TACHIKOMA_DATA_DIR.is_empty());
+        assert!(!vars::NODE_ENV.is_empty());
+        assert!(!vars::RUST_LOG.is_empty());
+        assert!(!vars::RUST_BACKTRACE.is_empty());
+    }
+
+    #[test]
+    fn test_dotenv_file_loading() {
+        use std::fs;
+        use tempfile::tempdir;
+
+        let dir = tempdir().unwrap();
+        let env_path = dir.path().join(".env");
+        
+        // Create a test .env file
+        fs::write(&env_path, "TEST_TACHIKOMA_VAR=from_dotenv\n").unwrap();
+        
+        // Save current directory and environment state
+        let original_dir = std::env::current_dir().unwrap();
+        let original_var = std::env::var("TEST_TACHIKOMA_VAR").ok();
+        
+        // Clear any existing value
+        std::env::remove_var("TEST_TACHIKOMA_VAR");
+        
+        // Change to the temp directory and load env
+        std::env::set_current_dir(dir.path()).unwrap();
+        
+        // Initialize environment (should load our .env file)
+        let _env = Environment::init().unwrap();
+        
+        // Verify the variable was loaded
+        assert_eq!(Environment::get("TEST_TACHIKOMA_VAR"), Some("from_dotenv".to_string()));
+        
+        // Restore original state
+        std::env::set_current_dir(original_dir).unwrap();
+        match original_var {
+            Some(val) => std::env::set_var("TEST_TACHIKOMA_VAR", val),
+            None => std::env::remove_var("TEST_TACHIKOMA_VAR"),
+        }
+    }
 }
-```
-
-### 2. Add Dependencies
-
-```toml
-[dependencies]
-dotenvy = "0.15"
-```
-
----
-
-## Testing Requirements
-
-1. `.env` file is loaded when present
-2. Missing required vars return clear error
-3. Bool parsing handles various formats
-4. API key lookup by backend name works
-
----
-
-## Related Specs
-
-- Depends on: [014-config-core-types.md](014-config-core-types.md)
-- Next: [017-secret-types.md](017-secret-types.md)

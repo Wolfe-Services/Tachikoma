@@ -5,12 +5,14 @@
 
 pub mod types;
 pub mod loader;
+pub mod env;
 
 #[cfg(test)]
 mod integration_test;
 
 pub use types::*;
 pub use loader::*;
+pub use env::*;
 
 #[cfg(test)]
 mod tests {
