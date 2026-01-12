@@ -13,14 +13,14 @@ Implement a high-level search API for querying the spec index. The API supports 
 
 ## Acceptance Criteria
 
-- [ ] Natural language query parsing works
-- [ ] Field-specific queries (field:value) work
-- [ ] Boolean operators (AND, OR, NOT) are supported
-- [ ] Fuzzy matching handles typos
-- [ ] Faceted filtering integrates with queries
-- [ ] Results are relevance-ranked
-- [ ] Result snippets with highlighting are generated
-- [ ] Pagination and sorting work
+- [x] Natural language query parsing works
+- [x] Field-specific queries (field:value) work
+- [x] Boolean operators (AND, OR, NOT) are supported
+- [x] Fuzzy matching handles typos
+- [x] Faceted filtering integrates with queries
+- [x] Results are relevance-ranked
+- [x] Result snippets with highlighting are generated
+- [x] Pagination and sorting work
 
 ## Implementation Details
 
