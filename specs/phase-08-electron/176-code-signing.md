@@ -25,14 +25,14 @@ Implement code signing for all platforms to ensure application integrity and ena
 
 ## Acceptance Criteria
 
-- [ ] macOS code signing with Developer ID certificate
-- [ ] macOS notarization for Gatekeeper approval
-- [ ] Windows Authenticode signing with EV certificate
-- [ ] Linux GPG signing for packages
-- [ ] Automated signing in CI/CD pipeline
-- [ ] Signature verification tools
-- [ ] Certificate management documentation
-- [ ] Timestamping for long-term validity
+- [x] macOS code signing with Developer ID certificate
+- [x] macOS notarization for Gatekeeper approval
+- [x] Windows Authenticode signing with EV certificate
+- [x] Linux GPG signing for packages
+- [x] Automated signing in CI/CD pipeline
+- [x] Signature verification tools
+- [x] Certificate management documentation
+- [x] Timestamping for long-term validity
 
 ---
 
