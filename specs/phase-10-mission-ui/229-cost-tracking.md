@@ -16,12 +16,12 @@ Create a cost tracking component that displays real-time cost information for mi
 
 ## Acceptance Criteria
 
-- [ ] Real-time cost display with input/output breakdown
-- [ ] Cumulative cost tracking across sessions
-- [ ] Cost projection based on current usage
-- [ ] Budget alerts and warnings
-- [ ] Cost history graph
-- [ ] Export cost reports
+- [x] Real-time cost display with input/output breakdown
+- [x] Cumulative cost tracking across sessions
+- [x] Cost projection based on current usage
+- [x] Budget alerts and warnings
+- [x] Cost history graph
+- [x] Export cost reports
 
 ---
 
