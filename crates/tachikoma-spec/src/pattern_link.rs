@@ -97,9 +97,9 @@ impl PatternRefParser {
     pub fn new() -> Self {
         let patterns = vec![
             (PatternRefFormat::WikiLink, Regex::new(r"\[\[pattern:([^\]]+)\]\]").unwrap()),
-            (PatternRefFormat::ImplementsTag, Regex::new(r"(?i)implements\s+pattern:\s*([^\n,]+)").unwrap()),
-            (PatternRefFormat::UsesTag, Regex::new(r"(?i)uses:\s*pattern[:\-]([^\n,]+)").unwrap()),
-            (PatternRefFormat::AtPattern, Regex::new(r"@pattern\s+([^\n]+)").unwrap()),
+            (PatternRefFormat::ImplementsTag, Regex::new(r"(?i)implements\s+pattern:\s*([a-zA-Z][a-zA-Z0-9_\-]+)").unwrap()),
+            (PatternRefFormat::UsesTag, Regex::new(r"(?i)uses:\s*pattern[\-:]([a-zA-Z][a-zA-Z0-9_\-]+)").unwrap()),
+            (PatternRefFormat::AtPattern, Regex::new(r"@pattern\s+([a-zA-Z][a-zA-Z0-9_\-]+)").unwrap()),
             (PatternRefFormat::PatternColon, Regex::new(r"pattern:([a-zA-Z][a-zA-Z0-9_\-]+)").unwrap()),
         ];
 
@@ -427,6 +427,11 @@ See also [[pattern:strategy]]
 "#;
 
         let refs = parser.parse(content, 116);
+        
+        // Debug output to understand what's being parsed
+        for r in &refs {
+            println!("Found pattern: '{}' with format {:?}", r.pattern_id, r.format);
+        }
 
         assert!(refs.iter().any(|r| r.pattern_id == "singleton"));
         assert!(refs.iter().any(|r| r.pattern_id == "factory"));
