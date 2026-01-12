@@ -26,15 +26,15 @@ Configure and optimize the macOS build process for Tachikoma, including universa
 
 ## Acceptance Criteria
 
-- [ ] Universal binary (x64 + arm64) support
-- [ ] DMG installer with custom design
-- [ ] PKG installer for enterprise deployment
-- [ ] Mac App Store build configuration
-- [ ] Notarization with hardened runtime
-- [ ] Touch Bar support
-- [ ] Dock integration
-- [ ] macOS-specific menu configuration
-- [ ] Proper Info.plist configuration
+- [x] Universal binary (x64 + arm64) support
+- [x] DMG installer with custom design
+- [x] PKG installer for enterprise deployment
+- [x] Mac App Store build configuration
+- [x] Notarization with hardened runtime
+- [x] Touch Bar support
+- [x] Dock integration
+- [x] macOS-specific menu configuration
+- [x] Proper Info.plist configuration
 
 ---
 
