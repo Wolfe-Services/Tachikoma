@@ -16,11 +16,11 @@ Implement context window tracking for backends to monitor usage, detect approach
 
 ## Acceptance Criteria
 
-- [ ] Context usage tracking per conversation
-- [ ] Redline threshold detection
-- [ ] Context compression suggestions
-- [ ] Conversation reset handling
-- [ ] Context visualization support
+- [x] Context usage tracking per conversation
+- [x] Redline threshold detection
+- [x] Context compression suggestions
+- [x] Conversation reset handling
+- [x] Context visualization support
 
 ---
 
