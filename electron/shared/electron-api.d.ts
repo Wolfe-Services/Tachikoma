@@ -8,3 +8,6 @@ declare global {
 }
 
 export {};
+
+// Type-safe API exposed via contextBridge
+export type { ElectronAPI } from '../preload/types';
