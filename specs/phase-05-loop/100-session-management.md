@@ -16,14 +16,14 @@ Implement session lifecycle management for Claude Code sessions - creating, main
 
 ## Acceptance Criteria
 
-- [ ] `Session` struct representing a Claude Code session
-- [ ] `SessionManager` for lifecycle orchestration
-- [ ] Session creation with configuration
-- [ ] Session state monitoring
-- [ ] Graceful session termination
-- [ ] Session persistence for recovery
-- [ ] Multiple concurrent session support
-- [ ] Session pooling (optional)
+- [x] `Session` struct representing a Claude Code session
+- [x] `SessionManager` for lifecycle orchestration
+- [x] Session creation with configuration
+- [x] Session state monitoring
+- [x] Graceful session termination
+- [x] Session persistence for recovery
+- [x] Multiple concurrent session support
+- [x] Session pooling (optional)
 
 ---
 
