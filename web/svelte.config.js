@@ -7,14 +7,25 @@ const config = {
 
   kit: {
     adapter: adapter({
-      pages: 'dist',
-      assets: 'dist',
+      pages: 'build',
+      assets: 'build',
       fallback: 'index.html',
       precompress: false,
       strict: true
     }),
-    paths: {
-      base: ''
+
+    alias: {
+      '@lib': 'src/lib',
+      '@components': 'src/lib/components',
+      '@stores': 'src/lib/stores',
+      '@utils': 'src/lib/utils',
+      '@types': 'src/lib/types',
+      '@ipc': 'src/lib/ipc'
+    },
+
+    // Disable SSR for Tauri
+    prerender: {
+      entries: []
     }
   }
 };
