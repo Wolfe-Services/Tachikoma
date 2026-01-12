@@ -229,21 +229,49 @@ fn highlight_match(line: &str, pattern: &str) -> String {
     let match_color = "\x1b[1;31m"; // Bold red
     let reset = "\x1b[0m";
     
-    // Try to use the pattern as a regex first, fallback to escaped literal
-    let regex_result = if pattern.starts_with('(') || pattern.contains('*') || pattern.contains('+') || pattern.contains('[') {
-        // Looks like a regex pattern
-        regex::Regex::new(pattern)
-    } else {
-        // Treat as literal string with case-insensitive matching
-        regex::Regex::new(&format!("(?i){}", regex::escape(pattern)))
-    };
+    // Try multiple highlighting strategies
     
-    if let Ok(regex) = regex_result {
-        regex.replace_all(line, &format!("{}{}{}", match_color, "$0", reset)).to_string()
-    } else {
-        // Fallback to simple string replacement if regex compilation fails
-        line.replace(pattern, &format!("{}{}{}", match_color, pattern, reset))
+    // First, try the pattern as-is (in case it's a valid regex)
+    if let Ok(regex) = regex::Regex::new(pattern) {
+        return regex.replace_all(line, &format!("{}{}{}", match_color, "$0", reset)).to_string();
     }
+    
+    // If that fails, try case-insensitive literal matching
+    let escaped = regex::escape(pattern);
+    if let Ok(regex) = regex::Regex::new(&format!("(?i){}", escaped)) {
+        return regex.replace_all(line, &format!("{}{}{}", match_color, "$0", reset)).to_string();
+    }
+    
+    // Fallback to simple case-insensitive string replacement
+    let lower_line = line.to_lowercase();
+    let lower_pattern = pattern.to_lowercase();
+    
+    if let Some(pos) = lower_line.find(&lower_pattern) {
+        let mut result = String::new();
+        let mut last_end = 0;
+        let mut search_from = 0;
+        
+        while let Some(match_pos) = lower_line[search_from..].find(&lower_pattern) {
+            let actual_pos = search_from + match_pos;
+            let match_end = actual_pos + pattern.len();
+            
+            // Add text before match
+            result.push_str(&line[last_end..actual_pos]);
+            
+            // Add highlighted match
+            result.push_str(&format!("{}{}{}", match_color, &line[actual_pos..match_end], reset));
+            
+            last_end = match_end;
+            search_from = match_end;
+        }
+        
+        // Add remaining text
+        result.push_str(&line[last_end..]);
+        return result;
+    }
+    
+    // If no matches found, return original line
+    line.to_string()
 }
 
 /// JSON formatting.
@@ -472,5 +500,69 @@ mod tests {
         truncated_result.truncated = true;
         let truncated_summary = format_summary(&truncated_result);
         assert!(truncated_summary.contains("truncated"));
+    }
+
+    #[test]
+    fn test_match_highlighting() {
+        // Test basic highlighting
+        let highlighted = highlight_match("fn main() {}", "main");
+        assert!(highlighted.contains("\x1b[1;31mmain\x1b[0m"));
+        
+        // Test case insensitive highlighting
+        let highlighted = highlight_match("FN MAIN() {}", "main");
+        assert!(highlighted.contains("\x1b[1;31mMAIN\x1b[0m"));
+        
+        // Test regex pattern
+        let highlighted = highlight_match("test123", r"\d+");
+        assert!(highlighted.contains("\x1b[1;31m123\x1b[0m"));
+        
+        // Test no match
+        let highlighted = highlight_match("hello world", "xyz");
+        assert_eq!(highlighted, "hello world");
+        
+        // Test multiple matches
+        let highlighted = highlight_match("test test test", "test");
+        let match_count = highlighted.matches("\x1b[1;31mtest\x1b[0m").count();
+        assert_eq!(match_count, 3);
+    }
+
+    #[test]
+    fn test_format_config_builders() {
+        let config = FormatConfig::new()
+            .format(OutputFormat::Colored)
+            .no_line_numbers()
+            .with_columns()
+            .no_context()
+            .absolute_paths()
+            .base_path("/tmp");
+
+        assert!(matches!(config.format, OutputFormat::Colored));
+        assert!(!config.line_numbers);
+        assert!(config.column_numbers);
+        assert!(!config.context);
+        assert!(!config.relative_paths);
+        assert_eq!(config.base_path, Some(PathBuf::from("/tmp")));
+    }
+
+    #[test]
+    fn test_multiple_files_grouped() {
+        let mut result = create_test_result();
+        result.matches.push(SearchMatch {
+            path: PathBuf::from("/project/src/lib.rs"),
+            line_number: 5,
+            column: 1,
+            line_content: "pub fn main_function() {}".to_string(),
+            context_before: vec![],
+            context_after: vec![],
+        });
+        
+        let config = FormatConfig::new().format(OutputFormat::Grouped);
+        let output = format_results(&result, &config);
+        
+        // Should contain both files
+        assert!(output.contains("main.rs"));
+        assert!(output.contains("lib.rs"));
+        // Should have file separators
+        assert!(output.matches("===").count() >= 2);
     }
 }
