@@ -1,0 +1,13 @@
+[package]
+name = "tachikoma-common-metrics"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Metrics collection for Tachikoma"
+
+[dependencies]
+# Minimal dependencies - only std library
+
+[dev-dependencies]
+proptest.workspace = true
+tokio-test.workspace = true

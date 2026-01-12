@@ -16,11 +16,11 @@ Set up a metrics collection system for tracking counters, gauges, and histograms
 
 ## Acceptance Criteria
 
-- [ ] Counter metrics
-- [ ] Gauge metrics
-- [ ] Histogram metrics
-- [ ] Labels/tags support
-- [ ] Prometheus-compatible export
+- [x] Counter metrics
+- [x] Gauge metrics
+- [x] Histogram metrics
+- [x] Labels/tags support
+- [x] Prometheus-compatible export
 
 ---
 

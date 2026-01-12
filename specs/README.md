@@ -177,6 +177,7 @@ Execute specs in numerical order. Each phase must complete before the next.
 | 121 | [Spec Metadata Extraction](phase-06-specs/121-spec-metadata.md) | metadata, status, version, date |
 | 122 | [Implementation Plan Format](phase-06-specs/122-impl-plan-format.md) | plan, format, checkbox, phase |
 | 123 | [Checkbox Tracking](phase-06-specs/123-checkbox-tracking.md) | checkbox, track, complete, progress |
+| 123b | [Spec Status Sync](phase-06-specs/123b-spec-status-sync.md) | status, sync, checkbox, auto-update |
 | 124 | [Progress Calculation](phase-06-specs/124-progress-calc.md) | progress, percent, calculate, done |
 | 125 | [Spec Citation System](phase-06-specs/125-spec-citation.md) | citation, reference, section, link |
 | 126 | [Pattern Reference Linking](phase-06-specs/126-pattern-linking.md) | pattern, link, reference, code |
