@@ -229,39 +229,46 @@ fn highlight_match(line: &str, pattern: &str) -> String {
     let match_color = "\x1b[1;31m"; // Bold red
     let reset = "\x1b[0m";
     
-    // Try multiple highlighting strategies
-    
-    // First, try the pattern as-is (in case it's a valid regex)
+    // Try the pattern as-is first (in case it's a valid regex)
     if let Ok(regex) = regex::Regex::new(pattern) {
         return regex.replace_all(line, &format!("{}{}{}", match_color, "$0", reset)).to_string();
     }
     
-    // If that fails, try case-insensitive literal matching
+    // If pattern is not a valid regex, escape it and try case-insensitive literal matching
     let escaped = regex::escape(pattern);
     if let Ok(regex) = regex::Regex::new(&format!("(?i){}", escaped)) {
         return regex.replace_all(line, &format!("{}{}{}", match_color, "$0", reset)).to_string();
     }
     
-    // Fallback to simple case-insensitive string replacement
+    // Fallback to manual case-insensitive string replacement
+    highlight_literal_case_insensitive(line, pattern, match_color, reset)
+}
+
+/// Manual case-insensitive highlighting for when regex fails.
+fn highlight_literal_case_insensitive(line: &str, pattern: &str, match_color: &str, reset: &str) -> String {
     let lower_line = line.to_lowercase();
     let lower_pattern = pattern.to_lowercase();
     
     let mut result = String::new();
     let mut last_end = 0;
-    let mut search_from = 0;
+    let mut search_start = 0;
     
-    while let Some(match_pos) = lower_line[search_from..].find(&lower_pattern) {
-        let actual_pos = search_from + match_pos;
-        let match_end = actual_pos + pattern.len();
-        
-        // Add text before match
-        result.push_str(&line[last_end..actual_pos]);
-        
-        // Add highlighted match (preserve original casing)
-        result.push_str(&format!("{}{}{}", match_color, &line[actual_pos..match_end], reset));
-        
-        last_end = match_end;
-        search_from = match_end;
+    while search_start < line.len() {
+        if let Some(relative_pos) = lower_line[search_start..].find(&lower_pattern) {
+            let actual_pos = search_start + relative_pos;
+            let match_end = actual_pos + lower_pattern.len();
+            
+            // Add text before match
+            result.push_str(&line[last_end..actual_pos]);
+            
+            // Add highlighted match (preserve original casing)
+            result.push_str(&format!("{}{}{}", match_color, &line[actual_pos..match_end], reset));
+            
+            last_end = match_end;
+            search_start = match_end;
+        } else {
+            break;
+        }
     }
     
     // Add remaining text
@@ -269,10 +276,10 @@ fn highlight_match(line: &str, pattern: &str) -> String {
     
     // If no matches were found, return the original line
     if last_end == 0 {
-        return line.to_string();
+        line.to_string()
+    } else {
+        result
     }
-    
-    result
 }
 
 /// JSON formatting.
