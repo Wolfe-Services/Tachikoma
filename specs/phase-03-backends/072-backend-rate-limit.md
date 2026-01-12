@@ -16,12 +16,12 @@ Implement rate limiting infrastructure for backends to prevent API throttling, i
 
 ## Acceptance Criteria
 
-- [ ] Request rate limiting (RPM)
-- [ ] Token rate limiting (TPM)
-- [ ] Provider-specific limits
-- [ ] Automatic backoff on 429 errors
-- [ ] Rate limit usage tracking
-- [ ] Predictive rate limit avoidance
+- [x] Request rate limiting (RPM)
+- [x] Token rate limiting (TPM)
+- [x] Provider-specific limits
+- [x] Automatic backoff on 429 errors
+- [x] Rate limit usage tracking
+- [x] Predictive rate limit avoidance
 
 ---
 
