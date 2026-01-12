@@ -357,6 +357,24 @@ async fn run_loop(
                 }
                 Ok(SpecResult::NeedsReboot) => {
                     reboot_count += 1;
+
+                    // Check if spec was actually completed during this run
+                    // (agent might have finished but hit redline during verification)
+                    if let Ok(Some(refreshed)) = find_next_spec(&specs_dir) {
+                        if refreshed.entry.id != spec.entry.id {
+                            // Spec was completed! Move on.
+                            specs_completed += 1;
+                            consecutive_failures = 0;
+                            println!("\n✅ Spec {:03} was completed. Moving to next spec.", spec.entry.id);
+                            break;
+                        }
+                    } else {
+                        // All specs complete
+                        specs_completed += 1;
+                        println!("\n✅ Spec {:03} was completed (last spec!).", spec.entry.id);
+                        break;
+                    }
+
                     if reboot_count >= MAX_REBOOTS_PER_SPEC {
                         println!("\n⚠️  Spec {:03} hit redline {} times. Moving to next spec.", spec.entry.id, reboot_count);
                         consecutive_failures += 1;
