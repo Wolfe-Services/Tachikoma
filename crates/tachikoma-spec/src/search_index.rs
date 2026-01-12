@@ -748,7 +748,7 @@ impl SpecSearchIndex {
                 text: text[start..end].to_string(),
                 highlights: adjusted_highlights,
             });
-        }
+        };
 
         Some(SearchSnippet {
             field,
