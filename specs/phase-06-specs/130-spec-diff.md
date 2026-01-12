@@ -13,14 +13,14 @@ Implement diff generation for specifications that produces meaningful, structure
 
 ## Acceptance Criteria
 
-- [ ] Line-level diffs are generated correctly
-- [ ] Section-level diffs show structural changes
-- [ ] Checkbox state changes are tracked
-- [ ] Code block changes are highlighted
-- [ ] Metadata changes are identified
-- [ ] Diff output supports multiple formats (text, HTML, JSON)
-- [ ] Three-way merge support for conflicts
-- [ ] Diff statistics are calculated
+- [x] Line-level diffs are generated correctly
+- [x] Section-level diffs show structural changes
+- [x] Checkbox state changes are tracked
+- [x] Code block changes are highlighted
+- [x] Metadata changes are identified
+- [x] Diff output supports multiple formats (text, HTML, JSON)
+- [x] Three-way merge support for conflicts
+- [x] Diff statistics are calculated
 
 ## Implementation Details
 
