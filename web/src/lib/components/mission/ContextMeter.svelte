@@ -13,10 +13,10 @@
   $: zone = getContextZone($animatedPercent);
 
   const zoneColors: Record<ContextZone, string> = {
-    safe: 'var(--color-success)',
-    warning: 'var(--color-warning)',
-    danger: 'var(--orange-500)',
-    critical: 'var(--color-error)',
+    safe: 'var(--color-success-fg)',
+    warning: 'var(--color-warning-fg)',
+    danger: 'var(--warning-500)',
+    critical: 'var(--color-error-fg)',
   };
 
   function formatTokens(tokens: number): string {
