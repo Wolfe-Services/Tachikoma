@@ -16,12 +16,12 @@ Implement the conflict resolution system that identifies disagreements between c
 
 ## Acceptance Criteria
 
-- [ ] Automatic conflict detection from critiques
-- [ ] Conflict categorization and prioritization
-- [ ] Resolution strategy selection
-- [ ] Synthesizer-guided resolution
-- [ ] Resolution logging with rationale
-- [ ] Human override support in attended mode
+- [x] Automatic conflict detection from critiques
+- [x] Conflict categorization and prioritization
+- [x] Resolution strategy selection
+- [x] Synthesizer-guided resolution
+- [x] Resolution logging with rationale
+- [x] Human override support in attended mode
 
 ---
 
