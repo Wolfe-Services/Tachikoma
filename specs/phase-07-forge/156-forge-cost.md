@@ -16,12 +16,12 @@ Implement comprehensive cost tracking for Forge sessions, including per-model co
 
 ## Acceptance Criteria
 
-- [ ] Per-model cost calculation
-- [ ] Real-time cost accumulation
-- [ ] Budget limit enforcement
-- [ ] Cost projection/estimation
-- [ ] Spending alerts and warnings
-- [ ] Cost breakdown reporting
+- [x] Per-model cost calculation
+- [x] Real-time cost accumulation
+- [x] Budget limit enforcement
+- [x] Cost projection/estimation
+- [x] Spending alerts and warnings
+- [x] Cost breakdown reporting
 
 ---
 
