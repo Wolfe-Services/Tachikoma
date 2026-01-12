@@ -5,12 +5,14 @@ pub mod output;
 pub mod session;
 pub mod round;
 pub mod quality;
+pub mod templates;
 
 // Re-export common types
 pub use error::{ForgeError, ForgeResult};
 pub use session::{ForgeSession, ForgeSessionStatus, ForgeSessionConfig, ForgeTopic, TokenUsage};
 pub use round::{ForgeRound, DraftRound, CritiqueRound, SynthesisRound, RefinementRound, ConvergenceRound};
 pub use quality::{QualityTracker, QualitySnapshot, QualityDimension, QualityTrend, QualityReport, CritiqueSummary};
+pub use templates::{TemplateEngine, Template, TemplateContext, OutputType, ParticipantRole};
 
 // Re-export from tachikoma-common-core
 pub use tachikoma_common_core::ForgeSessionId;
