@@ -16,13 +16,13 @@ Create the main Mission Panel layout component that serves as the container for 
 
 ## Acceptance Criteria
 
-- [ ] `MissionPanel.svelte` component created with responsive layout
-- [ ] Three-column layout: sidebar, main content, details panel
-- [ ] Collapsible sidebar and details panel
-- [ ] Keyboard shortcuts for panel navigation
-- [ ] Dark/light theme support via CSS variables
-- [ ] Mobile-responsive design with stacked layout
-- [ ] Proper ARIA labels for accessibility
+- [x] `MissionPanel.svelte` component created with responsive layout
+- [x] Three-column layout: sidebar, main content, details panel
+- [x] Collapsible sidebar and details panel
+- [x] Keyboard shortcuts for panel navigation
+- [x] Dark/light theme support via CSS variables
+- [x] Mobile-responsive design with stacked layout
+- [x] Proper ARIA labels for accessibility
 
 ---
 
