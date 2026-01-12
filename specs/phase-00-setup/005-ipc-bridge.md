@@ -16,12 +16,12 @@ Create a type-safe IPC bridge between Electron main process and Svelte renderer,
 
 ## Acceptance Criteria
 
-- [ ] Type-safe IPC channel definitions
-- [ ] Main process IPC handlers registered
-- [ ] Renderer-side typed client
-- [ ] Svelte store bindings for IPC state
-- [ ] Error handling for IPC failures
-- [ ] Placeholder for NAPI-RS native calls
+- [x] Type-safe IPC channel definitions
+- [x] Main process IPC handlers registered
+- [x] Renderer-side typed client
+- [x] Svelte store bindings for IPC state
+- [x] Error handling for IPC failures
+- [x] Placeholder for NAPI-RS native calls
 
 ---
 

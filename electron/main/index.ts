@@ -1,6 +1,7 @@
 import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { registerIpcHandlers } from './ipc-handlers'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -43,6 +44,9 @@ function createWindow(): void {
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.tachikoma.app')
+
+  // Register IPC handlers
+  registerIpcHandlers()
 
   // Watch for shortcuts in dev
   app.on('browser-window-created', (_, window) => {
