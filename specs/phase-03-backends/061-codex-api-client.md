@@ -16,12 +16,12 @@ Implement the OpenAI API client (Codex backend) that implements the `Backend` tr
 
 ## Acceptance Criteria
 
-- [ ] `CodexBackend` implementing `Backend` trait
-- [ ] Chat Completions API integration
-- [ ] Proper header handling (API key, organization)
-- [ ] Request/response type mapping
-- [ ] Model enumeration and validation
-- [ ] Streaming with SSE
+- [x] `CodexBackend` implementing `Backend` trait
+- [x] Chat Completions API integration
+- [x] Proper header handling (API key, organization)
+- [x] Request/response type mapping
+- [x] Model enumeration and validation
+- [x] Streaming with SSE
 
 ---
 
