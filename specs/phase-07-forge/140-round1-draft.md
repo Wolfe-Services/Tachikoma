@@ -16,12 +16,12 @@ Implement the initial draft generation round where the designated drafter model 
 
 ## Acceptance Criteria
 
-- [ ] Draft prompt construction from topic
-- [ ] Context assembly with references
-- [ ] Draft execution with timeout
-- [ ] Output parsing and validation
-- [ ] Draft metadata capture (tokens, timing)
-- [ ] Support for different output types
+- [x] Draft prompt construction from topic
+- [x] Context assembly with references
+- [x] Draft execution with timeout
+- [x] Output parsing and validation
+- [x] Draft metadata capture (tokens, timing)
+- [x] Support for different output types
 
 ---
 
