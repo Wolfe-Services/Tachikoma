@@ -229,8 +229,8 @@ fn highlight_match(line: &str, pattern: &str) -> String {
     let match_color = "\x1b[1;31m"; // Bold red
     let reset = "\x1b[0m";
     
-    // First try the pattern as a regex (case-sensitive)
-    if let Ok(regex) = regex::Regex::new(pattern) {
+    // First try the pattern as a regex with case-insensitive matching
+    if let Ok(regex) = regex::RegexBuilder::new(pattern).case_insensitive(true).build() {
         return regex.replace_all(line, &format!("{}{}{}", match_color, "$0", reset)).to_string();
     }
     
