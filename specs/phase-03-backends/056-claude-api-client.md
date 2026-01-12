@@ -16,12 +16,12 @@ Implement the Anthropic Claude API client that implements the `Backend` trait. T
 
 ## Acceptance Criteria
 
-- [ ] `ClaudeBackend` implementing `Backend` trait
-- [ ] Messages API integration
-- [ ] Proper header handling (API key, version, beta features)
-- [ ] Request/response type mapping
-- [ ] Model enumeration and validation
-- [ ] Connection management
+- [x] `ClaudeBackend` implementing `Backend` trait
+- [x] Messages API integration
+- [x] Proper header handling (API key, version, beta features)
+- [x] Request/response type mapping
+- [x] Model enumeration and validation
+- [x] Connection management
 
 ---
 
