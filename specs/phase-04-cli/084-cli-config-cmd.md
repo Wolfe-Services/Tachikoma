@@ -13,16 +13,16 @@ Implement the `tachikoma config` command for viewing, editing, and managing Tach
 
 ## Acceptance Criteria
 
-- [ ] `config get` - retrieve configuration values
-- [ ] `config set` - set configuration values
-- [ ] `config list` - list all configuration
-- [ ] `config edit` - open config in editor
-- [ ] `config path` - show configuration file paths
-- [ ] `config validate` - validate configuration
-- [ ] `config init` - initialize configuration
-- [ ] Support for nested keys (dot notation)
-- [ ] Environment variable display
-- [ ] Configuration source tracking
+- [x] `config get` - retrieve configuration values
+- [x] `config set` - set configuration values
+- [x] `config list` - list all configuration
+- [x] `config edit` - open config in editor
+- [x] `config path` - show configuration file paths
+- [x] `config validate` - validate configuration
+- [x] `config init` - initialize configuration
+- [x] Support for nested keys (dot notation)
+- [x] Environment variable display
+- [x] Configuration source tracking
 
 ## Implementation Details
 
