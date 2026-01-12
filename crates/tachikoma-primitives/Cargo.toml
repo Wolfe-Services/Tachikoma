@@ -12,7 +12,7 @@ read-file = []
 list-files = ["dep:walkdir"]
 bash = ["dep:tokio"]
 edit-file = []
-code-search = ["dep:serde_json"]
+code-search = ["dep:serde_json", "dep:regex"]
 
 [dependencies]
 tachikoma-common-core.workspace = true
@@ -32,6 +32,7 @@ tokio = { workspace = true, features = ["process", "time"], optional = true }
 nix = { version = "0.28", features = ["signal", "process"] }
 libc = "0.2"
 serde_json = { workspace = true, optional = true }
+regex = { version = "1.10", optional = true }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }

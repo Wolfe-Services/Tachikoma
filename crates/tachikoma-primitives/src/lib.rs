@@ -33,7 +33,7 @@ pub mod code_search;
 // Re-exports
 pub use context::{PrimitiveConfig, PrimitiveContext};
 pub use error::{PrimitiveError, PrimitiveResult};
-pub use result::{ExecutionMetadata, ReadFileResult, ListFilesResult, FileEntry, BashResult, EditFileResult};
+pub use result::{ExecutionMetadata, ReadFileResult, ListFilesResult, FileEntry, BashResult, EditFileResult, CodeSearchResult, SearchMatch};
 
 #[cfg(feature = "read-file")]
 pub use read_file::{read_file, ReadFileOptions};
