@@ -4,6 +4,7 @@
 //! including directory structure discovery, parsing, validation, and template-based generation.
 
 pub mod checkbox;
+pub mod citation;
 pub mod directory;
 pub mod impl_plan;
 pub mod metadata;
@@ -14,6 +15,7 @@ pub mod templates;
 pub mod watcher;
 
 pub use checkbox::*;
+pub use citation::*;
 pub use directory::*;
 pub use impl_plan::*;
 pub use metadata::*;
