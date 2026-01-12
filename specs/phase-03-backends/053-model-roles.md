@@ -16,12 +16,12 @@ Define the Brain and ThinkTank abstractions that assign semantic roles to LLM ba
 
 ## Acceptance Criteria
 
-- [ ] `ModelRole` enum (Brain, Critic, Synthesizer, etc.)
-- [ ] `Brain` struct wrapping primary backend
-- [ ] `ThinkTank` managing multiple model instances
-- [ ] Role-based model selection
-- [ ] Conversation routing based on role
-- [ ] Model capability matching for roles
+- [x] `ModelRole` enum (Brain, Critic, Synthesizer, etc.)
+- [x] `Brain` struct wrapping primary backend
+- [x] `ThinkTank` managing multiple model instances
+- [x] Role-based model selection
+- [x] Conversation routing based on role
+- [x] Model capability matching for roles
 
 ---
 
