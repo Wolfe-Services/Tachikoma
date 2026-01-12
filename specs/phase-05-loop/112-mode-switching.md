@@ -16,14 +16,14 @@ Implement seamless mode switching between attended and unattended modes for the 
 
 ## Acceptance Criteria
 
-- [ ] Switch from attended to unattended
-- [ ] Switch from unattended to attended
-- [ ] State preservation during switch
-- [ ] Pending decisions handled
-- [ ] Notification of mode changes
-- [ ] Scheduled mode switching
-- [ ] Mode-specific configurations persist
-- [ ] Smooth transition without iteration loss
+- [x] Switch from attended to unattended
+- [x] Switch from unattended to attended
+- [x] State preservation during switch
+- [x] Pending decisions handled
+- [x] Notification of mode changes
+- [x] Scheduled mode switching
+- [x] Mode-specific configurations persist
+- [x] Smooth transition without iteration loss
 
 ---
 
