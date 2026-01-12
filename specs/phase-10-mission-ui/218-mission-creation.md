@@ -16,13 +16,13 @@ Create a comprehensive mission creation dialog that allows users to configure al
 
 ## Acceptance Criteria
 
-- [ ] Modal dialog for mission creation
-- [ ] Multi-step wizard for complex configuration
-- [ ] Form validation with inline error messages
-- [ ] Template selection for common mission types
-- [ ] Preview of mission configuration before creation
-- [ ] Keyboard navigation through form fields
-- [ ] Save as draft functionality
+- [x] Modal dialog for mission creation
+- [x] Multi-step wizard for complex configuration
+- [x] Form validation with inline error messages
+- [x] Template selection for common mission types
+- [x] Preview of mission configuration before creation
+- [x] Keyboard navigation through form fields
+- [x] Save as draft functionality
 
 ---
 
