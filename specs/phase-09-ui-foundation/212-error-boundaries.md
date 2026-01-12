@@ -27,16 +27,16 @@ Implement comprehensive error handling components for Tachikoma including error 
 
 ## Acceptance Criteria
 
-- [ ] Error boundary component wrapping
-- [ ] Customizable fallback UI
-- [ ] Error recovery/retry mechanism
-- [ ] Global error handler
-- [ ] Error logging integration
-- [ ] Network error handling
-- [ ] 404/Not Found page
-- [ ] Generic error page
-- [ ] Error store for tracking
-- [ ] Development vs production error display
+- [x] Error boundary component wrapping
+- [x] Customizable fallback UI
+- [x] Error recovery/retry mechanism
+- [x] Global error handler
+- [x] Error logging integration
+- [x] Network error handling
+- [x] 404/Not Found page
+- [x] Generic error page
+- [x] Error store for tracking
+- [x] Development vs production error display
 
 ---
 
