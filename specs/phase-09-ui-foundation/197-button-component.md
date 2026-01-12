@@ -26,15 +26,15 @@ Implement a comprehensive Button component for Tachikoma with multiple variants,
 
 ## Acceptance Criteria
 
-- [ ] Multiple button variants (primary, secondary, ghost, outline, danger)
-- [ ] Three sizes (sm, md, lg)
-- [ ] Loading state with spinner
-- [ ] Disabled state
-- [ ] Icon support (left, right, icon-only)
-- [ ] Keyboard accessible
-- [ ] Focus visible styles
-- [ ] Click ripple effect (optional)
-- [ ] Full TypeScript support
+- [x] Multiple button variants (primary, secondary, ghost, outline, danger)
+- [x] Three sizes (sm, md, lg)
+- [x] Loading state with spinner
+- [x] Disabled state
+- [x] Icon support (left, right, icon-only)
+- [x] Keyboard accessible
+- [x] Focus visible styles
+- [x] Click ripple effect (optional)
+- [x] Full TypeScript support
 
 ---
 
