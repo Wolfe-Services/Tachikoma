@@ -730,4 +730,65 @@ role: null
         assert!(result.contains("Use clear section headers"));
         assert!(result.contains("Additional info."));
     }
+
+    #[test]
+    fn test_role_specific_templates() {
+        let mut engine = TemplateEngine::new();
+        
+        // Create a role-specific template
+        let critic_template = Template {
+            name: "critic_specific".to_string(),
+            system: "You are a {{role_name}} reviewing {{content_type}}".to_string(),
+            user: "Please critique: {{content}}".to_string(),
+            required_vars: vec!["role_name".to_string(), "content_type".to_string(), "content".to_string()],
+            optional_vars: HashMap::new(),
+            output_type: None,
+            role: Some(ParticipantRole::Critic),
+        };
+        
+        engine.register(critic_template);
+        assert!(engine.get("critic_specific").is_some());
+        assert_eq!(engine.get("critic_specific").unwrap().role, Some(ParticipantRole::Critic));
+    }
+
+    #[test]
+    fn test_list_templates() {
+        let engine = TemplateEngine::new();
+        let templates = engine.list_templates();
+        
+        // Should contain all built-in templates
+        assert!(templates.contains(&"draft"));
+        assert!(templates.contains(&"critique"));
+        assert!(templates.contains(&"synthesis"));
+        assert!(templates.contains(&"refinement"));
+        assert!(templates.contains(&"convergence"));
+    }
+
+    #[test]
+    fn test_optional_variables_with_defaults() {
+        let engine = TemplateEngine::new();
+        let context = TemplateContext::new()
+            .set("topic_title", "Test Topic")
+            .set("current_draft", "Test draft content");
+
+        // This should work because critique_summary is optional but we haven't set it
+        // The template should handle missing optional variables gracefully
+        let result = engine.render("synthesis", &context);
+        assert!(result.is_err()); // Should fail due to missing required var
+
+        // Now with all required vars
+        let context = context.set("critique_summary", "Test summary");
+        let result = engine.render("synthesis", &context);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_template_with_empty_conditionals() {
+        let engine = TemplateEngine::new();
+        let template_str = "Start {{#if empty_var}}Should not appear{{/if}} End";
+        let context = TemplateContext::new().set("empty_var", "");
+
+        let result = engine.render_string(template_str, &context, &HashMap::new()).unwrap();
+        assert_eq!(result, "Start  End");
+    }
 }
