@@ -16,14 +16,14 @@ Define the stop condition types for the Ralph Loop - the various conditions that
 
 ## Acceptance Criteria
 
-- [ ] Stop condition type definitions
-- [ ] Built-in stop conditions (iterations, time, etc.)
-- [ ] Test-based stop conditions
-- [ ] Progress-based stop conditions
-- [ ] Custom condition support
-- [ ] Condition composition (AND/OR)
-- [ ] Serializable condition configurations
-- [ ] Condition priority system
+- [x] Stop condition type definitions
+- [x] Built-in stop conditions (iterations, time, etc.)
+- [x] Test-based stop conditions
+- [x] Progress-based stop conditions
+- [x] Custom condition support
+- [x] Condition composition (AND/OR)
+- [x] Serializable condition configurations
+- [x] Condition priority system
 
 ---
 
