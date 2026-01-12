@@ -16,12 +16,12 @@ Design and implement the critique prompt construction system that generates targ
 
 ## Acceptance Criteria
 
-- [ ] Role-specific critique prompts
-- [ ] Structured output format for critiques
-- [ ] Category-specific evaluation criteria
-- [ ] Scoring rubric definition
-- [ ] Context window management for long drafts
-- [ ] Support for focused critiques on specific sections
+- [x] Role-specific critique prompts
+- [x] Structured output format for critiques
+- [x] Category-specific evaluation criteria
+- [x] Scoring rubric definition
+- [x] Context window management for long drafts
+- [x] Support for focused critiques on specific sections
 
 ---
 
