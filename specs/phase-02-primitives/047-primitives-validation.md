@@ -16,12 +16,12 @@ Implement comprehensive input validation for all primitives to ensure safe and c
 
 ## Acceptance Criteria
 
-- [ ] Path validation (traversal attacks, allowed paths)
-- [ ] Command validation (blocked patterns, injection)
-- [ ] Pattern validation (regex syntax)
-- [ ] Size and limit validation
-- [ ] Type validation with coercion
-- [ ] Custom validators per primitive
+- [x] Path validation (traversal attacks, allowed paths)
+- [x] Command validation (blocked patterns, injection)
+- [x] Pattern validation (regex syntax)
+- [x] Size and limit validation
+- [x] Type validation with coercion
+- [x] Custom validators per primitive
 
 ---
 
