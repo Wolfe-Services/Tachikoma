@@ -26,14 +26,14 @@ Implement custom protocol handlers for the Tachikoma application, enabling secur
 
 ## Acceptance Criteria
 
-- [ ] Custom protocol registration (tachikoma://)
-- [ ] Secure resource loading via protocol
-- [ ] Asset serving from asar archive
-- [ ] Stream protocol for large files
-- [ ] Protocol interception and modification
-- [ ] CORS handling for custom protocols
-- [ ] Privileged protocol support
-- [ ] Protocol handler cleanup on quit
+- [x] Custom protocol registration (tachikoma://)
+- [x] Secure resource loading via protocol
+- [x] Asset serving from asar archive
+- [x] Stream protocol for large files
+- [x] Protocol interception and modification
+- [x] CORS handling for custom protocols
+- [x] Privileged protocol support
+- [x] Protocol handler cleanup on quit
 
 ---
 
