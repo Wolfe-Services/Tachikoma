@@ -5,9 +5,9 @@ use crate::{
     error::{PrimitiveError, PrimitiveResult},
     result::{BashResult, ExecutionMetadata},
 };
+use super::output::{OutputConfig, capture_output};
 use std::process::Stdio;
 use std::time::{Duration, Instant};
-use tokio::io::AsyncReadExt;
 use tokio::process::{Child, Command};
 use tokio::time::{sleep, timeout};
 use tracing::{debug, instrument, warn};
@@ -22,6 +22,24 @@ pub async fn bash_with_timeout(
     command: &str,
     timeout_duration: Duration,
     working_dir: Option<&str>,
+) -> PrimitiveResult<BashResult> {
+    bash_with_timeout_and_config(
+        ctx, 
+        command, 
+        timeout_duration, 
+        working_dir, 
+        &OutputConfig::default()
+    ).await
+}
+
+/// Execute a bash command with timeout and custom output config.
+#[instrument(skip(ctx, output_config), fields(command = %command, timeout = ?timeout_duration, op_id = %ctx.operation_id))]
+pub async fn bash_with_timeout_and_config(
+    ctx: &PrimitiveContext,
+    command: &str,
+    timeout_duration: Duration,
+    working_dir: Option<&str>,
+    output_config: &OutputConfig,
 ) -> PrimitiveResult<BashResult> {
     let start = Instant::now();
 
@@ -60,24 +78,22 @@ pub async fn bash_with_timeout(
     let pid = child.id();
 
     // Execute with timeout
-    let result = timeout(timeout_duration, execute_and_capture(&mut child)).await;
+    let result = timeout(timeout_duration, execute_and_capture_with_config(&mut child, output_config)).await;
 
     match result {
-        Ok(Ok((exit_code, stdout, stderr))) => {
+        Ok(Ok((exit_code, captured))) => {
             let duration = start.elapsed();
-            let stdout_len = stdout.len();
-            let stderr_len = stderr.len();
             debug!("Command completed in {:?}", duration);
 
             Ok(BashResult {
                 exit_code,
-                stdout,
-                stderr,
+                stdout: captured.stdout,
+                stderr: captured.stderr,
                 timed_out: false,
-                stdout_truncated: false,
-                stderr_truncated: false,
-                stdout_total_bytes: stdout_len,
-                stderr_total_bytes: stderr_len,
+                stdout_truncated: captured.stdout_truncated,
+                stderr_truncated: captured.stderr_truncated,
+                stdout_total_bytes: captured.stdout_total_bytes,
+                stderr_total_bytes: captured.stderr_total_bytes,
                 metadata: ExecutionMetadata {
                     duration,
                     operation_id: ctx.operation_id.clone(),
@@ -119,6 +135,20 @@ pub async fn bash_with_timeout(
     }
 }
 
+/// Execute command and capture output with advanced configuration.
+async fn execute_and_capture_with_config(child: &mut Child, output_config: &OutputConfig) -> PrimitiveResult<(i32, super::output::CapturedOutput)> {
+    let stdout = child.stdout.take();
+    let stderr = child.stderr.take();
+    
+    let status_task = child.wait();
+    let capture_task = capture_output(stdout, stderr, output_config);
+
+    let (status, captured) = tokio::join!(status_task, capture_task);
+    
+    let status = status.map_err(PrimitiveError::Io)?;
+    Ok((status.code().unwrap_or(-1), captured))
+}
+
 /// Execute command and capture output.
 async fn execute_and_capture(child: &mut Child) -> PrimitiveResult<(i32, String, String)> {
     let mut stdout = child.stdout.take();
@@ -127,7 +157,7 @@ async fn execute_and_capture(child: &mut Child) -> PrimitiveResult<(i32, String,
     let stdout_task = async {
         let mut buf = Vec::new();
         if let Some(ref mut out) = stdout {
-            out.read_to_end(&mut buf).await?;
+            tokio::io::AsyncReadExt::read_to_end(out, &mut buf).await?;
         }
         Ok::<_, std::io::Error>(String::from_utf8_lossy(&buf).into_owned())
     };
@@ -135,7 +165,7 @@ async fn execute_and_capture(child: &mut Child) -> PrimitiveResult<(i32, String,
     let stderr_task = async {
         let mut buf = Vec::new();
         if let Some(ref mut err) = stderr {
-            err.read_to_end(&mut buf).await?;
+            tokio::io::AsyncReadExt::read_to_end(err, &mut buf).await?;
         }
         Ok::<_, std::io::Error>(String::from_utf8_lossy(&buf).into_owned())
     };
@@ -161,11 +191,11 @@ async fn capture_partial_output(child: &mut Child) -> (String, String) {
     let capture_timeout = Duration::from_millis(100);
 
     if let Some(ref mut stdout) = child.stdout {
-        let _ = timeout(capture_timeout, stdout.read_to_end(&mut stdout_buf)).await;
+        let _ = timeout(capture_timeout, tokio::io::AsyncReadExt::read_to_end(stdout, &mut stdout_buf)).await;
     }
 
     if let Some(ref mut stderr) = child.stderr {
-        let _ = timeout(capture_timeout, stderr.read_to_end(&mut stderr_buf)).await;
+        let _ = timeout(capture_timeout, tokio::io::AsyncReadExt::read_to_end(stderr, &mut stderr_buf)).await;
     }
 
     (

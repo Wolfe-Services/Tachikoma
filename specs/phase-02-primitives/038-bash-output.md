@@ -16,12 +16,12 @@ Implement stdout/stderr capture with streaming support, output size limits, and 
 
 ## Acceptance Criteria
 
-- [ ] Separate stdout and stderr capture
-- [ ] Combined output option
-- [ ] Output size limits with truncation
-- [ ] Streaming output for long-running commands
-- [ ] Line-based output callbacks
-- [ ] Binary output handling
+- [x] Separate stdout and stderr capture
+- [x] Combined output option
+- [x] Output size limits with truncation
+- [x] Streaming output for long-running commands
+- [x] Line-based output callbacks
+- [x] Binary output handling
 
 ---
 

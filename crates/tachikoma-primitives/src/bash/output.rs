@@ -455,4 +455,32 @@ mod tests {
         assert_eq!(stderr_lines.len(), 1);
         assert_eq!(stderr_lines[0], "stderr line 1");
     }
+
+    #[tokio::test]
+    async fn test_streaming_output() {
+        // Test OutputStreamer with a mock process
+        let mut streamer = OutputStreamer::new(10);
+        let tx = streamer.sender();
+
+        // Simulate lines coming from a process
+        let sender_task = tokio::spawn(async move {
+            tx.send(OutputLine::Stdout("Line 1".to_string())).await.unwrap();
+            tx.send(OutputLine::Stderr("Error 1".to_string())).await.unwrap();
+            tx.send(OutputLine::Stdout("Line 2".to_string())).await.unwrap();
+            // Drop sender to signal end
+        });
+
+        // Collect streamed output
+        let mut received = Vec::new();
+        while let Some(line) = streamer.recv().await {
+            received.push(line);
+        }
+
+        sender_task.await.unwrap();
+
+        assert_eq!(received.len(), 3);
+        assert!(matches!(received[0], OutputLine::Stdout(ref s) if s == "Line 1"));
+        assert!(matches!(received[1], OutputLine::Stderr(ref s) if s == "Error 1"));
+        assert!(matches!(received[2], OutputLine::Stdout(ref s) if s == "Line 2"));
+    }
 }
