@@ -1,0 +1,38 @@
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# Node
+node_modules/
+.npm
+*.log
+
+# Electron
+dist/
+out/
+release/
+
+# Build
+*.dmg
+*.exe
+*.AppImage
+*.deb
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
+*.pem
+
+# Tachikoma
+.tachikoma/forge/sessions/
