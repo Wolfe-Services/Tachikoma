@@ -16,12 +16,12 @@ Implement a prompt template system for Forge that allows customization of prompt
 
 ## Acceptance Criteria
 
-- [ ] Template registry with built-in templates
-- [ ] Custom template loading from files
-- [ ] Variable substitution in templates
-- [ ] Template inheritance/composition
-- [ ] Output type-specific templates
-- [ ] Template validation
+- [x] Template registry with built-in templates
+- [x] Custom template loading from files
+- [x] Variable substitution in templates
+- [x] Template inheritance/composition
+- [x] Output type-specific templates
+- [x] Template validation
 
 ---
 
