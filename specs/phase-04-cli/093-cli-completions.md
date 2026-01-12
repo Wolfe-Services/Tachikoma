@@ -13,14 +13,14 @@ Implement shell completion generation for the CLI, supporting bash, zsh, fish, P
 
 ## Acceptance Criteria
 
-- [ ] Generate static completions for all shells
-- [ ] Dynamic completions for tool names
-- [ ] Dynamic completions for backend names
-- [ ] Dynamic completions for config keys
-- [ ] File path completions where appropriate
-- [ ] Hidden command from help
-- [ ] Installation instructions
-- [ ] Completion scripts output to stdout or file
+- [x] Generate static completions for all shells
+- [x] Dynamic completions for tool names
+- [x] Dynamic completions for backend names
+- [x] Dynamic completions for config keys
+- [x] File path completions where appropriate
+- [x] Hidden command from help
+- [x] Installation instructions
+- [x] Completion scripts output to stdout or file
 
 ## Implementation Details
 
