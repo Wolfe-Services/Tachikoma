@@ -16,11 +16,11 @@ Implement secure API key and service account handling for the Google Gemini back
 
 ## Acceptance Criteria
 
-- [ ] Secure API key storage using `Secret<T>`
-- [ ] Environment variable loading (`GOOGLE_API_KEY`, `GEMINI_API_KEY`)
-- [ ] GCP service account authentication
-- [ ] OAuth2 token refresh
-- [ ] Key validation before use
+- [x] Secure API key storage using `Secret<T>`
+- [x] Environment variable loading (`GOOGLE_API_KEY`, `GEMINI_API_KEY`)
+- [x] GCP service account authentication
+- [x] OAuth2 token refresh
+- [x] Key validation before use
 
 ---
 
