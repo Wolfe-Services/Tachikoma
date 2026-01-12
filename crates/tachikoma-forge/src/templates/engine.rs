@@ -500,19 +500,19 @@ As the devil's advocate:
         let mut loaded = 0;
 
         let mut entries = tokio::fs::read_dir(dir).await
-            .map_err(|e| ForgeError::Io(format!("Failed to read template dir: {}", e)))?;
+            .map_err(|e| ForgeError::Template(format!("Failed to read template dir: {}", e)))?;
 
         while let Some(entry) = entries.next_entry().await
-            .map_err(|e| ForgeError::Io(e.to_string()))?
+            .map_err(|e| ForgeError::Template(format!("Failed to iterate template dir: {}", e)))?
         {
             let path = entry.path();
 
             if path.extension().map(|e| e == "yaml" || e == "yml").unwrap_or(false) {
                 let content = tokio::fs::read_to_string(&path).await
-                    .map_err(|e| ForgeError::Io(e.to_string()))?;
+                    .map_err(|e| ForgeError::Template(format!("Failed to read template file: {}", e)))?;
 
                 let template: Template = serde_yaml::from_str(&content)
-                    .map_err(|e| ForgeError::Config(format!("Failed to parse template YAML: {}", e)))?;
+                    .map_err(|e| ForgeError::Template(format!("Failed to parse template YAML: {}", e)))?;
 
                 self.templates.insert(template.name.clone(), template);
                 loaded += 1;
