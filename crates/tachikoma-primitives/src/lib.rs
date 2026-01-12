@@ -24,10 +24,13 @@ pub mod list_files;
 #[cfg(feature = "bash")]
 pub mod bash;
 
+#[cfg(feature = "edit-file")]
+pub mod edit_file;
+
 // Re-exports
 pub use context::{PrimitiveConfig, PrimitiveContext};
 pub use error::{PrimitiveError, PrimitiveResult};
-pub use result::{ExecutionMetadata, ReadFileResult, ListFilesResult, FileEntry, BashResult};
+pub use result::{ExecutionMetadata, ReadFileResult, ListFilesResult, FileEntry, BashResult, EditFileResult};
 
 #[cfg(feature = "read-file")]
 pub use read_file::{read_file, ReadFileOptions};
@@ -37,6 +40,9 @@ pub use list_files::{list_files, ListFilesOptions, SortBy, list_files_recursive,
 
 #[cfg(feature = "bash")]
 pub use bash::{bash, bash_success, bash_sequence, bash_with_timeout, BashOptions, TimeoutCommand, CancellationToken, CancellationWatcher};
+
+#[cfg(feature = "edit-file")]
+pub use edit_file::{edit_file, edit_file_preview, EditFileOptions, Diff, EditPreview};
 
 #[cfg(test)]
 mod tests {

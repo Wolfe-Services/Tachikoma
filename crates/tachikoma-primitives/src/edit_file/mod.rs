@@ -1,35 +1,3 @@
-# 040 - Edit File Core Implementation
-
-**Phase:** 2 - Five Primitives
-**Spec ID:** 040
-**Status:** Planned
-**Dependencies:** 031-primitives-crate
-**Estimated Context:** ~10% of Sonnet window
-
----
-
-## Objective
-
-Implement the `edit_file` primitive that performs search-and-replace operations in files with exact string matching.
-
----
-
-## Acceptance Criteria
-
-- [x] Search and replace with exact string matching
-- [x] Support for multi-line old_string/new_string
-- [x] Preserve file encoding and line endings
-- [x] Backup original file option
-- [x] Dry-run mode for preview
-- [x] Return diff of changes
-
----
-
-## Implementation Details
-
-### 1. Edit File Module (src/edit_file/mod.rs)
-
-```rust
 //! Edit file primitive implementation.
 
 mod options;
@@ -46,7 +14,7 @@ use crate::{
 use std::fs;
 use std::path::PathBuf;
 use std::time::Instant;
-use tracing::{debug, instrument, warn};
+use tracing::{debug, instrument};
 
 /// Edit a file using search and replace.
 ///
@@ -118,8 +86,8 @@ pub async fn edit_file(
         });
     }
 
-    // Read file
-    let content = fs::read_to_string(&resolved_path).map_err(|e| {
+    // Read file with encoding preservation
+    let original_bytes = fs::read(&resolved_path).map_err(|e| {
         if e.kind() == std::io::ErrorKind::NotFound {
             PrimitiveError::FileNotFound {
                 path: resolved_path.clone(),
@@ -132,6 +100,12 @@ pub async fn edit_file(
             PrimitiveError::Io(e)
         }
     })?;
+
+    // Detect line endings
+    let line_ending = detect_line_endings(&original_bytes);
+
+    // Convert to string - use lossy conversion to handle various encodings
+    let content = String::from_utf8_lossy(&original_bytes);
 
     // Count occurrences
     let count = content.matches(old_string).count();
@@ -171,13 +145,39 @@ pub async fn edit_file(
 
     // Create backup if requested
     if options.backup {
-        let backup_path = resolved_path.with_extension("bak");
+        let backup_path = resolved_path.with_extension(
+            format!("{}.bak", resolved_path.extension().and_then(|s| s.to_str()).unwrap_or(""))
+        );
         fs::copy(&resolved_path, &backup_path)?;
         debug!("Created backup at {:?}", backup_path);
     }
 
+    // Convert back to bytes with original line endings preserved
+    let new_bytes = preserve_line_endings(&new_content, line_ending);
+
+    // Preserve original file metadata
+    let original_metadata = fs::metadata(&resolved_path)?;
+
     // Write new content
-    fs::write(&resolved_path, &new_content)?;
+    fs::write(&resolved_path, &new_bytes)?;
+
+    // Preserve permissions if requested
+    if options.preserve_permissions {
+        #[cfg(unix)]
+        {
+            use std::fs::Permissions;
+            use std::os::unix::fs::PermissionsExt;
+            let permissions = Permissions::from_mode(original_metadata.permissions().mode());
+            fs::set_permissions(&resolved_path, permissions)?;
+        }
+        
+        #[cfg(not(unix))]
+        {
+            // On non-Unix systems, just set the readonly flag if it was set
+            let permissions = original_metadata.permissions();
+            fs::set_permissions(&resolved_path, permissions)?;
+        }
+    }
 
     let duration = start.elapsed();
     debug!(
@@ -212,7 +212,7 @@ pub async fn edit_file_preview(
         });
     }
 
-    let content = fs::read_to_string(&resolved_path).map_err(|e| {
+    let original_bytes = fs::read(&resolved_path).map_err(|e| {
         if e.kind() == std::io::ErrorKind::NotFound {
             PrimitiveError::FileNotFound {
                 path: resolved_path.clone(),
@@ -222,6 +222,7 @@ pub async fn edit_file_preview(
         }
     })?;
 
+    let content = String::from_utf8_lossy(&original_bytes);
     let count = content.matches(old_string).count();
     let new_content = content.replace(old_string, new_string);
     let diff = diff::create_diff(&content, &new_content);
@@ -264,6 +265,63 @@ impl EditPreview {
     /// Get formatted diff for display.
     pub fn format_diff(&self) -> String {
         self.diff.to_string()
+    }
+}
+
+/// Detect line endings in file content.
+#[derive(Debug, Clone, Copy)]
+enum LineEnding {
+    Unix,    // LF (\n)
+    Windows, // CRLF (\r\n)
+    Classic, // CR (\r)
+    Mixed,   // Multiple types found
+}
+
+/// Detect the primary line ending style in the file.
+fn detect_line_endings(bytes: &[u8]) -> LineEnding {
+    let mut crlf_count = 0;
+    let mut lf_count = 0;
+    let mut cr_count = 0;
+
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] == b'\r' {
+            if i + 1 < bytes.len() && bytes[i + 1] == b'\n' {
+                crlf_count += 1;
+                i += 2; // Skip both \r and \n
+            } else {
+                cr_count += 1;
+                i += 1;
+            }
+        } else if bytes[i] == b'\n' {
+            lf_count += 1;
+            i += 1;
+        } else {
+            i += 1;
+        }
+    }
+
+    // Determine the predominant line ending
+    if crlf_count > lf_count && crlf_count > cr_count {
+        LineEnding::Windows
+    } else if lf_count > crlf_count && lf_count > cr_count {
+        LineEnding::Unix
+    } else if cr_count > crlf_count && cr_count > lf_count {
+        LineEnding::Classic
+    } else if crlf_count > 0 || lf_count > 0 || cr_count > 0 {
+        LineEnding::Mixed
+    } else {
+        // Default to Unix if no line endings found
+        LineEnding::Unix
+    }
+}
+
+/// Convert string content to bytes while preserving the original line ending style.
+fn preserve_line_endings(content: &str, line_ending: LineEnding) -> Vec<u8> {
+    match line_ending {
+        LineEnding::Windows => content.replace('\n', "\r\n").into_bytes(),
+        LineEnding::Classic => content.replace('\n', "\r").into_bytes(),
+        LineEnding::Unix | LineEnding::Mixed => content.as_bytes().to_vec(),
     }
 }
 
@@ -377,273 +435,133 @@ mod tests {
         let content = fs::read_to_string(&file_path).unwrap();
         assert_eq!(content, "Hello, World!");
     }
-}
-```
 
-### 2. Edit File Options (src/edit_file/options.rs)
+    #[tokio::test]
+    async fn test_edit_file_backup() {
+        let dir = tempdir().unwrap();
+        let file_path = dir.path().join("test.txt");
+        write(&file_path, "Hello, World!").unwrap();
 
-```rust
-//! Options for edit_file primitive.
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        let opts = EditFileOptions::new().with_backup();
+        let result = edit_file(&ctx, "test.txt", "World", "Rust", Some(opts)).await.unwrap();
 
-/// Options for editing a file.
-#[derive(Debug, Clone, Default)]
-pub struct EditFileOptions {
-    /// Replace all occurrences (not just first unique match).
-    pub replace_all: bool,
-    /// Create a backup of the original file.
-    pub backup: bool,
-    /// Don't actually write changes (preview mode).
-    pub dry_run: bool,
-    /// Preserve original file permissions.
-    pub preserve_permissions: bool,
-}
+        assert!(result.success);
 
-impl EditFileOptions {
-    /// Create new default options.
-    pub fn new() -> Self {
-        Self::default()
+        // Check original file was changed
+        let content = fs::read_to_string(&file_path).unwrap();
+        assert_eq!(content, "Hello, Rust!");
+
+        // Check backup was created
+        let backup_path = dir.path().join("test.txt.bak");
+        let backup_content = fs::read_to_string(&backup_path).unwrap();
+        assert_eq!(backup_content, "Hello, World!");
     }
 
-    /// Replace all occurrences.
-    pub fn replace_all(mut self) -> Self {
-        self.replace_all = true;
-        self
+    #[tokio::test]
+    async fn test_edit_file_windows_line_endings() {
+        let dir = tempdir().unwrap();
+        let file_path = dir.path().join("test.txt");
+        // Write file with Windows line endings
+        fs::write(&file_path, b"line1\r\nline2\r\nline3\r\n").unwrap();
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        let result = edit_file(&ctx, "test.txt", "line2", "modified", None).await.unwrap();
+
+        assert!(result.success);
+
+        // Check that Windows line endings are preserved
+        let bytes = fs::read(&file_path).unwrap();
+        let content = String::from_utf8_lossy(&bytes);
+        assert!(content.contains("\r\n"));
+        assert!(content.contains("modified"));
     }
 
-    /// Create backup before editing.
-    pub fn with_backup(mut self) -> Self {
-        self.backup = true;
-        self
+    #[tokio::test]
+    async fn test_edit_preview() {
+        let dir = tempdir().unwrap();
+        let file_path = dir.path().join("test.txt");
+        write(&file_path, "Hello, World!\nGoodbye, World!").unwrap();
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        let preview = edit_file_preview(&ctx, "test.txt", "World", "Rust").await.unwrap();
+
+        assert_eq!(preview.occurrences, 2);
+        assert!(preview.has_changes());
+        assert!(!preview.is_unique());
+        assert_eq!(preview.old_string, "World");
+        assert_eq!(preview.new_string, "Rust");
+
+        let diff_str = preview.format_diff();
+        assert!(diff_str.contains("-Hello, World!"));
+        assert!(diff_str.contains("+Hello, Rust!"));
     }
 
-    /// Preview changes without writing.
-    pub fn dry_run(mut self) -> Self {
-        self.dry_run = true;
-        self
+    #[tokio::test]
+    async fn test_empty_old_string_validation() {
+        let dir = tempdir().unwrap();
+        let file_path = dir.path().join("test.txt");
+        write(&file_path, "Hello, World!").unwrap();
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        let result = edit_file(&ctx, "test.txt", "", "replacement", None).await;
+
+        assert!(matches!(result, Err(PrimitiveError::Validation { .. })));
     }
 
-    /// Preserve file permissions.
-    pub fn preserve_permissions(mut self) -> Self {
-        self.preserve_permissions = true;
-        self
-    }
-}
-```
+    #[tokio::test]
+    async fn test_identical_strings_validation() {
+        let dir = tempdir().unwrap();
+        let file_path = dir.path().join("test.txt");
+        write(&file_path, "Hello, World!").unwrap();
 
-### 3. Diff Generation (src/edit_file/diff.rs)
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        let result = edit_file(&ctx, "test.txt", "same", "same", None).await;
 
-```rust
-//! Diff generation for edit preview.
-
-use std::fmt;
-
-/// A unified diff representation.
-#[derive(Debug, Clone)]
-pub struct Diff {
-    /// Diff hunks.
-    pub hunks: Vec<DiffHunk>,
-}
-
-/// A single diff hunk.
-#[derive(Debug, Clone)]
-pub struct DiffHunk {
-    /// Starting line in old file.
-    pub old_start: usize,
-    /// Number of lines in old file.
-    pub old_count: usize,
-    /// Starting line in new file.
-    pub new_start: usize,
-    /// Number of lines in new file.
-    pub new_count: usize,
-    /// Lines in the hunk.
-    pub lines: Vec<DiffLine>,
-}
-
-/// A single diff line.
-#[derive(Debug, Clone)]
-pub enum DiffLine {
-    Context(String),
-    Added(String),
-    Removed(String),
-}
-
-impl fmt::Display for DiffLine {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            DiffLine::Context(s) => write!(f, " {}", s),
-            DiffLine::Added(s) => write!(f, "+{}", s),
-            DiffLine::Removed(s) => write!(f, "-{}", s),
-        }
-    }
-}
-
-impl fmt::Display for DiffHunk {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(
-            f,
-            "@@ -{},{} +{},{} @@",
-            self.old_start, self.old_count, self.new_start, self.new_count
-        )?;
-        for line in &self.lines {
-            writeln!(f, "{}", line)?;
-        }
-        Ok(())
-    }
-}
-
-impl fmt::Display for Diff {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        for hunk in &self.hunks {
-            write!(f, "{}", hunk)?;
-        }
-        Ok(())
-    }
-}
-
-/// Create a diff between two strings.
-pub fn create_diff(old: &str, new: &str) -> Diff {
-    let old_lines: Vec<&str> = old.lines().collect();
-    let new_lines: Vec<&str> = new.lines().collect();
-
-    let mut hunks = Vec::new();
-    let mut old_idx = 0;
-    let mut new_idx = 0;
-
-    while old_idx < old_lines.len() || new_idx < new_lines.len() {
-        // Find next difference
-        while old_idx < old_lines.len()
-            && new_idx < new_lines.len()
-            && old_lines[old_idx] == new_lines[new_idx]
-        {
-            old_idx += 1;
-            new_idx += 1;
-        }
-
-        if old_idx >= old_lines.len() && new_idx >= new_lines.len() {
-            break;
-        }
-
-        // Create hunk
-        let hunk_old_start = old_idx.saturating_sub(2);
-        let hunk_new_start = new_idx.saturating_sub(2);
-
-        let mut lines = Vec::new();
-
-        // Context before
-        for i in hunk_old_start..old_idx {
-            if i < old_lines.len() {
-                lines.push(DiffLine::Context(old_lines[i].to_string()));
-            }
-        }
-
-        // Find extent of changes
-        let mut old_end = old_idx;
-        let mut new_end = new_idx;
-
-        while old_end < old_lines.len() || new_end < new_lines.len() {
-            if old_end < old_lines.len()
-                && new_end < new_lines.len()
-                && old_lines[old_end] == new_lines[new_end]
-            {
-                // Check if we have enough context to end hunk
-                let mut context_count = 0;
-                let mut check_old = old_end;
-                let mut check_new = new_end;
-                while check_old < old_lines.len()
-                    && check_new < new_lines.len()
-                    && old_lines[check_old] == new_lines[check_new]
-                {
-                    context_count += 1;
-                    check_old += 1;
-                    check_new += 1;
-                    if context_count >= 4 {
-                        break;
-                    }
-                }
-                if context_count >= 4 || (check_old >= old_lines.len() && check_new >= new_lines.len()) {
-                    break;
-                }
-            }
-            old_end += 1;
-            new_end += 1;
-        }
-
-        // Add removed lines
-        for i in old_idx..old_end.min(old_lines.len()) {
-            lines.push(DiffLine::Removed(old_lines[i].to_string()));
-        }
-
-        // Add added lines
-        for i in new_idx..new_end.min(new_lines.len()) {
-            lines.push(DiffLine::Added(new_lines[i].to_string()));
-        }
-
-        // Context after
-        let context_end = old_end + 2;
-        for i in old_end..context_end.min(old_lines.len()) {
-            lines.push(DiffLine::Context(old_lines[i].to_string()));
-        }
-
-        if !lines.is_empty() {
-            hunks.push(DiffHunk {
-                old_start: hunk_old_start + 1,
-                old_count: old_end - hunk_old_start,
-                new_start: hunk_new_start + 1,
-                new_count: new_end - hunk_new_start,
-                lines,
-            });
-        }
-
-        old_idx = old_end + 2;
-        new_idx = new_end + 2;
+        assert!(matches!(result, Err(PrimitiveError::Validation { .. })));
     }
 
-    Diff { hunks }
-}
+    #[tokio::test]
+    async fn test_edit_file_comprehensive() {
+        // Test comprehensive functionality with all features
+        let dir = tempdir().unwrap();
+        let file_path = dir.path().join("comprehensive.txt");
+        let content = "function old_name() {\n    console.log('old');\n    return old_value;\n}";
+        write(&file_path, content).unwrap();
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_simple_diff() {
-        let old = "line1\nline2\nline3";
-        let new = "line1\nmodified\nline3";
-
-        let diff = create_diff(old, new);
-        let formatted = diff.to_string();
-
-        assert!(formatted.contains("-line2"));
-        assert!(formatted.contains("+modified"));
-    }
-
-    #[test]
-    fn test_no_changes() {
-        let content = "line1\nline2\nline3";
-        let diff = create_diff(content, content);
-
-        assert!(diff.hunks.is_empty());
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        
+        // First, preview the changes
+        let preview = edit_file_preview(&ctx, "comprehensive.txt", "old", "new").await.unwrap();
+        assert_eq!(preview.occurrences, 3);
+        assert!(preview.has_changes());
+        assert!(!preview.is_unique());
+        
+        let diff = preview.format_diff();
+        assert!(diff.contains("-function old_name()"));
+        assert!(diff.contains("+function new_name()"));
+        
+        // Now perform the actual edit with backup
+        let opts = EditFileOptions::new()
+            .replace_all()
+            .with_backup()
+            .preserve_permissions();
+            
+        let result = edit_file(&ctx, "comprehensive.txt", "old", "new", Some(opts)).await.unwrap();
+        
+        assert!(result.success);
+        assert_eq!(result.replacements, 3);
+        
+        // Check the file was changed
+        let new_content = fs::read_to_string(&file_path).unwrap();
+        assert!(new_content.contains("function new_name()"));
+        assert!(new_content.contains("console.log('new');"));
+        assert!(new_content.contains("return new_value;"));
+        assert!(!new_content.contains("old"));
+        
+        // Check backup was created
+        let backup_path = dir.path().join("comprehensive.txt.bak");
+        let backup_content = fs::read_to_string(&backup_path).unwrap();
+        assert_eq!(backup_content, content);
     }
 }
-```
-
----
-
-## Testing Requirements
-
-1. Basic replacement works correctly
-2. Multi-line strings are handled
-3. Target not found returns appropriate error
-4. Non-unique matches fail without replace_all
-5. replace_all replaces all occurrences
-6. Dry run doesn't modify file
-7. Backup creates .bak file
-8. File permissions are preserved
-
----
-
-## Related Specs
-
-- Depends on: [031-primitives-crate.md](031-primitives-crate.md)
-- Next: [041-edit-file-unique.md](041-edit-file-unique.md)
-- Related: [042-edit-file-atomic.md](042-edit-file-atomic.md)
