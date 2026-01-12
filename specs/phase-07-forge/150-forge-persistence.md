@@ -16,13 +16,13 @@ Implement persistence for Forge sessions, allowing sessions to be saved to disk,
 
 ## Acceptance Criteria
 
-- [ ] Session serialization to JSON/YAML
-- [ ] Auto-save at configurable intervals
-- [ ] Manual save on demand
-- [ ] Session listing and discovery
-- [ ] Session metadata storage
-- [ ] Atomic write operations
-- [ ] Compression for large sessions
+- [x] Session serialization to JSON/YAML
+- [x] Auto-save at configurable intervals
+- [x] Manual save on demand
+- [x] Session listing and discovery
+- [x] Session metadata storage
+- [x] Atomic write operations
+- [x] Compression for large sessions
 
 ---
 
