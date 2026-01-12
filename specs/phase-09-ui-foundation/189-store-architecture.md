@@ -25,14 +25,14 @@ Establish a scalable and type-safe Svelte store architecture for Tachikoma's sta
 
 ## Acceptance Criteria
 
-- [ ] Base store factory with TypeScript generics
-- [ ] Async store pattern for API/IPC data
-- [ ] Derived store utilities
-- [ ] Store persistence layer
-- [ ] Store devtools integration
-- [ ] Store composition patterns
-- [ ] Memory leak prevention
-- [ ] Store testing utilities
+- [x] Base store factory with TypeScript generics
+- [x] Async store pattern for API/IPC data
+- [x] Derived store utilities
+- [x] Store persistence layer
+- [x] Store devtools integration
+- [x] Store composition patterns
+- [x] Memory leak prevention
+- [x] Store testing utilities
 
 ---
 
