@@ -13,15 +13,15 @@ Implement interactive prompt utilities for user input, confirmation dialogs, sel
 
 ## Acceptance Criteria
 
-- [ ] Confirmation prompts (yes/no)
-- [ ] Text input with validation
-- [ ] Password input (masked)
-- [ ] Single selection from list
-- [ ] Multi-selection from list
-- [ ] Number input with range validation
-- [ ] Path input with completion
-- [ ] Non-interactive fallback mode
-- [ ] Default values support
+- [x] Confirmation prompts (yes/no)
+- [x] Text input with validation
+- [x] Password input (masked)
+- [x] Single selection from list
+- [x] Multi-selection from list
+- [x] Number input with range validation
+- [x] Path input with completion
+- [x] Non-interactive fallback mode
+- [x] Default values support
 
 ## Implementation Details
 
