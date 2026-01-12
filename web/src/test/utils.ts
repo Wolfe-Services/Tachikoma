@@ -6,7 +6,7 @@ import { vi } from 'vitest';
  * Render a Svelte component with default test providers.
  */
 export function renderWithProviders<T extends SvelteComponent>(
-  component: new (...args: any[]) => T,
+  component: any,
   props?: ComponentProps<T>
 ): RenderResult<T> {
   return render(component, { props });

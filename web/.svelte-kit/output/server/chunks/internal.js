@@ -91,5 +91,5 @@ import{c as _,s as g,a as y,v as f,m as h}from"./vendor.js";import"./environment
 		</div>
 	</body>
 </html>
-`},version_hash:"1y1e5y5"};async function F(){return{handle:void 0,handleFetch:void 0,handleError:void 0,handleValidationError:void 0,init:void 0,reroute:void 0,transport:void 0}}export{O as a,S as b,U as c,F as g,q as o,k as p,x as r,E as s};
+`},version_hash:"161g87r"};async function F(){return{handle:void 0,handleFetch:void 0,handleError:void 0,handleValidationError:void 0,init:void 0,reroute:void 0,transport:void 0}}export{O as a,S as b,U as c,F as g,q as o,k as p,x as r,E as s};
 //# sourceMappingURL=internal.js.map

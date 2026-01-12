@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { missionStore, isRunning, progress } from '$lib/stores/mission';
   import { ipc } from '$lib/ipc';
   

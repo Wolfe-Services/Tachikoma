@@ -26,13 +26,11 @@
  * ```
  */
 declare module '$env/static/private' {
-	export const MANPATH: string;
 	export const TERM_PROGRAM: string;
 	export const NODE: string;
 	export const INIT_CWD: string;
-	export const SHELL: string;
 	export const TERM: string;
-	export const MAKEFLAGS: string;
+	export const SHELL: string;
 	export const TMPDIR: string;
 	export const npm_config_global_prefix: string;
 	export const TERM_PROGRAM_VERSION: string;
@@ -45,11 +43,9 @@ declare module '$env/static/private' {
 	export const SSH_AUTH_SOCK: string;
 	export const __CF_USER_TEXT_ENCODING: string;
 	export const npm_execpath: string;
-	export const MAKELEVEL: string;
-	export const MFLAGS: string;
 	export const PATH: string;
-	export const npm_package_json: string;
 	export const _: string;
+	export const npm_package_json: string;
 	export const npm_config_userconfig: string;
 	export const npm_config_init_module: string;
 	export const __CFBundleIdentifier: string;
@@ -73,13 +69,7 @@ declare module '$env/static/private' {
 	export const npm_config_user_agent: string;
 	export const npm_node_execpath: string;
 	export const npm_config_prefix: string;
-	export const TEST: string;
-	export const VITEST: string;
 	export const NODE_ENV: string;
-	export const PROD: string;
-	export const DEV: string;
-	export const BASE_URL: string;
-	export const MODE: string;
 }
 
 /**
@@ -109,13 +99,11 @@ declare module '$env/static/public' {
  */
 declare module '$env/dynamic/private' {
 	export const env: {
-		MANPATH: string;
 		TERM_PROGRAM: string;
 		NODE: string;
 		INIT_CWD: string;
-		SHELL: string;
 		TERM: string;
-		MAKEFLAGS: string;
+		SHELL: string;
 		TMPDIR: string;
 		npm_config_global_prefix: string;
 		TERM_PROGRAM_VERSION: string;
@@ -128,11 +116,9 @@ declare module '$env/dynamic/private' {
 		SSH_AUTH_SOCK: string;
 		__CF_USER_TEXT_ENCODING: string;
 		npm_execpath: string;
-		MAKELEVEL: string;
-		MFLAGS: string;
 		PATH: string;
-		npm_package_json: string;
 		_: string;
+		npm_package_json: string;
 		npm_config_userconfig: string;
 		npm_config_init_module: string;
 		__CFBundleIdentifier: string;
@@ -156,13 +142,7 @@ declare module '$env/dynamic/private' {
 		npm_config_user_agent: string;
 		npm_node_execpath: string;
 		npm_config_prefix: string;
-		TEST: string;
-		VITEST: string;
 		NODE_ENV: string;
-		PROD: string;
-		DEV: string;
-		BASE_URL: string;
-		MODE: string;
 		[key: `PUBLIC_${string}`]: undefined;
 		[key: `${string}`]: string | undefined;
 	}

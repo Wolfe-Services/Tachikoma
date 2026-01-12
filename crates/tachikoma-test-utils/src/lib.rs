@@ -86,12 +86,12 @@ mod tests {
         ) {
             let path_str = parts.join("/");
             let path = std::path::Path::new(&path_str);
-            
+
             // Property: all path components are present
             let components: Vec<_> = path.components()
                 .filter_map(|c| c.as_os_str().to_str())
                 .collect();
-            
+
             for part in &parts {
                 prop_assert!(components.contains(&part.as_str()));
             }

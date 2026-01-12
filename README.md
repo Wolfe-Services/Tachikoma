@@ -1,5 +1,8 @@
 # Tachikoma
 
+[![CI](https://github.com/tachikoma-project/tachikoma/actions/workflows/ci.yml/badge.svg)](https://github.com/tachikoma-project/tachikoma/actions/workflows/ci.yml)
+[![Release](https://github.com/tachikoma-project/tachikoma/actions/workflows/release.yml/badge.svg)](https://github.com/tachikoma-project/tachikoma/actions/workflows/release.yml)
+
 **Agentic Coding Platform**
 
 A powerful development environment that combines AI agents with modern tooling to create an intelligent, collaborative coding experience.
