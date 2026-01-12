@@ -229,12 +229,20 @@ fn highlight_match(line: &str, pattern: &str) -> String {
     let match_color = "\x1b[1;31m"; // Bold red
     let reset = "\x1b[0m";
     
-    // For now, do a simple case-insensitive replacement
-    // In the future, this could be improved to handle regex patterns properly
-    if let Ok(regex) = regex::Regex::new(&format!("(?i){}", regex::escape(pattern))) {
+    // Try to use the pattern as a regex first, fallback to escaped literal
+    let regex_result = if pattern.starts_with('(') || pattern.contains('*') || pattern.contains('+') || pattern.contains('[') {
+        // Looks like a regex pattern
+        regex::Regex::new(pattern)
+    } else {
+        // Treat as literal string with case-insensitive matching
+        regex::Regex::new(&format!("(?i){}", regex::escape(pattern)))
+    };
+    
+    if let Ok(regex) = regex_result {
         regex.replace_all(line, &format!("{}{}{}", match_color, "$0", reset)).to_string()
     } else {
-        line.to_string()
+        // Fallback to simple string replacement if regex compilation fails
+        line.replace(pattern, &format!("{}{}{}", match_color, pattern, reset))
     }
 }
 
