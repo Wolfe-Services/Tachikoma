@@ -13,15 +13,15 @@ Implement the `tachikoma backends` command for managing AI backend providers, in
 
 ## Acceptance Criteria
 
-- [ ] `backends list` - list configured backends
-- [ ] `backends add` - add a new backend
-- [ ] `backends remove` - remove a backend
-- [ ] `backends show` - show backend details
-- [ ] `backends test` - test backend connectivity
-- [ ] `backends default` - set default backend
-- [ ] `backends models` - list available models
-- [ ] Interactive configuration wizard
-- [ ] Secure API key handling
+- [x] `backends list` - list configured backends
+- [x] `backends add` - add a new backend
+- [x] `backends remove` - remove a backend
+- [x] `backends show` - show backend details
+- [x] `backends test` - test backend connectivity
+- [x] `backends default` - set default backend
+- [x] `backends models` - list available models
+- [x] Interactive configuration wizard
+- [x] Secure API key handling
 
 ## Implementation Details
 
