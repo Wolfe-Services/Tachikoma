@@ -42,7 +42,11 @@ pub use list_files::{list_files, ListFilesOptions, SortBy, list_files_recursive,
 pub use bash::{bash, bash_success, bash_sequence, bash_with_timeout, BashOptions, TimeoutCommand, CancellationToken, CancellationWatcher};
 
 #[cfg(feature = "edit-file")]
-pub use edit_file::{edit_file, edit_file_preview, EditFileOptions, Diff, EditPreview};
+pub use edit_file::{
+    edit_file, edit_file_preview, EditFileOptions, Diff, EditPreview,
+    UniquenessResult, MatchLocation, MatchSelection, EditValidationError,
+    check_uniqueness, format_matches, select_match, validate_edit_target
+};
 
 #[cfg(test)]
 mod tests {

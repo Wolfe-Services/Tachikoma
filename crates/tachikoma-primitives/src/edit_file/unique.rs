@@ -1,38 +1,4 @@
-# 041 - Edit File Uniqueness Validation
-
-**Phase:** 2 - Five Primitives
-**Spec ID:** 041
-**Status:** Planned
-**Dependencies:** 040-edit-file-core
-**Estimated Context:** ~8% of Sonnet window
-
----
-
-## Objective
-
-Implement uniqueness validation for `edit_file` to ensure the target string is unique or provide context for disambiguation.
-
----
-
-## Acceptance Criteria
-
-- [x] Detect non-unique matches
-- [x] Return locations of all matches
-- [x] Provide context around each match
-- [x] Suggest expanded context for uniqueness
-- [x] Support force mode with explicit match selection
-- [x] Line number reporting for all matches
-
----
-
-## Implementation Details
-
-### 1. Uniqueness Module (src/edit_file/unique.rs)
-
-```rust
 //! Uniqueness validation for edit_file.
-
-use std::path::Path;
 
 /// Result of uniqueness check.
 #[derive(Debug, Clone)]
@@ -92,50 +58,89 @@ impl MatchLocation {
 pub fn check_uniqueness(content: &str, target: &str, context_lines: usize) -> UniquenessResult {
     let lines: Vec<&str> = content.lines().collect();
     let mut matches = Vec::new();
-    let mut offset = 0;
+    let mut byte_offset = 0;
 
-    for (line_idx, line) in lines.iter().enumerate() {
+    // Handle multiline targets differently
+    if target.contains('\n') {
+        // For multiline targets, search in the full content
         let mut search_start = 0;
-        while let Some(col) = line[search_start..].find(target) {
-            let actual_col = search_start + col;
-
-            // Check if this is part of a multi-line match
-            let is_multiline = target.contains('\n');
-
-            let matched_lines = if is_multiline {
-                let target_line_count = target.lines().count();
-                lines[line_idx..].iter().take(target_line_count).map(|s| s.to_string()).collect()
-            } else {
-                vec![line.to_string()]
-            };
-
+        while let Some(pos) = content[search_start..].find(target) {
+            let absolute_pos = search_start + pos;
+            
+            // Find which line this match starts on
+            let content_up_to_match = &content[..absolute_pos];
+            let line_number = content_up_to_match.matches('\n').count() + 1;
+            
+            // Calculate column position
+            let line_start = content_up_to_match.rfind('\n').map(|p| p + 1).unwrap_or(0);
+            let column = absolute_pos - line_start + 1;
+            
+            // Get the matched lines
+            let target_lines: Vec<&str> = target.lines().collect();
+            let matched_lines: Vec<String> = target_lines.iter().map(|s| s.to_string()).collect();
+            
             // Get context
+            let start_line_idx = line_number.saturating_sub(1); // Convert to 0-indexed
             let context_before: Vec<String> = lines
-                [line_idx.saturating_sub(context_lines)..line_idx]
+                [start_line_idx.saturating_sub(context_lines)..start_line_idx]
                 .iter()
                 .map(|s| s.to_string())
                 .collect();
 
-            let end_line = line_idx + matched_lines.len();
+            let end_line_idx = start_line_idx + target_lines.len();
             let context_after: Vec<String> = lines
-                [end_line..(end_line + context_lines).min(lines.len())]
+                [end_line_idx.min(lines.len())..(end_line_idx + context_lines).min(lines.len())]
                 .iter()
                 .map(|s| s.to_string())
                 .collect();
 
             matches.push(MatchLocation {
-                line: line_idx + 1, // 1-indexed
-                column: actual_col + 1, // 1-indexed
-                offset: offset + actual_col,
+                line: line_number,
+                column,
+                offset: absolute_pos,
                 context_before,
                 matched_lines,
                 context_after,
             });
 
-            search_start = actual_col + 1;
+            search_start = absolute_pos + target.len().max(1);
         }
+    } else {
+        // For single-line targets, search line by line
+        for (line_idx, line) in lines.iter().enumerate() {
+            let mut search_start = 0;
+            while let Some(col) = line[search_start..].find(target) {
+                let actual_col = search_start + col;
+                
+                let matched_lines = vec![line.to_string()];
 
-        offset += line.len() + 1; // +1 for newline
+                // Get context
+                let context_before: Vec<String> = lines
+                    [line_idx.saturating_sub(context_lines)..line_idx]
+                    .iter()
+                    .map(|s| s.to_string())
+                    .collect();
+
+                let context_after: Vec<String> = lines
+                    [(line_idx + 1)..(line_idx + 1 + context_lines).min(lines.len())]
+                    .iter()
+                    .map(|s| s.to_string())
+                    .collect();
+
+                matches.push(MatchLocation {
+                    line: line_idx + 1, // 1-indexed
+                    column: actual_col + 1, // 1-indexed
+                    offset: byte_offset + actual_col,
+                    context_before,
+                    matched_lines,
+                    context_after,
+                });
+
+                search_start = actual_col + target.len().max(1);
+            }
+
+            byte_offset += line.len() + 1; // +1 for newline
+        }
     }
 
     let is_unique = matches.len() == 1;
@@ -270,7 +275,9 @@ pub enum EditValidationError {
     TargetNotFound,
     /// Target string not unique.
     NotUnique {
+        /// Number of matches found.
         count: usize,
+        /// Formatted match details.
         formatted: String,
     },
 }
@@ -316,7 +323,7 @@ mod tests {
         let content = "line1\nline2\nline3";
         let result = check_uniqueness(content, "notfound", 2);
 
-        assert!(result.is_unique); // vacuously unique
+        assert!(!result.is_unique); // Not unique because no matches found
         assert_eq!(result.match_count, 0);
     }
 
@@ -357,25 +364,55 @@ mod tests {
         let result = validate_edit_target(content, "foo", false);
         assert!(matches!(result, Err(EditValidationError::NotUnique { .. })));
     }
+
+    #[test]
+    fn test_multiline_match() {
+        let content = "start\nfirst line\nsecond line\nend";
+        let target = "first line\nsecond line";
+        let result = check_uniqueness(content, target, 1);
+
+        assert!(result.is_unique);
+        assert_eq!(result.match_count, 1);
+        assert_eq!(result.matches[0].line, 2);
+        assert_eq!(result.matches[0].matched_lines.len(), 2);
+    }
+
+    #[test]
+    fn test_line_column_reporting() {
+        let content = "abc def foo ghi\njkl foo mno";
+        let result = check_uniqueness(content, "foo", 0);
+
+        assert!(!result.is_unique);
+        assert_eq!(result.match_count, 2);
+        
+        // First match at line 1, column 9
+        assert_eq!(result.matches[0].line, 1);
+        assert_eq!(result.matches[0].column, 9);
+        
+        // Second match at line 2, column 5
+        assert_eq!(result.matches[1].line, 2);
+        assert_eq!(result.matches[1].column, 5);
+    }
+
+    #[test]
+    fn test_format_matches() {
+        let content = "line 1\nfoo here\nline 3\nfoo there";
+        let result = check_uniqueness(content, "foo", 1);
+        let formatted = format_matches(&result);
+
+        assert!(formatted.contains("Found 2 matches:"));
+        assert!(formatted.contains("Match 1 at line 2, column 1:"));
+        assert!(formatted.contains("Match 2 at line 4, column 1:"));
+        assert!(formatted.contains("Suggestion:"));
+    }
+
+    #[test]
+    fn test_match_selection_by_line() {
+        let content = "foo\nbar\nfoo again\nbaz\nfoo final";
+        let result = check_uniqueness(content, "foo", 1);
+
+        let match_at_line_3 = select_match(&result, MatchSelection::Line(3)).unwrap();
+        assert_eq!(match_at_line_3.line, 3);
+        assert!(match_at_line_3.matched_lines[0].contains("again"));
+    }
 }
-```
-
----
-
-## Testing Requirements
-
-1. Single match returns is_unique = true
-2. Multiple matches return all locations
-3. Context lines are captured correctly
-4. Match selection by various criteria works
-5. Line and column numbers are 1-indexed
-6. Suggestions help disambiguate matches
-7. Formatted output is readable
-
----
-
-## Related Specs
-
-- Depends on: [040-edit-file-core.md](040-edit-file-core.md)
-- Next: [042-edit-file-atomic.md](042-edit-file-atomic.md)
-- Related: [033-read-file-errors.md](033-read-file-errors.md)

@@ -60,10 +60,12 @@ pub enum PrimitiveError {
     },
 
     /// Edit target not unique.
-    #[error("edit target not unique: found {count} matches")]
+    #[error("edit target not unique: found {count} matches\n{details}")]
     NotUnique {
         /// Number of matches found.
         count: usize,
+        /// Detailed match information.
+        details: String,
     },
 
     /// Edit target not found.

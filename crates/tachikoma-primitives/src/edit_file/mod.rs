@@ -2,9 +2,14 @@
 
 mod options;
 mod diff;
+mod unique;
 
 pub use options::EditFileOptions;
 pub use diff::Diff;
+pub use unique::{
+    UniquenessResult, MatchLocation, MatchSelection, EditValidationError,
+    check_uniqueness, format_matches, select_match, validate_edit_target
+};
 
 use crate::{
     context::PrimitiveContext,
@@ -107,21 +112,71 @@ pub async fn edit_file(
     // Convert to string - use lossy conversion to handle various encodings
     let content = String::from_utf8_lossy(&original_bytes);
 
-    // Count occurrences
+    // Count occurrences and handle uniqueness
     let count = content.matches(old_string).count();
 
     if count == 0 {
         return Err(PrimitiveError::TargetNotFound);
     }
 
-    // Check uniqueness if required
+    // Handle non-unique matches
     if !options.replace_all && count > 1 {
-        return Err(PrimitiveError::NotUnique { count });
+        if let Some(selection) = options.force_selection {
+            // Force mode: validate the selection exists
+            let uniqueness = unique::check_uniqueness(&content, old_string, 3);
+            let selected_match = unique::select_match(&uniqueness, selection);
+            
+            if selected_match.is_none() {
+                return Err(PrimitiveError::Validation {
+                    message: format!(
+                        "Invalid force selection {:?}: {} matches available",
+                        selection, count
+                    ),
+                });
+            }
+        } else {
+            // Normal mode: return error with detailed match information
+            let uniqueness = unique::check_uniqueness(&content, old_string, 3);
+            return Err(PrimitiveError::NotUnique {
+                count,
+                details: unique::format_matches(&uniqueness),
+            });
+        }
     }
 
     // Perform replacement
     let new_content = if options.replace_all {
         content.replace(old_string, new_string)
+    } else if let Some(selection) = options.force_selection {
+        // Force mode with specific match selection
+        let uniqueness = unique::check_uniqueness(&content, old_string, 3);
+        if let Some(selected_match) = unique::select_match(&uniqueness, selection) {
+            // We need to find and replace the exact match at the specified location
+            // Convert content to bytes for accurate offset handling
+            let content_bytes = content.as_bytes();
+            let old_string_bytes = old_string.as_bytes();
+            let new_string_bytes = new_string.as_bytes();
+            
+            let start = selected_match.offset;
+            let end = start + old_string_bytes.len();
+            
+            if end <= content_bytes.len() && &content_bytes[start..end] == old_string_bytes {
+                let mut new_bytes = Vec::new();
+                new_bytes.extend_from_slice(&content_bytes[..start]);
+                new_bytes.extend_from_slice(new_string_bytes);
+                new_bytes.extend_from_slice(&content_bytes[end..]);
+                
+                String::from_utf8_lossy(&new_bytes).into_owned()
+            } else {
+                return Err(PrimitiveError::Validation {
+                    message: "Match location is invalid".to_string(),
+                });
+            }
+        } else {
+            return Err(PrimitiveError::Validation {
+                message: "Selected match not found".to_string(),
+            });
+        }
     } else {
         content.replacen(old_string, new_string, 1)
     };
@@ -377,7 +432,7 @@ mod tests {
         let ctx = PrimitiveContext::new(dir.path().to_path_buf());
         let result = edit_file(&ctx, "test.txt", "foo", "qux", None).await;
 
-        assert!(matches!(result, Err(PrimitiveError::NotUnique { count: 3 })));
+        assert!(matches!(result, Err(PrimitiveError::NotUnique { count: 3, .. })));
     }
 
     #[tokio::test]
@@ -563,5 +618,58 @@ mod tests {
         let backup_path = dir.path().join("comprehensive.txt.bak");
         let backup_content = fs::read_to_string(&backup_path).unwrap();
         assert_eq!(backup_content, content);
+    }
+
+    #[tokio::test]
+    async fn test_edit_file_force_selection() {
+        let dir = tempdir().unwrap();
+        let file_path = dir.path().join("test.txt");
+        write(&file_path, "foo bar\nbaz foo\nfoo qux").unwrap();
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        
+        // Force edit first match
+        let opts = EditFileOptions::new().force_first();
+        let result = edit_file(&ctx, "test.txt", "foo", "replaced", Some(opts)).await.unwrap();
+        
+        assert!(result.success);
+        assert_eq!(result.replacements, 1);
+        
+        let content = fs::read_to_string(&file_path).unwrap();
+        assert_eq!(content, "replaced bar\nbaz foo\nfoo qux");
+    }
+
+    #[tokio::test]
+    async fn test_edit_file_force_selection_by_line() {
+        let dir = tempdir().unwrap();
+        let file_path = dir.path().join("test.txt");
+        write(&file_path, "foo bar\nbaz foo\nfoo qux").unwrap();
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        
+        // Force edit match on line 3
+        let opts = EditFileOptions::new().force_line(3);
+        let result = edit_file(&ctx, "test.txt", "foo", "replaced", Some(opts)).await.unwrap();
+        
+        assert!(result.success);
+        assert_eq!(result.replacements, 1);
+        
+        let content = fs::read_to_string(&file_path).unwrap();
+        assert_eq!(content, "foo bar\nbaz foo\nreplaced qux");
+    }
+
+    #[tokio::test]
+    async fn test_edit_file_force_invalid_selection() {
+        let dir = tempdir().unwrap();
+        let file_path = dir.path().join("test.txt");
+        write(&file_path, "foo bar\nbaz foo\nfoo qux").unwrap();
+
+        let ctx = PrimitiveContext::new(dir.path().to_path_buf());
+        
+        // Try to force edit a non-existent line
+        let opts = EditFileOptions::new().force_line(10);
+        let result = edit_file(&ctx, "test.txt", "foo", "replaced", Some(opts)).await;
+        
+        assert!(matches!(result, Err(PrimitiveError::Validation { .. })));
     }
 }
