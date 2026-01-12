@@ -21,6 +21,7 @@ tachikoma-primitives = { workspace = true }
 
 clap = { workspace = true, features = ["derive", "env", "string", "wrap_help"] }
 clap_complete = "4.5"
+clap_mangen = "0.2"
 tokio = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
