@@ -26,15 +26,15 @@ Implement Checkbox and Toggle (Switch) components for Tachikoma with support for
 
 ## Acceptance Criteria
 
-- [ ] Checkbox with checked, unchecked, and indeterminate states
-- [ ] Toggle/Switch component
-- [ ] Multiple sizes (sm, md, lg)
-- [ ] Label and description support
-- [ ] Checkbox group for multiple selections
-- [ ] Disabled state
-- [ ] Keyboard accessible (Space to toggle)
-- [ ] Animated transitions
-- [ ] Focus visible states
+- [x] Checkbox with checked, unchecked, and indeterminate states
+- [x] Toggle/Switch component
+- [x] Multiple sizes (sm, md, lg)
+- [x] Label and description support
+- [x] Checkbox group for multiple selections
+- [x] Disabled state
+- [x] Keyboard accessible (Space to toggle)
+- [x] Animated transitions
+- [x] Focus visible states
 
 ---
 
