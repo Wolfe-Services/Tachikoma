@@ -26,17 +26,17 @@ Implement a Tree View component for Tachikoma to display hierarchical data struc
 
 ## Acceptance Criteria
 
-- [ ] Recursive tree structure rendering
-- [ ] Expand/collapse nodes
-- [ ] Single and multiple selection modes
-- [ ] Checkbox selection
-- [ ] Custom node rendering
-- [ ] Icons for different node types
-- [ ] Lazy loading for large trees
-- [ ] Keyboard navigation
-- [ ] Drag and drop (optional)
-- [ ] Search/filter functionality
-- [ ] Virtual scrolling for performance
+- [x] Recursive tree structure rendering
+- [x] Expand/collapse nodes
+- [x] Single and multiple selection modes
+- [x] Checkbox selection
+- [x] Custom node rendering
+- [x] Icons for different node types
+- [x] Lazy loading for large trees
+- [x] Keyboard navigation
+- [x] Drag and drop (optional)
+- [x] Search/filter functionality
+- [x] Virtual scrolling for performance
 
 ---
 
