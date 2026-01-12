@@ -26,15 +26,15 @@ Implement comprehensive window management for the Electron application, includin
 
 ## Acceptance Criteria
 
-- [ ] Main window creates with proper security settings
-- [ ] Window state (size, position, maximized) persists across sessions
-- [ ] Support for multiple window types (main, settings, about)
-- [ ] Frameless window option with custom title bar
-- [ ] Window bounds validation (ensure visible on screen)
-- [ ] Proper window close behavior per platform
-- [ ] DevTools management in development mode
-- [ ] Window focus and blur handling
-- [ ] Splash screen support during app load
+- [x] Main window creates with proper security settings
+- [x] Window state (size, position, maximized) persists across sessions
+- [x] Support for multiple window types (main, settings, about)
+- [x] Frameless window option with custom title bar
+- [x] Window bounds validation (ensure visible on screen)
+- [x] Proper window close behavior per platform
+- [x] DevTools management in development mode
+- [x] Window focus and blur handling
+- [x] Splash screen support during app load
 
 ---
 
