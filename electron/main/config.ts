@@ -128,4 +128,5 @@ class ConfigManager {
 const configManager = new ConfigManager();
 configManager.applyEnvironmentOverrides();
 
-export { configManager, AppConfig };
+export { configManager };
+export type { AppConfig };

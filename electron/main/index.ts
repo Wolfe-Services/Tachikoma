@@ -237,7 +237,7 @@ class TachikomaApp {
     });
 
     // Configure permissions
-    defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
+    defaultSession.setPermissionRequestHandler((_, permission, callback) => {
       const allowedPermissions = ['clipboard-read', 'clipboard-write', 'notifications'];
 
       if (allowedPermissions.includes(permission)) {
