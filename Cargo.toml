@@ -74,6 +74,7 @@ tachikoma-primitives = { path = "crates/tachikoma-primitives" }
 # Common crates
 tachikoma-common-core = { path = "crates/tachikoma-common-core" }
 tachikoma-common-config = { path = "crates/tachikoma-common-config" }
+tachikoma-test-utils = { path = "crates/tachikoma-test-utils" }
 
 [profile.dev]
 opt-level = 0
