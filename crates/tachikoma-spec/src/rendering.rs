@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use handlebars::{Handlebars, Helper, HelperResult, Context, RenderContext as HbRenderContext, Output, Renderable, Template};
+use handlebars::{Handlebars, Helper, HelperResult, Context, RenderContext as HbRenderContext, Output};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tokio::fs;
@@ -473,18 +473,30 @@ fn pluralize_helper(
         .unwrap_or("item");
 
     let plural = h.param(2)
-        .and_then(|v| v.value().as_str())
-        .unwrap_or(&format!("{}s", singular));
+        .and_then(|v| v.value().as_str());
 
-    out.write(if count == 1 { singular } else { plural })?;
+    let plural_str = if let Some(p) = plural {
+        p
+    } else {
+        // Create a longer-lived value for the default plural
+        let default_plural = format!("{}s", singular);
+        if count == 1 { 
+            out.write(singular)?;
+        } else {
+            out.write(&default_plural)?;
+        }
+        return Ok(());
+    };
+
+    out.write(if count == 1 { singular } else { plural_str })?;
     Ok(())
 }
 
-fn if_eq_helper(
-    h: &Helper,
-    hb: &Handlebars,
-    ctx: &Context,
-    rc: &mut HbRenderContext,
+fn if_eq_helper<'a>(
+    h: &Helper<'a>,
+    hb: &'a Handlebars<'a>,
+    ctx: &'a Context,
+    rc: &mut HbRenderContext<'a, 'a>,
     out: &mut dyn Output,
 ) -> HelperResult {
     let a = h.param(0).map(|v| v.value());
