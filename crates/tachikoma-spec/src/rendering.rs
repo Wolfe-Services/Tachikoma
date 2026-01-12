@@ -688,11 +688,11 @@ mod tests {
         let temp_dir = TempDir::new().unwrap();
         
         // Create a simple template file
-        let template_content = r#"# Spec {{spec.id}}: {{spec.title}}
-Status: {{spec.status}}
+        let template_content = r#"# Spec {{id}}: {{title}}
+Status: {{status}}
 Project: {{project.name}}
 
-{{#checkbox spec.acceptance_criteria.0.checked}}First criterion{{/checkbox}}
+{{checkbox acceptance_criteria.0.checked}}First criterion
 "#;
         
         let template_path = temp_dir.path().join("test.hbs");
