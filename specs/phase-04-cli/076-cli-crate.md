@@ -13,14 +13,14 @@ Create the foundational CLI crate structure using clap with derive macros, estab
 
 ## Acceptance Criteria
 
-- [ ] CLI crate created at `crates/tachikoma-cli`
-- [ ] Binary named `tachikoma` produced
-- [ ] Clap derive macros configured with proper settings
-- [ ] Version, author, about information from Cargo.toml
-- [ ] Global flags defined (--verbose, --quiet, --config, --color)
-- [ ] Async runtime properly initialized
-- [ ] Clean error handling at entry point
-- [ ] Exit codes properly defined
+- [x] CLI crate created at `crates/tachikoma-cli`
+- [x] Binary named `tachikoma` produced
+- [x] Clap derive macros configured with proper settings
+- [x] Version, author, about information from Cargo.toml
+- [x] Global flags defined (--verbose, --quiet, --config, --color)
+- [x] Async runtime properly initialized
+- [x] Clean error handling at entry point
+- [x] Exit codes properly defined
 
 ## Implementation Details
 
