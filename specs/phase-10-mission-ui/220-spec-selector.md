@@ -16,13 +16,13 @@ Create a spec selector component that allows users to browse, search, and select
 
 ## Acceptance Criteria
 
-- [ ] Tree view of specs by phase/category
-- [ ] Multi-select with checkboxes
-- [ ] Search and filter functionality
-- [ ] Dependency chain visualization
-- [ ] Quick preview on hover/focus
-- [ ] Keyboard navigation support
-- [ ] Selected specs summary panel
+- [x] Tree view of specs by phase/category
+- [x] Multi-select with checkboxes
+- [x] Search and filter functionality
+- [x] Dependency chain visualization
+- [x] Quick preview on hover/focus
+- [x] Keyboard navigation support
+- [x] Selected specs summary panel
 
 ---
 
