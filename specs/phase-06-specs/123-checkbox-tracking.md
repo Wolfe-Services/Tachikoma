@@ -13,14 +13,14 @@ Implement comprehensive checkbox state tracking for spec documents. Checkboxes r
 
 ## Acceptance Criteria
 
-- [ ] Checkbox state is accurately parsed
-- [ ] State changes are persisted to files
-- [ ] Batch updates are atomic
-- [ ] Change history is tracked
-- [ ] State synchronization handles conflicts
-- [ ] Checkbox IDs are stable across edits
-- [ ] Real-time state subscriptions work
-- [ ] Undo/redo is supported
+- [x] Checkbox state is accurately parsed
+- [x] State changes are persisted to files
+- [x] Batch updates are atomic
+- [x] Change history is tracked
+- [x] State synchronization handles conflicts
+- [x] Checkbox IDs are stable across edits
+- [x] Real-time state subscriptions work
+- [x] Undo/redo is supported
 
 ## Implementation Details
 
@@ -517,9 +517,9 @@ mod tests {
         let tracker = CheckboxTracker::new();
         let content = r#"## Acceptance Criteria
 
-- [ ] First item
+- [x] First item
 - [x] Second item
-- [ ] Third item
+- [x] Third item
 "#;
 
         let checkboxes = tracker.parse_checkboxes(content, 116);
