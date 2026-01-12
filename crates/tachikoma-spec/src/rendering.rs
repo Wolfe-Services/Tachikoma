@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use handlebars::{Handlebars, Helper, HelperResult, Context, RenderContext as HbRenderContext, Output, Renderable};
+use handlebars::{Handlebars, Helper, HelperResult, Context, RenderContext as HbRenderContext, Output};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tokio::fs;
@@ -388,7 +388,7 @@ fn spec_ref_helper(
     h: &Helper,
     _: &Handlebars,
     _: &Context,
-    _: &mut RenderContext,
+    _: &mut HbRenderContext,
     out: &mut dyn Output,
 ) -> HelperResult {
     let id = h.param(0)
@@ -403,7 +403,7 @@ fn code_block_helper(
     h: &Helper,
     _: &Handlebars,
     _: &Context,
-    _: &mut RenderContext,
+    _: &mut HbRenderContext,
     out: &mut dyn Output,
 ) -> HelperResult {
     let lang = h.param(0)
