@@ -26,16 +26,16 @@ Implement a Toast notification system for Tachikoma with support for multiple va
 
 ## Acceptance Criteria
 
-- [ ] Multiple variants (success, error, warning, info)
-- [ ] Auto-dismiss with configurable duration
-- [ ] Manual dismiss with close button
-- [ ] Toast stacking and positioning
-- [ ] Action buttons within toasts
-- [ ] Progress bar for auto-dismiss
-- [ ] Pause on hover
-- [ ] ARIA live region announcements
-- [ ] Programmatic toast creation
-- [ ] Maximum toast limit
+- [x] Multiple variants (success, error, warning, info)
+- [x] Auto-dismiss with configurable duration
+- [x] Manual dismiss with close button
+- [x] Toast stacking and positioning
+- [x] Action buttons within toasts
+- [x] Progress bar for auto-dismiss
+- [x] Pause on hover
+- [x] ARIA live region announcements
+- [x] Programmatic toast creation
+- [x] Maximum toast limit
 
 ---
 
