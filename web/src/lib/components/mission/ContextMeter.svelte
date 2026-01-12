@@ -7,13 +7,11 @@
   export let usage: ContextUsage;
   export let compact = false;
 
-  // Create animatedPercent reactively based on usage
-  $: animatedPercent = tweened(usage.usagePercent, { duration: 400, easing: cubicOut });
+  // Create animatedPercent with initial value
+  const animatedPercent = tweened(usage.usagePercent, { duration: 400, easing: cubicOut });
 
-  // Reset the animation when usage changes
-  $: if (animatedPercent) {
-    animatedPercent.set(usage.usagePercent);
-  }
+  // Update the animation when usage changes
+  $: animatedPercent.set(usage.usagePercent);
   $: zone = usage.zone;
 
   const zoneColors: Record<ContextZone, string> = {
