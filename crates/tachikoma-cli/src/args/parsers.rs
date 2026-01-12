@@ -180,4 +180,33 @@ mod tests {
         assert_eq!(id.provider, "default");
         assert_eq!(id.model, "gpt-4");
     }
+
+    #[test]
+    fn test_parse_comma_list() {
+        assert_eq!(parse_comma_list("a,b,c"), vec!["a", "b", "c"]);
+        assert_eq!(parse_comma_list("a, b, c "), vec!["a", "b", "c"]);
+        assert_eq!(parse_comma_list(""), Vec::<String>::new());
+        assert_eq!(parse_comma_list("single"), vec!["single"]);
+    }
+
+    #[test]
+    fn test_parse_url() {
+        assert!(parse_url("https://example.com").is_ok());
+        assert!(parse_url("http://localhost:8080").is_ok());
+        assert!(parse_url("invalid-url").is_err());
+    }
+
+    #[test]
+    fn test_parse_semver() {
+        assert!(parse_semver("1.0.0").is_ok());
+        assert!(parse_semver("1.2.3-alpha").is_ok());
+        assert!(parse_semver("invalid").is_err());
+    }
+
+    #[test]
+    fn test_parse_glob() {
+        assert!(parse_glob("*.rs").is_ok());
+        assert!(parse_glob("**/*.toml").is_ok());
+        assert!(parse_glob("[invalid").is_err());
+    }
 }
