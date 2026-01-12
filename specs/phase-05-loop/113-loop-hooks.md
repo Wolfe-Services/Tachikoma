@@ -16,14 +16,14 @@ Implement the hook system for the Ralph Loop - extension points that allow custo
 
 ## Acceptance Criteria
 
-- [ ] Define hook points (pre/post iteration, etc.)
-- [ ] Hook registration and unregistration
-- [ ] Async hook execution
-- [ ] Hook priority ordering
-- [ ] Hook timeout handling
-- [ ] Error handling in hooks
-- [ ] Built-in hooks (git, logging, etc.)
-- [ ] External hook scripts support
+- [x] Define hook points (pre/post iteration, etc.)
+- [x] Hook registration and unregistration
+- [x] Async hook execution
+- [x] Hook priority ordering
+- [x] Hook timeout handling
+- [x] Error handling in hooks
+- [x] Built-in hooks (git, logging, etc.)
+- [x] External hook scripts support
 
 ---
 
