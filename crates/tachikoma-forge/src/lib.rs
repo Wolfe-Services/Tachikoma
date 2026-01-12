@@ -4,11 +4,13 @@ pub mod error;
 pub mod output;
 pub mod session;
 pub mod round;
+pub mod quality;
 
 // Re-export common types
 pub use error::{ForgeError, ForgeResult};
 pub use session::{ForgeSession, ForgeSessionStatus, ForgeSessionConfig, ForgeTopic, TokenUsage};
 pub use round::{ForgeRound, DraftRound, CritiqueRound, SynthesisRound, RefinementRound, ConvergenceRound};
+pub use quality::{QualityTracker, QualitySnapshot, QualityDimension, QualityTrend, QualityReport, CritiqueSummary};
 
 // Re-export from tachikoma-common-core
 pub use tachikoma_common_core::ForgeSessionId;
@@ -81,13 +83,47 @@ pub struct Participant {
     pub model_name: String,
 }
 
+impl Participant {
+    pub fn claude_sonnet() -> Self {
+        Self {
+            id: "claude-3-5-sonnet-20241022".to_string(),
+            display_name: "Claude 3.5 Sonnet".to_string(),
+            model_name: "claude-3-5-sonnet-20241022".to_string(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Critique {
     pub critic: Participant,
     pub score: u8,
     pub strengths: Vec<String>,
     pub weaknesses: Vec<String>,
-    pub suggestions: Vec<String>,
+    pub suggestions: Vec<Suggestion>,
+    pub raw_content: String,
+    pub tokens: TokenUsage,
+    pub duration_ms: u64,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct Suggestion {
+    pub section: Option<String>,
+    pub text: String,
+    pub priority: u8,
+    pub category: SuggestionCategory,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SuggestionCategory {
+    Correctness,
+    Clarity,
+    Completeness,
+    CodeQuality,
+    Architecture,
+    Performance,
+    Security,
+    Other,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
