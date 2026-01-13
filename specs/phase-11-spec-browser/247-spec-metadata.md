@@ -16,12 +16,12 @@ Create a metadata panel component that displays spec properties, dependencies, r
 
 ## Acceptance Criteria
 
-- [ ] Display all spec frontmatter fields
-- [ ] Show dependency graph/links
-- [ ] Related specs list
-- [ ] Edit metadata inline
-- [ ] Tag management
-- [ ] Last modified info
+- [x] Display all spec frontmatter fields
+- [x] Show dependency graph/links
+- [x] Related specs list
+- [x] Edit metadata inline
+- [x] Tag management
+- [x] Last modified info
 
 ---
 
