@@ -16,13 +16,13 @@ Create a template selection component that displays available spec templates wit
 
 ## Acceptance Criteria
 
-- [ ] Display template grid/list
-- [ ] Template preview on hover/select
-- [ ] Category filtering
-- [ ] Search templates
-- [ ] Template metadata display
-- [ ] Custom template creation
-- [ ] Recently used templates
+- [x] Display template grid/list
+- [x] Template preview on hover/select
+- [x] Category filtering
+- [x] Search templates
+- [x] Template metadata display
+- [x] Custom template creation
+- [x] Recently used templates
 
 ---
 
