@@ -16,12 +16,12 @@ Create a redline warning component that alerts users when context usage approach
 
 ## Acceptance Criteria
 
-- [ ] Progressive warning levels (yellow, orange, red)
-- [ ] Animated alert appearance
-- [ ] Actionable recommendations
-- [ ] Quick actions (create checkpoint, summarize, reboot)
-- [ ] Dismissible with snooze option
-- [ ] Accessible announcements
+- [x] Progressive warning levels (yellow, orange, red)
+- [x] Animated alert appearance
+- [x] Actionable recommendations
+- [x] Quick actions (create checkpoint, summarize, reboot)
+- [x] Dismissible with snooze option
+- [x] Accessible announcements
 
 ---
 
