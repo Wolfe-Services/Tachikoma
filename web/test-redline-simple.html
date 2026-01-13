@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RedlineWarning Test</title>
+</head>
+<body>
+    <div id="app"></div>
+    <script>
+        // Simple test to verify RedlineWarning functionality
+        console.log('Testing RedlineWarning component...');
+        
+        const testWarning = {
+            level: 'red',
+            contextPercent: 95,
+            message: 'Context usage is in redline',
+            recommendations: [
+                {
+                    id: '1',
+                    title: 'Create Checkpoint',
+                    description: 'Save progress',
+                    action: 'create_checkpoint',
+                    impact: 'Reduces by 50%'
+                }
+            ],
+            canDismiss: true
+        };
+        
+        console.log('Test warning:', testWarning);
+    </script>
+</body>
+</html>
