@@ -16,15 +16,15 @@ Create a spec creation wizard component that guides users through creating new s
 
 ## Acceptance Criteria
 
-- [ ] Multi-step creation wizard
-- [ ] Template selection
-- [ ] Auto-generate spec number
-- [ ] Phase selection
-- [ ] Frontmatter editor
-- [ ] Initial content scaffolding
-- [ ] Dependency selection
-- [ ] Preview before creation
-- [ ] Validation at each step
+- [x] Multi-step creation wizard
+- [x] Template selection
+- [x] Auto-generate spec number
+- [x] Phase selection
+- [x] Frontmatter editor
+- [x] Initial content scaffolding
+- [x] Dependency selection
+- [x] Preview before creation
+- [x] Validation at each step
 
 ---
 
