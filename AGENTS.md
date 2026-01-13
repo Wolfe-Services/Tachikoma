@@ -31,6 +31,7 @@ This prevents wasted context on re-verification.
 
 ## File Locations
 
+- **Codebase Map**: `code_base_reference_map_evolving.md` - **UPDATE THIS** when adding crates/modules/patterns
 - Specs: `specs/README.md` (THE PIN - lookup table)
 - Config: `.tachikoma/config.yaml`
 - Rust crates: `crates/`
