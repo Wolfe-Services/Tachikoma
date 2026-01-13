@@ -16,12 +16,12 @@ Create an interactive checkbox component for implementation plan items that sync
 
 ## Acceptance Criteria
 
-- [ ] Visual checkbox with states (unchecked, checked, partial)
-- [ ] Click/tap to toggle
-- [ ] Keyboard accessible (Space/Enter)
-- [ ] Sync state to markdown file
-- [ ] Optimistic updates with rollback
-- [ ] Animation on state change
+- [x] Visual checkbox with states (unchecked, checked, partial)
+- [x] Click/tap to toggle
+- [x] Keyboard accessible (Space/Enter)
+- [x] Sync state to markdown file
+- [x] Optimistic updates with rollback
+- [x] Animation on state change
 
 ---
 
