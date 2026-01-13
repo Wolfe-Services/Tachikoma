@@ -16,12 +16,12 @@ Create a mission history view that displays past missions with filtering, sortin
 
 ## Acceptance Criteria
 
-- [ ] Chronological list of past missions
-- [ ] Filter by status, date range, tags
-- [ ] Sort by date, duration, cost
-- [ ] Quick preview on hover
-- [ ] Batch operations (delete, export)
-- [ ] Search functionality
+- [x] Chronological list of past missions
+- [x] Filter by status, date range, tags
+- [x] Sort by date, duration, cost
+- [x] Quick preview on hover
+- [x] Batch operations (delete, export)
+- [x] Search functionality
 
 ---
 
