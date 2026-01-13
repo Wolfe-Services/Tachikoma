@@ -1,6 +1,8 @@
 // Shared IPC types for web app
 // These are duplicated from electron/shared/ipc.ts to avoid path issues
 
+import type { SearchFilters, SearchResult } from '$lib/types/spec-search';
+
 export interface IpcChannels {
   // Mission operations
   'mission:start': {
