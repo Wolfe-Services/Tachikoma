@@ -25,6 +25,10 @@ export interface IpcChannels {
     request: { path: string };
     response: { content: string; metadata: SpecMetadata };
   };
+  'spec:search': {
+    request: { text: string; filters: SearchFilters };
+    response: SearchResult[];
+  };
 
   // Config operations
   'config:get': {
