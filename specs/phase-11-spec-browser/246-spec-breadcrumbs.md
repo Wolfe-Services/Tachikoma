@@ -16,12 +16,12 @@ Create a breadcrumb navigation component that shows the current location in the 
 
 ## Acceptance Criteria
 
-- [ ] Show phase > spec path
-- [ ] Clickable navigation links
-- [ ] Current item highlighted
-- [ ] Overflow handling with ellipsis
-- [ ] Dropdown for long paths
-- [ ] Keyboard accessible
+- [x] Show phase > spec path
+- [x] Clickable navigation links
+- [x] Current item highlighted
+- [x] Overflow handling with ellipsis
+- [x] Dropdown for long paths
+- [x] Keyboard accessible
 
 ---
 
