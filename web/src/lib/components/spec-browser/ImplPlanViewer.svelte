@@ -59,15 +59,13 @@
         <ul class="plan-section__items">
           {#each section.items as item}
             <li class="plan-item" class:completed={item.completed}>
-              <label class="plan-item__checkbox">
-                <input
-                  type="checkbox"
-                  checked={item.completed}
-                  disabled={!editable}
-                  on:change={() => toggleItem(item)}
-                />
-                <span class="plan-item__text">{item.text}</span>
-              </label>
+              <ImplCheckbox
+                id={item.id}
+                label={item.text}
+                checked={item.completed}
+                disabled={!editable}
+                on:change={(e) => toggleItem(item)}
+              />
 
               {#if item.subItems?.length}
                 <ul class="plan-item__subitems">
