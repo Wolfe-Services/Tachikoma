@@ -11,13 +11,13 @@
 Create the main layout structure for the Forge UI, providing a comprehensive workspace for AI-driven deliberation sessions with multi-panel views for session management, participant monitoring, and result visualization.
 
 ## Acceptance Criteria
-1. Layout provides responsive multi-panel structure with collapsible sidebars
-2. Main content area displays active session with dynamic panel arrangement
-3. Navigation between session views is seamless with keyboard shortcuts
-4. Layout persists user preferences for panel sizes and visibility
-5. Real-time updates reflect session state changes without layout shifts
-6. Accessibility requirements met for screen readers and keyboard navigation
-7. Layout adapts gracefully to different screen sizes and orientations
+- [ ] Layout provides responsive multi-panel structure with collapsible sidebars
+- [ ] Main content area displays active session with dynamic panel arrangement
+- [ ] Navigation between session views is seamless with keyboard shortcuts
+- [ ] Layout persists user preferences for panel sizes and visibility
+- [ ] Real-time updates reflect session state changes without layout shifts
+- [ ] Accessibility requirements met for screen readers and keyboard navigation
+- [ ] Layout adapts gracefully to different screen sizes and orientations
 
 ## Implementation
 
