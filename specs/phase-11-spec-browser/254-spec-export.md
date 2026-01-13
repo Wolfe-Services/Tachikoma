@@ -16,14 +16,14 @@ Create an export system for specifications that supports multiple formats (Markd
 
 ## Acceptance Criteria
 
-- [ ] Export single spec to multiple formats
-- [ ] Batch export multiple specs
-- [ ] Export with dependencies
-- [ ] Customizable export templates
-- [ ] Include/exclude code blocks
-- [ ] Export to ZIP archive
-- [ ] Progress indicator for large exports
-- [ ] Export history tracking
+- [x] Export single spec to multiple formats
+- [x] Batch export multiple specs
+- [x] Export with dependencies
+- [x] Customizable export templates
+- [x] Include/exclude code blocks
+- [x] Export to ZIP archive
+- [x] Progress indicator for large exports
+- [x] Export history tracking
 
 ---
 
