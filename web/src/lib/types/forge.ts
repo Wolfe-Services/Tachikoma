@@ -32,6 +32,7 @@ export interface Participant {
   role: string;
   status: 'active' | 'inactive' | 'thinking' | 'contributing';
   avatar?: string;
+  estimatedCostPerRound?: number;
 }
 
 export interface Oracle {
@@ -39,6 +40,7 @@ export interface Oracle {
   name: string;
   type: string;
   config: Record<string, any>;
+  estimatedCostPerRound?: number;
 }
 
 export interface Round {
@@ -87,4 +89,58 @@ export interface ForgeSessionState {
   sessions: ForgeSession[];
   loading: boolean;
   error: string | null;
+}
+
+export interface SessionDraft {
+  name: string;
+  goal: string;
+  participants: Participant[];
+  oracle: Oracle | null;
+  config: SessionConfig;
+  metadata: DraftMetadata;
+}
+
+export interface SessionConfig {
+  maxRounds: number;
+  convergenceThreshold: number;
+  allowHumanIntervention: boolean;
+  autoSaveInterval: number;
+  timeoutMinutes: number;
+}
+
+export interface DraftMetadata {
+  templateId?: string;
+  createdAt: Date;
+  lastModified: Date;
+}
+
+export interface SessionTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  defaultGoal: string;
+  defaultParticipants: Participant[];
+  defaultOracle: Oracle;
+  defaultConfig: SessionConfig;
+  createdAt: Date;
+  isBuiltIn: boolean;
+}
+
+export interface ValidationResult {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+}
+
+export interface WizardStep {
+  id: string;
+  label: string;
+  icon: string;
+}
+
+export interface CostEstimate {
+  perRound: number;
+  estimated: number;
+  maximum: number;
 }
