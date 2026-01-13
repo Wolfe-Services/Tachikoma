@@ -16,12 +16,12 @@ Create a mission export component that allows users to export mission data, logs
 
 ## Acceptance Criteria
 
-- [ ] Export format selection (JSON, Markdown, HTML)
-- [ ] Content selection (config, logs, diffs, costs)
-- [ ] Archive generation (ZIP)
-- [ ] Progress indicator for large exports
-- [ ] Shareable link generation
-- [ ] Import/restore functionality
+- [x] Export format selection (JSON, Markdown, HTML)
+- [x] Content selection (config, logs, diffs, costs)
+- [x] Archive generation (ZIP)
+- [x] Progress indicator for large exports
+- [x] Shareable link generation
+- [x] Import/restore functionality
 
 ---
 
