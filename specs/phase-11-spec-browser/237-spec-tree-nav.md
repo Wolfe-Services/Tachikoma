@@ -16,13 +16,13 @@ Create a tree navigation component for browsing specification files organized by
 
 ## Acceptance Criteria
 
-- [ ] Hierarchical tree view by phase
-- [ ] Expand/collapse folders
-- [ ] Single-click to preview, double-click to open
-- [ ] Drag-and-drop reordering within phase
-- [ ] Status indicators (planned/in-progress/complete)
-- [ ] Context menu for actions
-- [ ] Keyboard navigation (arrows, enter)
+- [x] Hierarchical tree view by phase
+- [x] Expand/collapse folders
+- [x] Single-click to preview, double-click to open
+- [x] Drag-and-drop reordering within phase
+- [x] Status indicators (planned/in-progress/complete)
+- [x] Context menu for actions
+- [x] Keyboard navigation (arrows, enter)
 
 ---
 
