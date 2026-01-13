@@ -16,13 +16,13 @@ Create a comprehensive diff viewer component for comparing spec content changes 
 
 ## Acceptance Criteria
 
-- [ ] Unified and split diff views
-- [ ] Syntax highlighting for code blocks
-- [ ] Line-by-line navigation
-- [ ] Inline comments on changes
-- [ ] Word-level diff highlighting
-- [ ] Collapse unchanged sections
-- [ ] Copy diff to clipboard
+- [x] Unified and split diff views
+- [x] Syntax highlighting for code blocks
+- [x] Line-by-line navigation
+- [x] Inline comments on changes
+- [x] Word-level diff highlighting
+- [x] Collapse unchanged sections
+- [x] Copy diff to clipboard
 
 ---
 
