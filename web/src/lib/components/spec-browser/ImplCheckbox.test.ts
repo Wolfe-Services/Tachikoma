@@ -43,7 +43,7 @@ describe('ImplCheckbox', () => {
       expect(svg).toBeInTheDocument();
     });
 
-    it('applies correct CSS classes for different states', () => {
+    it('applies correct CSS classes for different states', async () => {
       const { container, component } = render(ImplCheckbox, defaultProps);
       
       let label = container.querySelector('.impl-checkbox');
@@ -52,10 +52,12 @@ describe('ImplCheckbox', () => {
       
       // Update to checked
       component.$set({ checked: true });
+      await tick(); // Wait for Svelte to update
       expect(label).toHaveClass('impl-checkbox--checked');
       
       // Update to partial
       component.$set({ checked: false, partial: true });
+      await tick(); // Wait for Svelte to update
       expect(label).toHaveClass('impl-checkbox--partial');
     });
 

@@ -33,6 +33,10 @@
     }, 300);
   }
 
+  // Reactive statements to ensure state consistency
+  $: ariaChecked = partial ? 'mixed' : checked;
+  $: isDisabled = disabled;
+
   function handleKeyDown(event: KeyboardEvent) {
     if (event.key === ' ' || event.key === 'Enter') {
       event.preventDefault();
@@ -51,8 +55,8 @@
   <span
     class="impl-checkbox__box"
     role="checkbox"
-    aria-checked={partial ? 'mixed' : checked}
-    aria-disabled={disabled}
+    aria-checked={ariaChecked}
+    aria-disabled={isDisabled}
     tabindex={disabled ? -1 : 0}
     on:click={toggle}
     on:keydown={handleKeyDown}
