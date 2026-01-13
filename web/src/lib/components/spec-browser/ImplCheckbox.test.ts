@@ -318,20 +318,23 @@ describe('ImplCheckbox', () => {
       expect(checkbox).toHaveAttribute('aria-disabled', 'false');
     });
 
-    it('updates ARIA attributes based on state', () => {
+    it('updates ARIA attributes based on state', async () => {
       const { container, component } = render(ImplCheckbox, defaultProps);
       const checkbox = container.querySelector('[role="checkbox"]');
       
       // Update to checked
       component.$set({ checked: true });
+      await tick(); // Wait for Svelte to update
       expect(checkbox).toHaveAttribute('aria-checked', 'true');
       
       // Update to partial
       component.$set({ checked: false, partial: true });
+      await tick(); // Wait for Svelte to update
       expect(checkbox).toHaveAttribute('aria-checked', 'mixed');
       
       // Update to disabled
       component.$set({ disabled: true, partial: false });
+      await tick(); // Wait for Svelte to update
       expect(checkbox).toHaveAttribute('aria-disabled', 'true');
     });
 
