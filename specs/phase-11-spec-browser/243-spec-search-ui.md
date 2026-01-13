@@ -16,13 +16,13 @@ Create a search interface for finding specifications by title, content, tags, or
 
 ## Acceptance Criteria
 
-- [ ] Real-time search as you type
-- [ ] Search by title, content, tags, ID
-- [ ] Advanced filter options
-- [ ] Search history persistence
-- [ ] Keyboard navigation through results
-- [ ] Highlight matching text
-- [ ] Search across all specs
+- [x] Real-time search as you type
+- [x] Search by title, content, tags, ID
+- [x] Advanced filter options
+- [x] Search history persistence
+- [x] Keyboard navigation through results
+- [x] Highlight matching text
+- [x] Search across all specs
 
 ---
 
