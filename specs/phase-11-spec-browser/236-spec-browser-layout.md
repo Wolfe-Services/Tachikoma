@@ -16,12 +16,12 @@ Create the main Spec Browser layout component that provides a three-panel interf
 
 ## Acceptance Criteria
 
-- [ ] Three-panel layout: navigation tree, content viewer, metadata panel
-- [ ] Collapsible panels with resizable widths
-- [ ] Breadcrumb navigation
-- [ ] Keyboard shortcuts for navigation
-- [ ] Dark/light theme support
-- [ ] Mobile-responsive design
+- [x] Three-panel layout: navigation tree, content viewer, metadata panel
+- [x] Collapsible panels with resizable widths
+- [x] Breadcrumb navigation
+- [x] Keyboard shortcuts for navigation
+- [x] Dark/light theme support
+- [x] Mobile-responsive design
 
 ---
 
