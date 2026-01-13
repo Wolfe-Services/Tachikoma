@@ -16,14 +16,14 @@ Create a spec linking system that enables bi-directional links between specs, vi
 
 ## Acceptance Criteria
 
-- [ ] Create links between specs
-- [ ] Visualize dependency graph
-- [ ] Auto-detect spec references in content
-- [ ] Broken link detection
-- [ ] Link preview on hover
-- [ ] Bi-directional link tracking
-- [ ] Link type categorization
-- [ ] Bulk link operations
+- [x] Create links between specs
+- [x] Visualize dependency graph
+- [x] Auto-detect spec references in content
+- [x] Broken link detection
+- [x] Link preview on hover
+- [x] Bi-directional link tracking
+- [x] Link type categorization
+- [x] Bulk link operations
 
 ---
 
