@@ -16,13 +16,13 @@ Create a spec file viewer component that displays specification markdown files w
 
 ## Acceptance Criteria
 
-- [ ] View mode with rendered markdown
-- [ ] Edit mode with syntax highlighting
-- [ ] Split mode with side-by-side view
-- [ ] Line numbers in edit mode
-- [ ] Find and replace functionality
-- [ ] Auto-save with debouncing
-- [ ] Unsaved changes indicator
+- [x] View mode with rendered markdown
+- [x] Edit mode with syntax highlighting
+- [x] Split mode with side-by-side view
+- [x] Line numbers in edit mode
+- [x] Find and replace functionality
+- [x] Auto-save with debouncing
+- [x] Unsaved changes indicator
 
 ---
 
