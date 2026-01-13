@@ -16,12 +16,12 @@ Create a search result display component that shows matching specifications with
 
 ## Acceptance Criteria
 
-- [ ] Display matching specs with highlights
-- [ ] Show match context (surrounding text)
-- [ ] Indicate match type (title/content/tag)
-- [ ] Quick preview on hover
-- [ ] Relevance score indicator
-- [ ] Keyboard selection support
+- [x] Display matching specs with highlights
+- [x] Show match context (surrounding text)
+- [x] Indicate match type (title/content/tag)
+- [x] Quick preview on hover
+- [x] Relevance score indicator
+- [x] Keyboard selection support
 
 ---
 
