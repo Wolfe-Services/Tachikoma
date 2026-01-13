@@ -16,14 +16,14 @@ Create a validation UI component that displays spec validation results, warnings
 
 ## Acceptance Criteria
 
-- [ ] Display validation errors inline
-- [ ] Show warnings and suggestions
-- [ ] Quick-fix actions for common issues
-- [ ] Validate frontmatter completeness
-- [ ] Check dependency validity
-- [ ] Verify markdown structure
-- [ ] Real-time validation feedback
-- [ ] Validation summary panel
+- [x] Display validation errors inline
+- [x] Show warnings and suggestions
+- [x] Quick-fix actions for common issues
+- [x] Validate frontmatter completeness
+- [x] Check dependency validity
+- [x] Verify markdown structure
+- [x] Real-time validation feedback
+- [x] Validation summary panel
 
 ---
 
