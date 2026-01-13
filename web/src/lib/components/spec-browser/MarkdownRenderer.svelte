@@ -21,87 +21,81 @@
   marked.setOptions({
     gfm: true,
     breaks: true,
-    highlight: (code, lang) => {
-      if (config.syntaxHighlight && lang && hljs.getLanguage(lang)) {
-        return hljs.highlight(code, { language: lang }).value;
-      }
-      return code;
-    },
   });
 
   // Custom renderer
-  const renderer = new marked.Renderer();
+  const renderer = {
+    heading(text: string, level: number): string {
+      const cleanText = typeof text === 'string' ? text : String(text);
+      const id = cleanText.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+      if (config.generateToc) {
+        toc.push({ id, text: cleanText, level });
+      }
+      return `<h${level} id="${id}">
+        <a class="anchor" href="#${id}" aria-label="Link to ${cleanText}">#</a>
+        ${cleanText}
+      </h${level}>`;
+    },
 
-  // Heading with anchors
-  renderer.heading = (text, level) => {
-    const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-    if (config.generateToc) {
-      toc.push({ id, text, level });
-    }
-    return `<h${level} id="${id}">
-      <a class="anchor" href="#${id}" aria-label="Link to ${text}">#</a>
-      ${text}
-    </h${level}>`;
-  };
+    listitem(text: string, task?: boolean, checked?: boolean): string {
+      if (task) {
+        const checkboxId = `checkbox-${Math.random().toString(36).substr(2, 9)}`;
+        const checkedAttr = checked ? 'checked' : '';
+        return `<li class="task-item">
+          <input type="checkbox" id="${checkboxId}" ${checkedAttr} ${config.interactiveCheckboxes ? '' : 'disabled'}>
+          <label for="${checkboxId}">${text}</label>
+        </li>`;
+      }
+      return `<li>${text}</li>`;
+    },
 
-  // Interactive checkboxes
-  renderer.listitem = (text, task, checked) => {
-    if (task) {
-      const checkboxId = `checkbox-${Math.random().toString(36).substr(2, 9)}`;
-      const checkedAttr = checked ? 'checked' : '';
-      return `<li class="task-item">
-        <input type="checkbox" id="${checkboxId}" ${checkedAttr} ${config.interactiveCheckboxes ? '' : 'disabled'}>
-        <label for="${checkboxId}">${text}</label>
-      </li>`;
-    }
-    return `<li>${text}</li>`;
-  };
+    blockquote(quote: string): string {
+      const noteMatch = quote.match(/^<p>\[!NOTE\](.*)<\/p>$/s);
+      const warnMatch = quote.match(/^<p>\[!WARNING\](.*)<\/p>$/s);
+      const tipMatch = quote.match(/^<p>\[!TIP\](.*)<\/p>$/s);
 
-  // Custom callouts
-  renderer.blockquote = (quote) => {
-    const noteMatch = quote.match(/^<p>\[!NOTE\](.*)<\/p>$/s);
-    const warnMatch = quote.match(/^<p>\[!WARNING\](.*)<\/p>$/s);
-    const tipMatch = quote.match(/^<p>\[!TIP\](.*)<\/p>$/s);
+      if (config.customCallouts) {
+        if (noteMatch) {
+          return `<div class="callout callout--note">
+            <span class="callout-icon" aria-label="Note">ℹ️</span>
+            <div class="callout-content">${noteMatch[1]}</div>
+          </div>`;
+        }
+        if (warnMatch) {
+          return `<div class="callout callout--warning">
+            <span class="callout-icon" aria-label="Warning">⚠️</span>
+            <div class="callout-content">${warnMatch[1]}</div>
+          </div>`;
+        }
+        if (tipMatch) {
+          return `<div class="callout callout--tip">
+            <span class="callout-icon" aria-label="Tip">💡</span>
+            <div class="callout-content">${tipMatch[1]}</div>
+          </div>`;
+        }
+      }
+      return `<blockquote>${quote}</blockquote>`;
+    },
 
-    if (config.customCallouts) {
-      if (noteMatch) {
-        return `<div class="callout callout--note">
-          <span class="callout-icon" aria-label="Note">ℹ️</span>
-          <div class="callout-content">${noteMatch[1]}</div>
+    code(code: string, infostring?: string): string {
+      const cleanCode = typeof code === 'string' ? code : String(code);
+      const lang = infostring || '';
+      
+      if (lang === 'mermaid' && config.mermaidDiagrams) {
+        const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
+        return `<div class="mermaid-container">
+          <pre class="mermaid" id="${id}">${cleanCode}</pre>
         </div>`;
       }
-      if (warnMatch) {
-        return `<div class="callout callout--warning">
-          <span class="callout-icon" aria-label="Warning">⚠️</span>
-          <div class="callout-content">${warnMatch[1]}</div>
-        </div>`;
+      
+      if (config.syntaxHighlight && lang && hljs.getLanguage(lang)) {
+        const highlighted = hljs.highlight(cleanCode, { language: lang }).value;
+        return `<pre><code class="hljs ${lang}">${highlighted}</code></pre>`;
       }
-      if (tipMatch) {
-        return `<div class="callout callout--tip">
-          <span class="callout-icon" aria-label="Tip">💡</span>
-          <div class="callout-content">${tipMatch[1]}</div>
-        </div>`;
-      }
+      
+      const escapedCode = cleanCode.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return `<pre><code${lang ? ` class="${lang}"` : ''}>${escapedCode}</code></pre>`;
     }
-    return `<blockquote>${quote}</blockquote>`;
-  };
-
-  // Mermaid diagram support
-  renderer.code = (code, infostring, escaped) => {
-    const lang = infostring || '';
-    if (lang === 'mermaid' && config.mermaidDiagrams) {
-      const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
-      return `<div class="mermaid-container">
-        <pre class="mermaid" id="${id}">${code}</pre>
-      </div>`;
-    }
-    
-    if (config.syntaxHighlight && lang && hljs.getLanguage(lang)) {
-      const highlighted = hljs.highlight(code, { language: lang }).value;
-      return `<pre><code class="hljs ${lang}">${highlighted}</code></pre>`;
-    }
-    
-    return `<pre><code${lang ? ` class="${lang}"` : ''}>${escaped ? code : code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
   };
 
   function render() {
