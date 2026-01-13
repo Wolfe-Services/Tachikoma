@@ -16,12 +16,12 @@ Create a quick navigation component (command palette style) that allows rapid na
 
 ## Acceptance Criteria
 
-- [ ] Trigger with Cmd+K or Cmd+P
-- [ ] Fuzzy search by title or number
-- [ ] Recently opened specs at top
-- [ ] Keyboard navigation
-- [ ] Preview on hover
-- [ ] Direct number input (e.g., "216")
+- [x] Trigger with Cmd+K or Cmd+P
+- [x] Fuzzy search by title or number
+- [x] Recently opened specs at top
+- [x] Keyboard navigation
+- [x] Preview on hover
+- [x] Direct number input (e.g., "216")
 
 ---
 
