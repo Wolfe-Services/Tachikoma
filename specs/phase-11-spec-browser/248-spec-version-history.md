@@ -16,13 +16,13 @@ Create a version history component that displays spec revision history, allows v
 
 ## Acceptance Criteria
 
-- [ ] Display version history timeline
-- [ ] Show change summary per version
-- [ ] View previous versions
-- [ ] Compare two versions
-- [ ] Restore previous version
-- [ ] Author and timestamp display
-- [ ] Diff highlighting between versions
+- [x] Display version history timeline
+- [x] Show change summary per version
+- [x] View previous versions
+- [x] Compare two versions
+- [x] Restore previous version
+- [x] Author and timestamp display
+- [x] Diff highlighting between versions
 
 ---
 
