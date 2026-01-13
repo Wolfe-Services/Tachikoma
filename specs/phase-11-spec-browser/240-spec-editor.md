@@ -16,13 +16,13 @@ Create a rich spec editor component with markdown syntax highlighting, auto-comp
 
 ## Acceptance Criteria
 
-- [ ] Markdown syntax highlighting
-- [ ] Line numbers with gutter
-- [ ] Auto-completion for spec references
-- [ ] Template snippet insertion
-- [ ] Formatting toolbar
-- [ ] Undo/redo with history
-- [ ] Find and replace
+- [x] Markdown syntax highlighting
+- [x] Line numbers with gutter
+- [x] Auto-completion for spec references
+- [x] Template snippet insertion
+- [x] Formatting toolbar
+- [x] Undo/redo with history
+- [x] Find and replace
 
 ---
 
