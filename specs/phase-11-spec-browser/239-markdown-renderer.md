@@ -16,13 +16,13 @@ Create a markdown renderer component that displays spec files with proper format
 
 ## Acceptance Criteria
 
-- [ ] Standard markdown rendering (GFM)
-- [ ] Syntax highlighting for code blocks
-- [ ] Interactive checkboxes for implementation plans
-- [ ] Table of contents generation
-- [ ] Anchor links for headings
-- [ ] Mermaid diagram support
-- [ ] Custom spec callouts (Notes, Warnings)
+- [x] Standard markdown rendering (GFM)
+- [x] Syntax highlighting for code blocks
+- [x] Interactive checkboxes for implementation plans
+- [x] Table of contents generation
+- [x] Anchor links for headings
+- [x] Mermaid diagram support
+- [x] Custom spec callouts (Notes, Warnings)
 
 ---
 
