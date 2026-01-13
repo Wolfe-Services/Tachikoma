@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  import ImplCheckbox from './ImplCheckbox.svelte';
   import type { ImplementationPlan, PlanSection, PlanItem } from '$lib/types/impl-plan';
 
   export let plan: ImplementationPlan;
