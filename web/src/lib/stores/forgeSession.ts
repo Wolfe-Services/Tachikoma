@@ -1,5 +1,5 @@
 import { writable, derived } from 'svelte/store';
-import type { ForgeSession, ForgeSessionState, SessionPhase } from '$lib/types/forge';
+import type { ForgeSession, ForgeSessionState, SessionPhase, SessionDraft } from '$lib/types/forge';
 
 function createForgeSessionStore() {
   const initialState: ForgeSessionState = {
@@ -107,6 +107,57 @@ function createForgeSessionStore() {
 
     clearError(): void {
       update(state => ({ ...state, error: null }));
+    },
+
+    async saveDraft(draft: SessionDraft): Promise<string> {
+      try {
+        // TODO: Replace with actual API call
+        const draftId = `draft-${Date.now()}`;
+        
+        // For now, just simulate saving
+        console.log('Saving draft:', draft);
+        
+        return draftId;
+      } catch (error) {
+        throw new Error(error instanceof Error ? error.message : 'Failed to save draft');
+      }
+    },
+
+    async createSession(draft: SessionDraft): Promise<string> {
+      update(state => ({ ...state, loading: true, error: null }));
+      
+      try {
+        // TODO: Replace with actual API call
+        const sessionId = `session-${Date.now()}`;
+        
+        const newSession: ForgeSession = {
+          id: sessionId,
+          name: draft.name,
+          goal: draft.goal,
+          phase: 'configuring',
+          participants: draft.participants,
+          oracle: draft.oracle,
+          rounds: [],
+          hasResults: false,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+
+        update(state => ({
+          ...state,
+          sessions: [...state.sessions, newSession],
+          loading: false
+        }));
+
+        return sessionId;
+      } catch (error) {
+        update(state => ({
+          ...state,
+          loading: false,
+          error: error instanceof Error ? error.message : 'Failed to create session'
+        }));
+        throw error;
+      }
     },
 
     reset(): void {
