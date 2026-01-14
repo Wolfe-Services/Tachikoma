@@ -11,14 +11,14 @@
 Create an export and import interface that allows users to backup, restore, and transfer their settings, sessions, templates, and other application data between instances or for archival purposes.
 
 ## Acceptance Criteria
-1. Export all settings to a file
-2. Export selected data categories
-3. Import settings with validation
-4. Preview import changes before applying
-5. Handle version compatibility
-6. Support multiple export formats (JSON, YAML)
-7. Create automatic backups
-8. Restore from backup
+- [x] Export all settings to a file
+- [x] Export selected data categories
+- [x] Import settings with validation
+- [x] Preview import changes before applying
+- [x] Handle version compatibility
+- [x] Support multiple export formats (JSON, YAML)
+- [x] Create automatic backups
+- [x] Restore from backup
 
 ## Implementation
 

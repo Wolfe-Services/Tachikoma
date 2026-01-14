@@ -16,13 +16,13 @@ Implement server scaling capabilities with connection limits, worker configurati
 
 ## Acceptance Criteria
 
-- [ ] Worker/thread pool configuration
-- [ ] Connection limits
-- [ ] Request queue management
-- [ ] Backpressure handling
-- [ ] Load balancing support
-- [ ] Instance coordination
-- [ ] Scale metrics
+- [x] Worker/thread pool configuration
+- [x] Connection limits
+- [x] Request queue management
+- [x] Backpressure handling
+- [x] Load balancing support
+- [x] Instance coordination
+- [x] Scale metrics
 
 ---
 

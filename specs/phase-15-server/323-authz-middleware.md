@@ -16,13 +16,13 @@ Implement authorization middleware for role-based access control (RBAC) and reso
 
 ## Acceptance Criteria
 
-- [ ] Role-based access control
-- [ ] Permission checking middleware
-- [ ] Resource ownership validation
-- [ ] Policy-based authorization
-- [ ] Action-resource matrices
-- [ ] Dynamic permission evaluation
-- [ ] Authorization audit logging
+- [x] Role-based access control
+- [x] Permission checking middleware
+- [x] Resource ownership validation
+- [x] Policy-based authorization
+- [x] Action-resource matrices
+- [x] Dynamic permission evaluation
+- [x] Authorization audit logging
 
 ---
 

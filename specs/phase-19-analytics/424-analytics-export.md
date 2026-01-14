@@ -4,6 +4,10 @@
 
 Data export capabilities for analytics events including batch exports, streaming exports, and data warehouse integrations.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ```rust

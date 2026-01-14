@@ -16,13 +16,13 @@ Implement graceful shutdown handling that properly closes connections, drains re
 
 ## Acceptance Criteria
 
-- [ ] Signal handling (SIGTERM, SIGINT)
-- [ ] Request draining
-- [ ] WebSocket connection closure
-- [ ] Database connection cleanup
-- [ ] Background task cancellation
-- [ ] Shutdown timeout
-- [ ] Shutdown hooks
+- [x] Signal handling (SIGTERM, SIGINT)
+- [x] Request draining
+- [x] WebSocket connection closure
+- [x] Database connection cleanup
+- [x] Background task cancellation
+- [x] Shutdown timeout
+- [x] Shutdown hooks
 
 ---
 

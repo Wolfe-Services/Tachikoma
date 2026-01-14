@@ -3,6 +3,10 @@
 ## Overview
 Define types for passwordless magic link authentication.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ### Magic Link Types

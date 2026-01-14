@@ -11,14 +11,14 @@
 Create a secure interface for managing API keys for various AI providers, with encryption, usage tracking, quota monitoring, and secure storage capabilities.
 
 ## Acceptance Criteria
-1. Add, edit, and delete API keys for supported providers
-2. Secure key display with masked view toggle
-3. Test key validity with provider APIs
-4. Track key usage and remaining quota
-5. Set key priorities and fallback order
-6. Configure rate limiting per key
-7. Audit log for key access and usage
-8. Secure encryption at rest indicators
+- [x] Add, edit, and delete API keys for supported providers
+- [x] Secure key display with masked view toggle
+- [x] Test key validity with provider APIs
+- [x] Track key usage and remaining quota
+- [x] Set key priorities and fallback order
+- [x] Configure rate limiting per key
+- [x] Audit log for key access and usage
+- [x] Secure encryption at rest indicators
 
 ## Implementation
 

@@ -11,14 +11,14 @@
 Create a dedicated interface for tracking and displaying dissenting opinions from AI participants, ensuring minority viewpoints are recorded, analyzed, and considered in the deliberation process.
 
 ## Acceptance Criteria
-1. Display all recorded dissents with full attribution
-2. Categorize dissents by type and severity
-3. Track dissent persistence across rounds
-4. Show dissent rationale and supporting arguments
-5. Visualize dissent patterns and clustering
-6. Enable dissent acknowledgment and response
-7. Generate dissent summary reports
-8. Link dissents to related decisions and conflicts
+- [x] Display all recorded dissents with full attribution
+- [x] Categorize dissents by type and severity
+- [x] Track dissent persistence across rounds
+- [x] Show dissent rationale and supporting arguments
+- [x] Visualize dissent patterns and clustering
+- [x] Enable dissent acknowledgment and response
+- [x] Generate dissent summary reports
+- [x] Link dissents to related decisions and conflicts
 
 ## Implementation
 

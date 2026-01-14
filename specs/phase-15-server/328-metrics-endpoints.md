@@ -16,13 +16,13 @@ Implement Prometheus-compatible metrics endpoints with request metrics, custom a
 
 ## Acceptance Criteria
 
-- [ ] Prometheus metrics endpoint (/metrics)
-- [ ] Request duration histograms
-- [ ] Request count by status/method/path
-- [ ] Active connections gauge
-- [ ] Custom application metrics
-- [ ] Metric labels support
-- [ ] Metric middleware integration
+- [x] Prometheus metrics endpoint (/metrics)
+- [x] Request duration histograms
+- [x] Request count by status/method/path
+- [x] Active connections gauge
+- [x] Custom application metrics
+- [x] Metric labels support
+- [x] Metric middleware integration
 
 ---
 

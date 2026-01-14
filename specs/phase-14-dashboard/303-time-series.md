@@ -16,14 +16,14 @@ Create time series chart components for visualizing mission metrics over time, i
 
 ## Acceptance Criteria
 
-- [ ] `TimeSeriesChart.svelte` component created
-- [ ] Multiple data series support
-- [ ] Interactive zoom and pan
-- [ ] Time range selection
-- [ ] Tooltip with timestamp details
-- [ ] Responsive brush selection
-- [ ] Multiple time granularities
-- [ ] Real-time data streaming support
+- [x] `TimeSeriesChart.svelte` component created
+- [x] Multiple data series support
+- [x] Interactive zoom and pan
+- [x] Time range selection
+- [x] Tooltip with timestamp details
+- [x] Responsive brush selection
+- [x] Multiple time granularities
+- [x] Real-time data streaming support
 
 ---
 

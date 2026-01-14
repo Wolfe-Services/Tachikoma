@@ -16,13 +16,13 @@ Implement caching layer with in-memory and Redis backends, cache invalidation, a
 
 ## Acceptance Criteria
 
-- [ ] In-memory cache implementation
-- [ ] Redis cache backend
-- [ ] Cache-aside pattern helpers
-- [ ] TTL support
-- [ ] Cache invalidation
-- [ ] Cache statistics
-- [ ] Response caching middleware
+- [x] In-memory cache implementation
+- [x] Redis cache backend
+- [x] Cache-aside pattern helpers
+- [x] TTL support
+- [x] Cache invalidation
+- [x] Cache statistics
+- [x] Response caching middleware
 
 ---
 

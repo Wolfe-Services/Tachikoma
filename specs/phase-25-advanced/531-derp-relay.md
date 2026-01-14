@@ -3,6 +3,10 @@
 ## Overview
 DERP (Designated Encrypted Relay for Packets) server implementation for relaying encrypted WireGuard traffic when direct peer-to-peer connections fail.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Requirements
 
 ### DERP Server Types

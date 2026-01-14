@@ -3,6 +3,10 @@
 ## Overview
 Documentation for migrating between Tachikoma versions and from competing/related tools to Tachikoma.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Requirements
 
 ### Version Migration Guides

@@ -4,6 +4,10 @@
 
 HTTP API endpoints for capturing analytics events from web, mobile, and server-side clients.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ```rust

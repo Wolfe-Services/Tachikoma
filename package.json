@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently -k -n web,electron \"npm run dev:web\" \"npm run dev:electron\"",
     "dev:web": "cd web && npm run dev",
-    "dev:electron": "wait-on http://localhost:5173 && cd electron && npm run dev",
+    "dev:electron": "wait-on http://localhost:1420 && cd electron && npm run dev",
     "dev:rust": "source ~/.cargo/env 2>/dev/null || true && cargo watch -x check -x test",
     "build": "npm run build:rust && npm run build:web && npm run build:electron",
     "build:dev": "npm run build:rust:dev && npm run build:web && npm run build:electron",

@@ -3,6 +3,10 @@
 ## Overview
 Implement UI components and routes for authentication flows including login, registration, and OAuth callbacks.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ### Auth UI Routes

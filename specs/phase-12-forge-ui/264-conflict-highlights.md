@@ -11,14 +11,14 @@
 Create a visual system for highlighting and navigating conflicts between participant responses, including contradictory statements, incompatible recommendations, and areas of disagreement requiring resolution.
 
 ## Acceptance Criteria
-1. Automatically detect and highlight conflicting statements across drafts
-2. Categorize conflicts by type (factual, opinion, approach, priority)
-3. Provide visual indicators showing conflict severity and scope
-4. Enable navigation between related conflicts
-5. Display conflict resolution suggestions from oracle
-6. Track conflict resolution status through rounds
-7. Support manual conflict flagging by users
-8. Generate conflict summary reports
+- [x] Automatically detect and highlight conflicting statements across drafts
+- [x] Categorize conflicts by type (factual, opinion, approach, priority)
+- [x] Provide visual indicators showing conflict severity and scope
+- [x] Enable navigation between related conflicts
+- [x] Display conflict resolution suggestions from oracle
+- [x] Track conflict resolution status through rounds
+- [x] Support manual conflict flagging by users
+- [x] Generate conflict summary reports
 
 ## Implementation
 

@@ -16,14 +16,14 @@ Create a recent missions component that displays a chronologically ordered list 
 
 ## Acceptance Criteria
 
-- [ ] `RecentMissions.svelte` component created
-- [ ] Chronological mission list
-- [ ] Status filtering (all, success, failed, etc.)
-- [ ] Pagination or infinite scroll
-- [ ] Quick actions (view, rerun, archive)
-- [ ] Time-based grouping (today, yesterday, this week)
-- [ ] Search within recent missions
-- [ ] Empty state handling
+- [x] `RecentMissions.svelte` component created
+- [x] Chronological mission list
+- [x] Status filtering (all, success, failed, etc.)
+- [x] Pagination or infinite scroll
+- [x] Quick actions (view, rerun, archive)
+- [x] Time-based grouping (today, yesterday, this week)
+- [x] Search within recent missions
+- [x] Empty state handling
 
 ---
 

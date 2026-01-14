@@ -11,14 +11,14 @@
 Create a visual indicator system that displays real-time convergence metrics during deliberation sessions, showing progress toward consensus and highlighting areas of agreement and remaining disagreement.
 
 ## Acceptance Criteria
-1. Display overall convergence score as animated progress indicator
-2. Show per-topic convergence breakdown
-3. Visualize convergence trend across rounds
-4. Highlight threshold proximity with warnings
-5. Animate transitions as convergence changes
-6. Display participant alignment matrix
-7. Provide convergence velocity metrics
-8. Support multiple convergence algorithms
+- [x] Display overall convergence score as animated progress indicator
+- [x] Show per-topic convergence breakdown
+- [x] Visualize convergence trend across rounds
+- [x] Highlight threshold proximity with warnings
+- [x] Animate transitions as convergence changes
+- [x] Display participant alignment matrix
+- [x] Provide convergence velocity metrics
+- [x] Support multiple convergence algorithms
 
 ## Implementation
 

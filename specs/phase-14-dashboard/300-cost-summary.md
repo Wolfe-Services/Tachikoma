@@ -16,14 +16,14 @@ Create a cost summary component that displays API usage costs, budget tracking, 
 
 ## Acceptance Criteria
 
-- [ ] `CostSummary.svelte` component created
-- [ ] Total cost display with currency formatting
-- [ ] Cost breakdown by model (Claude, etc.)
-- [ ] Cost breakdown by mission
-- [ ] Budget tracking with limits
-- [ ] Period comparison (daily, weekly, monthly)
-- [ ] Cost projection estimates
-- [ ] Alert thresholds configuration
+- [x] `CostSummary.svelte` component created
+- [x] Total cost display with currency formatting
+- [x] Cost breakdown by model (Claude, etc.)
+- [x] Cost breakdown by mission
+- [x] Budget tracking with limits
+- [x] Period comparison (daily, weekly, monthly)
+- [x] Cost projection estimates
+- [x] Alert thresholds configuration
 
 ---
 

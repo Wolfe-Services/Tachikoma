@@ -11,14 +11,14 @@
 Create a telemetry and analytics preferences interface that allows users to control what data is collected, view collected data, manage privacy settings, and configure usage reporting for product improvement.
 
 ## Acceptance Criteria
-1. Configure telemetry collection levels
-2. View what data is being collected
-3. Export collected telemetry data
-4. Delete telemetry data
-5. Configure crash reporting
-6. Set usage analytics preferences
-7. Manage data sharing consent
-8. View privacy policy and data handling
+- [x] Configure telemetry collection levels
+- [x] View what data is being collected
+- [x] Export collected telemetry data
+- [x] Delete telemetry data
+- [x] Configure crash reporting
+- [x] Set usage analytics preferences
+- [x] Manage data sharing consent
+- [x] View privacy policy and data handling
 
 ## Implementation
 

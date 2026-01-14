@@ -11,14 +11,14 @@
 Create a configuration interface for managing deliberation loop settings, including round limits, iteration parameters, and convergence behaviors for forge sessions.
 
 ## Acceptance Criteria
-1. Configure maximum rounds per session
-2. Set iteration limits for each phase
-3. Configure automatic retry behavior
-4. Define loop timeout settings
-5. Set up parallel execution options
-6. Configure checkpoint frequency
-7. Define resource limits per loop
-8. Visualize loop flow configuration
+- [x] Configure maximum rounds per session
+- [x] Set iteration limits for each phase
+- [x] Configure automatic retry behavior
+- [x] Define loop timeout settings
+- [x] Set up parallel execution options
+- [x] Configure checkpoint frequency
+- [x] Define resource limits per loop
+- [x] Visualize loop flow configuration
 
 ## Implementation
 

@@ -16,14 +16,14 @@ Create dashboard refresh functionality that allows manual and automatic data ref
 
 ## Acceptance Criteria
 
-- [ ] `RefreshControl.svelte` component created
-- [ ] Manual refresh button
-- [ ] Auto-refresh toggle with intervals
-- [ ] Last updated timestamp display
-- [ ] Loading state indicator
-- [ ] Refresh error handling
-- [ ] Configurable refresh intervals
-- [ ] Pause refresh on tab inactive
+- [x] `RefreshControl.svelte` component created
+- [x] Manual refresh button
+- [x] Auto-refresh toggle with intervals
+- [x] Last updated timestamp display
+- [x] Loading state indicator
+- [x] Refresh error handling
+- [x] Configurable refresh intervals
+- [x] Pause refresh on tab inactive
 
 ---
 

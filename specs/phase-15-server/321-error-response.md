@@ -16,13 +16,13 @@ Create a comprehensive error handling system with typed errors, proper HTTP stat
 
 ## Acceptance Criteria
 
-- [ ] ApiError enum with variants
-- [ ] Automatic HTTP status mapping
-- [ ] IntoResponse implementation
-- [ ] Error context/chaining
-- [ ] Error logging integration
-- [ ] Stack trace in dev mode
-- [ ] Error codes for client handling
+- [x] ApiError enum with variants
+- [x] Automatic HTTP status mapping
+- [x] IntoResponse implementation
+- [x] Error context/chaining
+- [x] Error logging integration
+- [x] Stack trace in dev mode
+- [x] Error codes for client handling
 
 ---
 

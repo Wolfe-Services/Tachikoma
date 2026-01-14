@@ -16,14 +16,14 @@ Create an active status component that displays real-time information about curr
 
 ## Acceptance Criteria
 
-- [ ] `ActiveStatus.svelte` component created
-- [ ] Real-time mission progress updates
-- [ ] Current operation display
-- [ ] Resource utilization indicators
-- [ ] WebSocket integration for live updates
-- [ ] Pulse animation for active state
-- [ ] Expandable detail panel
-- [ ] Multi-mission support
+- [x] `ActiveStatus.svelte` component created
+- [x] Real-time mission progress updates
+- [x] Current operation display
+- [x] Resource utilization indicators
+- [x] WebSocket integration for live updates
+- [x] Pulse animation for active state
+- [x] Expandable detail panel
+- [x] Multi-mission support
 
 ---
 

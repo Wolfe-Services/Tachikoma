@@ -11,14 +11,14 @@
 Create a settings interface for configuring default think tanks (oracle + participant combinations), managing saved configurations, and setting up quick-access deliberation teams.
 
 ## Acceptance Criteria
-1. Configure default think tank compositions
-2. Save and name custom think tank configurations
-3. Set default oracle for deliberations
-4. Quick-select from saved think tanks
-5. Import/export think tank configurations
-6. Display estimated costs per configuration
-7. Validate think tank compositions
-8. Support think tank templates
+- [x] Configure default think tank compositions
+- [x] Save and name custom think tank configurations
+- [x] Set default oracle for deliberations
+- [x] Quick-select from saved think tanks
+- [x] Import/export think tank configurations
+- [x] Display estimated costs per configuration
+- [x] Validate think tank compositions
+- [x] Support think tank templates
 
 ## Implementation
 

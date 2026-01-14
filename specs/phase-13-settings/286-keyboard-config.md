@@ -11,14 +11,14 @@
 Create a keyboard shortcut configuration interface that allows users to customize, view, and manage keyboard shortcuts throughout the application, including conflict detection and preset management.
 
 ## Acceptance Criteria
-1. Display all available keyboard shortcuts
-2. Allow custom shortcut assignments
-3. Detect and resolve shortcut conflicts
-4. Support shortcut presets (Default, VS Code, Vim, etc.)
-5. Enable/disable individual shortcuts
-6. Search and filter shortcuts
-7. Reset shortcuts to defaults
-8. Export/import shortcut configurations
+- [x] Display all available keyboard shortcuts
+- [x] Allow custom shortcut assignments
+- [x] Detect and resolve shortcut conflicts
+- [x] Support shortcut presets (Default, VS Code, Vim, etc.)
+- [x] Enable/disable individual shortcuts
+- [x] Search and filter shortcuts
+- [x] Reset shortcuts to defaults
+- [x] Export/import shortcut configurations
 
 ## Implementation
 

@@ -16,14 +16,14 @@ Create deployment metrics visualization components that display deployment frequ
 
 ## Acceptance Criteria
 
-- [ ] `DeployMetrics.svelte` component created
-- [ ] Deployment frequency timeline
-- [ ] Success/failure rate visualization
-- [ ] Rollback tracking
-- [ ] Mean time to deploy (MTTD)
-- [ ] Pipeline stage breakdown
-- [ ] Environment comparison
-- [ ] Deployment history table
+- [x] `DeployMetrics.svelte` component created
+- [x] Deployment frequency timeline
+- [x] Success/failure rate visualization
+- [x] Rollback tracking
+- [x] Mean time to deploy (MTTD)
+- [x] Pipeline stage breakdown
+- [x] Environment comparison
+- [x] Deployment history table
 
 ---
 

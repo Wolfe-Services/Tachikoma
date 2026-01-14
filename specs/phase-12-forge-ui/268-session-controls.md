@@ -11,14 +11,14 @@
 Create a comprehensive control panel for managing active forge sessions, including start/stop controls, round management, timeout handling, and session state transitions.
 
 ## Acceptance Criteria
-1. Provide clear start, pause, resume, and stop controls
-2. Display session state with visual indicators
-3. Show round progression controls (next round, skip, restart)
-4. Handle timeout warnings and extensions
-5. Support emergency stop with confirmation
-6. Display session timing and duration
-7. Enable round-level rollback capability
-8. Provide session save/checkpoint controls
+- [x] Provide clear start, pause, resume, and stop controls
+- [x] Display session state with visual indicators
+- [x] Show round progression controls (next round, skip, restart)
+- [x] Handle timeout warnings and extensions
+- [x] Support emergency stop with confirmation
+- [x] Display session timing and duration
+- [x] Enable round-level rollback capability
+- [x] Provide session save/checkpoint controls
 
 ## Implementation
 

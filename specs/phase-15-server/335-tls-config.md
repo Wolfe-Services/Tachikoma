@@ -16,13 +16,13 @@ Implement TLS configuration with certificate management, cipher suite selection,
 
 ## Acceptance Criteria
 
-- [ ] TLS certificate loading
-- [ ] Private key configuration
-- [ ] Cipher suite selection
-- [ ] Protocol version enforcement
-- [ ] Certificate chain support
-- [ ] SNI support
-- [ ] Auto-renewal hooks
+- [x] TLS certificate loading
+- [x] Private key configuration
+- [x] Cipher suite selection
+- [x] Protocol version enforcement
+- [x] Certificate chain support
+- [x] SNI support
+- [x] Auto-renewal hooks
 
 ---
 

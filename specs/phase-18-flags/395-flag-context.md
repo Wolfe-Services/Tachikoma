@@ -4,6 +4,10 @@
 
 Detailed specification for evaluation context handling, property resolution, and context builders for different platforms.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ```rust

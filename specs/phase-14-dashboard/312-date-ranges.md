@@ -16,14 +16,14 @@ Create date range picker components for filtering dashboard data by time periods
 
 ## Acceptance Criteria
 
-- [ ] `DateRangePicker.svelte` component created
-- [ ] Preset date ranges (today, week, month, etc.)
-- [ ] Custom date range selection
-- [ ] Calendar view for date picking
-- [ ] Relative date options (last N days)
-- [ ] Time zone handling
-- [ ] Keyboard navigation
-- [ ] Mobile-friendly interface
+- [x] `DateRangePicker.svelte` component created
+- [x] Preset date ranges (today, week, month, etc.)
+- [x] Custom date range selection
+- [x] Calendar view for date picking
+- [x] Relative date options (last N days)
+- [x] Time zone handling
+- [x] Keyboard navigation
+- [x] Mobile-friendly interface
 
 ---
 

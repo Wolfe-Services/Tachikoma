@@ -3,6 +3,10 @@
 ## Overview
 Implement the Okta OAuth/OIDC provider for enterprise SSO authentication.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ### Okta OAuth Provider

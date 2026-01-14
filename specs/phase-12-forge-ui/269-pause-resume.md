@@ -11,14 +11,14 @@
 Implement robust pause and resume functionality for forge sessions, ensuring graceful handling of in-progress operations, state preservation, and seamless continuation of deliberation.
 
 ## Acceptance Criteria
-1. Pause gracefully completes current atomic operations before stopping
-2. Resume restores exact session state including partial progress
-3. Display clear status during pause transition
-4. Track pause duration and history
-5. Handle auto-pause on timeout warnings
-6. Support pause scheduling for planned interruptions
-7. Preserve all participant context during pause
-8. Notify participants of pause/resume events
+- [x] Pause gracefully completes current atomic operations before stopping
+- [x] Resume restores exact session state including partial progress
+- [x] Display clear status during pause transition
+- [x] Track pause duration and history
+- [x] Handle auto-pause on timeout warnings
+- [x] Support pause scheduling for planned interruptions
+- [x] Preserve all participant context during pause
+- [x] Notify participants of pause/resume events
 
 ## Implementation
 

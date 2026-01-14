@@ -3,6 +3,10 @@
 ## Overview
 Certificate management system for SPIFFE SVIDs including issuance, rotation, revocation, and trust bundle distribution for Tachikoma's autonomous infrastructure.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Requirements
 
 ### Certificate Authority Integration

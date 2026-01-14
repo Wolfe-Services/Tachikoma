@@ -11,14 +11,14 @@
 Create comprehensive test suites for all Forge UI components, ensuring reliability, accessibility, performance, and visual consistency across the deliberation interface.
 
 ## Acceptance Criteria
-1. Unit tests achieve 90%+ code coverage for all components
-2. Integration tests cover all user workflows
-3. E2E tests validate critical paths
-4. Visual regression tests prevent UI breakage
-5. Accessibility tests ensure WCAG 2.1 AA compliance
-6. Performance tests meet defined thresholds
-7. Cross-browser tests validate compatibility
-8. Mobile responsiveness tests verify layouts
+- [x] Unit tests achieve 90%+ code coverage for all components
+- [x] Integration tests cover all user workflows
+- [x] E2E tests validate critical paths
+- [x] Visual regression tests prevent UI breakage
+- [x] Accessibility tests ensure WCAG 2.1 AA compliance
+- [x] Performance tests meet defined thresholds
+- [x] Cross-browser tests validate compatibility
+- [x] Mobile responsiveness tests verify layouts
 
 ## Implementation
 

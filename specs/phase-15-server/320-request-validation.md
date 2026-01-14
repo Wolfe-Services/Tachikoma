@@ -16,13 +16,13 @@ Implement comprehensive request validation using the validator crate with custom
 
 ## Acceptance Criteria
 
-- [ ] Validator integration with Axum
-- [ ] Custom validation rules
-- [ ] Field-level error messages
-- [ ] Nested object validation
-- [ ] Array validation
-- [ ] Custom validators for domain types
-- [ ] i18n support for error messages
+- [x] Validator integration with Axum
+- [x] Custom validation rules
+- [x] Field-level error messages
+- [x] Nested object validation
+- [x] Array validation
+- [x] Custom validators for domain types
+- [x] i18n support for error messages
 
 ---
 

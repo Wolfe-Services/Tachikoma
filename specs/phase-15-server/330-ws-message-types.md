@@ -16,13 +16,13 @@ Define typed WebSocket message structures for client-server communication includ
 
 ## Acceptance Criteria
 
-- [ ] Typed message envelope
-- [ ] Event message types
-- [ ] Command message types
-- [ ] Response/ack messages
-- [ ] Error message format
-- [ ] Subscription management messages
-- [ ] Serialization/deserialization
+- [x] Typed message envelope
+- [x] Event message types
+- [x] Command message types
+- [x] Response/ack messages
+- [x] Error message format
+- [x] Subscription management messages
+- [x] Serialization/deserialization
 
 ---
 

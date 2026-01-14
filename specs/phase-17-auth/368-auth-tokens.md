@@ -3,6 +3,10 @@
 ## Overview
 Implement token generation and validation including access tokens, refresh tokens, and various token types used in authentication flows.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ### Token Types

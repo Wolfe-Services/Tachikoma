@@ -11,14 +11,14 @@
 Create an update preferences interface that allows users to configure how the application checks for, downloads, and installs updates, including channel selection, scheduling, and rollback options.
 
 ## Acceptance Criteria
-1. Configure automatic update behavior
-2. Select update channel (stable, beta, canary)
-3. Schedule update installation times
-4. View update history
-5. Manage rollback options
-6. Configure bandwidth limits for downloads
-7. View release notes before updating
-8. Enable/disable pre-release notifications
+- [x] Configure automatic update behavior
+- [x] Select update channel (stable, beta, canary)
+- [x] Schedule update installation times
+- [x] View update history
+- [x] Manage rollback options
+- [x] Configure bandwidth limits for downloads
+- [x] View release notes before updating
+- [x] Enable/disable pre-release notifications
 
 ## Implementation
 

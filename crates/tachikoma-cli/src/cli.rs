@@ -7,6 +7,7 @@ use clap::{ArgAction, ColorChoice, Parser, Subcommand, ValueHint};
 use crate::commands::{
     BackendsCommand, ConfigCommand, DoctorCommand, 
     InitCommand, ToolsCommand, CompletionsCommand, ManpagesCommand,
+    MigrateCommands,
 };
 use crate::error::CliError;
 
@@ -129,6 +130,9 @@ pub enum Command {
     /// Manage AI backends
     Backends(BackendsCommand),
 
+    /// Database migration management
+    Migrate(MigrateCommands),
+
     /// Manage prompts
     Prompts(PromptsCommand),
 
@@ -210,6 +214,7 @@ impl Cli {
             Command::Doctor(cmd) => cmd.execute(&ctx).await,
             Command::Tools(cmd) => cmd.execute(&ctx).await,
             Command::Backends(cmd) => cmd.execute(&ctx).await,
+            Command::Migrate(cmd) => cmd.execute(&ctx).await,
             Command::Completions(cmd) => {
                 cmd.execute(&ctx)?;
                 Ok(())

@@ -3,6 +3,10 @@
 ## Overview
 Implement the Google OAuth provider with OpenID Connect support for authentication.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ### Google OAuth Provider

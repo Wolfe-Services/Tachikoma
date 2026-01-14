@@ -18,6 +18,7 @@ path = "src/main.rs"
 tachikoma-common-core = { workspace = true }
 tachikoma-common-config = { workspace = true }
 tachikoma-primitives = { workspace = true }
+tachikoma-database = { workspace = true }
 
 clap = { workspace = true, features = ["derive", "env", "string", "wrap_help"] }
 clap_complete = "4.5"

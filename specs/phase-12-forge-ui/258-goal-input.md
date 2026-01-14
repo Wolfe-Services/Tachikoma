@@ -11,14 +11,14 @@
 Create a rich goal input component that allows users to clearly articulate the objective for AI deliberation sessions, with markdown support, templates, and intelligent suggestions.
 
 ## Acceptance Criteria
-1. Rich text input with markdown preview toggle
-2. Session name input with auto-generation option
-3. Goal templates for common use cases
-4. Character count and length validation
-5. AI-powered goal refinement suggestions
-6. Context attachment support (files, URLs, code snippets)
-7. History of previous goals for quick reuse
-8. Real-time validation feedback
+- [x] Rich text input with markdown preview toggle
+- [x] Session name input with auto-generation option
+- [x] Goal templates for common use cases
+- [x] Character count and length validation
+- [x] AI-powered goal refinement suggestions
+- [x] Context attachment support (files, URLs, code snippets)
+- [x] History of previous goals for quick reuse
+- [x] Real-time validation feedback
 
 ## Implementation
 

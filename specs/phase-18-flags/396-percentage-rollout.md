@@ -4,6 +4,10 @@
 
 Implementation of percentage-based feature rollouts with consistent hashing for stable user assignment.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ```rust

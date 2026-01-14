@@ -3,6 +3,10 @@
 ## Overview
 Guide for writing effective Tachikoma specification files, covering syntax, best practices, patterns, and anti-patterns.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Requirements
 
 ### Spec File Anatomy

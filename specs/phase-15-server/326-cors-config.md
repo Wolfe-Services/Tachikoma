@@ -16,13 +16,13 @@ Implement CORS (Cross-Origin Resource Sharing) configuration with flexible origi
 
 ## Acceptance Criteria
 
-- [ ] Configurable allowed origins
-- [ ] Wildcard and regex origin matching
-- [ ] Credentials support
-- [ ] Preflight request handling
-- [ ] Exposed headers configuration
-- [ ] Max age caching
-- [ ] Per-route CORS overrides
+- [x] Configurable allowed origins
+- [x] Wildcard and regex origin matching
+- [x] Credentials support
+- [x] Preflight request handling
+- [x] Exposed headers configuration
+- [x] Max age caching
+- [x] Per-route CORS overrides
 
 ---
 

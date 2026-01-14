@@ -3,6 +3,10 @@
 ## Overview
 Define configuration and types for Okta OAuth/OIDC authentication integration for enterprise SSO.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ### Okta OAuth Types

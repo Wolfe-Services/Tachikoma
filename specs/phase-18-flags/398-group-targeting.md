@@ -4,6 +4,10 @@
 
 Group-level targeting for feature flags, enabling flags for organizations, teams, or custom segments.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ```rust

@@ -11,14 +11,14 @@
 Create a comprehensive decision logging interface that records and displays all decisions made during deliberation sessions, including oracle rulings, consensus points, and human interventions with full audit trail capabilities.
 
 ## Acceptance Criteria
-1. Display chronological log of all decisions made during session
-2. Categorize decisions by type (consensus, oracle ruling, human override)
-3. Show decision rationale and supporting evidence
-4. Track decision dependencies and implications
-5. Enable search and filtering of decision history
-6. Export decision logs for compliance and review
-7. Support decision annotation and tagging
-8. Visualize decision impact on session progression
+- [x] Display chronological log of all decisions made during session
+- [x] Categorize decisions by type (consensus, oracle ruling, human override)
+- [x] Show decision rationale and supporting evidence
+- [x] Track decision dependencies and implications
+- [x] Enable search and filtering of decision history
+- [x] Export decision logs for compliance and review
+- [x] Support decision annotation and tagging
+- [x] Visualize decision impact on session progression
 
 ## Implementation
 

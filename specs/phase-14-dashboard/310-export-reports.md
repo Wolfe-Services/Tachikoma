@@ -16,14 +16,14 @@ Create export and reporting functionality for dashboard data, including PDF repo
 
 ## Acceptance Criteria
 
-- [ ] `ExportModal.svelte` component created
-- [ ] PDF report generation
-- [ ] CSV data export
-- [ ] JSON data export
-- [ ] Date range selection
-- [ ] Custom field selection
-- [ ] Scheduled report configuration
-- [ ] Export history tracking
+- [x] `ExportModal.svelte` component created
+- [x] PDF report generation
+- [x] CSV data export
+- [x] JSON data export
+- [x] Date range selection
+- [x] Custom field selection
+- [x] Scheduled report configuration
+- [x] Export history tracking
 
 ---
 

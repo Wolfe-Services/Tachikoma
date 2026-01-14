@@ -11,14 +11,14 @@
 Create an oracle selection interface that allows users to choose and configure the decision-making AI that will evaluate deliberations, synthesize consensus, and make final determinations during forge sessions.
 
 ## Acceptance Criteria
-1. Display available oracles with capability indicators
-2. Show compatibility with selected participants
-3. Provide recommendations based on session goal and participants
-4. Allow oracle configuration (temperature, reasoning style)
-5. Support custom oracle creation from available brains
-6. Display cost implications of oracle selection
-7. Validate oracle selection against session requirements
-8. Show oracle performance history and ratings
+- [x] Display available oracles with capability indicators
+- [x] Show compatibility with selected participants
+- [x] Provide recommendations based on session goal and participants
+- [x] Allow oracle configuration (temperature, reasoning style)
+- [x] Support custom oracle creation from available brains
+- [x] Display cost implications of oracle selection
+- [x] Validate oracle selection against session requirements
+- [x] Show oracle performance history and ratings
 
 ## Implementation
 

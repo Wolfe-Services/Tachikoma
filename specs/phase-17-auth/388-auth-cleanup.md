@@ -3,6 +3,10 @@
 ## Overview
 Implement cleanup services for expired tokens, sessions, and other authentication artifacts.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ### Auth Cleanup Service

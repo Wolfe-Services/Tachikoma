@@ -11,14 +11,14 @@
 Create a specialized viewer for displaying participant draft responses during deliberation, with side-by-side comparison, diff highlighting, version tracking, and collaborative annotation support.
 
 ## Acceptance Criteria
-1. Display individual drafts with full formatting support
-2. Side-by-side comparison of multiple drafts
-3. Diff highlighting between draft versions
-4. Syntax highlighting for code blocks
-5. Version history navigation per draft
-6. Annotation and commenting on specific sections
-7. Export drafts in multiple formats
-8. Real-time updates as drafts are submitted
+- [x] Display individual drafts with full formatting support
+- [x] Side-by-side comparison of multiple drafts
+- [x] Diff highlighting between draft versions
+- [x] Syntax highlighting for code blocks
+- [x] Version history navigation per draft
+- [x] Annotation and commenting on specific sections
+- [x] Export drafts in multiple formats
+- [x] Real-time updates as drafts are submitted
 
 ## Implementation
 

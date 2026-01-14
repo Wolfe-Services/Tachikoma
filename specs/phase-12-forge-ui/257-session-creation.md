@@ -11,14 +11,14 @@
 Implement a comprehensive session creation workflow that guides users through configuring AI deliberation sessions, including goal definition, participant selection, oracle assignment, and session parameters.
 
 ## Acceptance Criteria
-1. Multi-step wizard guides users through session configuration
-2. Goal input supports rich text with markdown preview
-3. Participant selection allows filtering and searching available brains
-4. Oracle selection shows compatibility and recommendations
-5. Session templates enable quick starts with pre-configured setups
-6. Validation prevents invalid configurations before session start
-7. Draft sessions can be saved and resumed later
-8. Real-time cost estimation based on selected participants
+- [x] Multi-step wizard guides users through session configuration
+- [x] Goal input supports rich text with markdown preview
+- [x] Participant selection allows filtering and searching available brains
+- [x] Oracle selection shows compatibility and recommendations
+- [x] Session templates enable quick starts with pre-configured setups
+- [x] Validation prevents invalid configurations before session start
+- [x] Draft sessions can be saved and resumed later
+- [x] Real-time cost estimation based on selected participants
 
 ## Implementation
 

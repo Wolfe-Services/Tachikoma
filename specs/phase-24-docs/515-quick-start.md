@@ -3,6 +3,10 @@
 ## Overview
 A streamlined 5-minute getting started guide that gets users from zero to running their first Tachikoma agent with minimal friction.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Requirements
 
 ### Prerequisites Section

@@ -16,14 +16,14 @@ Implement rate limiting middleware to protect the API from abuse, with configura
 
 ## Acceptance Criteria
 
-- [ ] Token bucket algorithm implementation
-- [ ] Per-user rate limiting
-- [ ] Per-IP rate limiting
-- [ ] Per-endpoint configuration
-- [ ] Rate limit headers in responses
-- [ ] Redis backend for distributed limiting
-- [ ] Sliding window support
-- [ ] Burst allowance configuration
+- [x] Token bucket algorithm implementation
+- [x] Per-user rate limiting
+- [x] Per-IP rate limiting
+- [x] Per-endpoint configuration
+- [x] Rate limit headers in responses
+- [x] Redis backend for distributed limiting
+- [x] Sliding window support
+- [x] Burst allowance configuration
 
 ---
 

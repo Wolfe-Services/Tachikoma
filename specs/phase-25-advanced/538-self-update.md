@@ -3,6 +3,10 @@
 ## Overview
 Autonomous self-update capability for Tachikoma agents, enabling automatic version upgrades with rollback support, integrity verification, and zero-downtime updates.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Requirements
 
 ### Update Manager Interface

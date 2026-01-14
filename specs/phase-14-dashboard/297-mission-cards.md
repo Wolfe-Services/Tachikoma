@@ -16,14 +16,14 @@ Create reusable mission card components that display mission status, progress, a
 
 ## Acceptance Criteria
 
-- [ ] `MissionCard.svelte` component created
-- [ ] `MissionCardGrid.svelte` for card layouts
-- [ ] Status indicators with color coding
-- [ ] Progress bars for active missions
-- [ ] Token usage display
-- [ ] Expandable card details
-- [ ] Action buttons (pause, resume, cancel)
-- [ ] Animation on state changes
+- [x] `MissionCard.svelte` component created
+- [x] `MissionCardGrid.svelte` for card layouts
+- [x] Status indicators with color coding
+- [x] Progress bars for active missions
+- [x] Token usage display
+- [x] Expandable card details
+- [x] Action buttons (pause, resume, cancel)
+- [x] Animation on state changes
 
 ---
 

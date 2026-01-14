@@ -3,6 +3,10 @@
 ## Overview
 Type definitions for eBPF-based system monitoring, network auditing, and security enforcement in Tachikoma's autonomous infrastructure.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Requirements
 
 ### Event Types

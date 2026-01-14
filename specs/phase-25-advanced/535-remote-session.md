@@ -3,6 +3,10 @@
 ## Overview
 Interactive remote session management for Tachikoma agents, supporting PTY allocation, session multiplexing, and terminal emulation.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Requirements
 
 ### Session Types

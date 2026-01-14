@@ -3,6 +3,10 @@
 ## Overview
 eBPF-based event capture system for comprehensive runtime monitoring, security auditing, and performance analysis of Tachikoma agents and spawned processes.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Requirements
 
 ### Capture Manager Interface

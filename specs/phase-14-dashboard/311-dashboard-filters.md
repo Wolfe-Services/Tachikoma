@@ -16,14 +16,14 @@ Create reusable filter components for dashboard data filtering, including multi-
 
 ## Acceptance Criteria
 
-- [ ] `FilterBar.svelte` component created
-- [ ] `FilterDropdown.svelte` multi-select
-- [ ] `FilterChip.svelte` for active filters
-- [ ] Search within filter options
-- [ ] Filter state persistence
-- [ ] Clear all filters functionality
-- [ ] Filter presets/saved filters
-- [ ] Responsive filter panel
+- [x] `FilterBar.svelte` component created
+- [x] `FilterDropdown.svelte` multi-select
+- [x] `FilterChip.svelte` for active filters
+- [x] Search within filter options
+- [x] Filter state persistence
+- [x] Clear all filters functionality
+- [x] Filter presets/saved filters
+- [x] Responsive filter panel
 
 ---
 

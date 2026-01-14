@@ -16,13 +16,13 @@ Create the Axum router configuration with nested route groups, middleware stacks
 
 ## Acceptance Criteria
 
-- [ ] Main router construction function
-- [ ] API v1 route group
-- [ ] Internal routes (health, metrics)
-- [ ] Middleware application order
-- [ ] Nested routers for resources
-- [ ] Fallback handler for 404
-- [ ] OpenAPI/Swagger integration ready
+- [x] Main router construction function
+- [x] API v1 route group
+- [x] Internal routes (health, metrics)
+- [x] Middleware application order
+- [x] Nested routers for resources
+- [x] Fallback handler for 404
+- [x] OpenAPI/Swagger integration ready
 
 ---
 

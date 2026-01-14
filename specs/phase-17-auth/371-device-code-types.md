@@ -3,6 +3,10 @@
 ## Overview
 Define types for the OAuth 2.0 Device Authorization Grant flow, enabling authentication on input-constrained devices.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ### Device Code Types

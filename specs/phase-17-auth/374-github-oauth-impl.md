@@ -3,6 +3,10 @@
 ## Overview
 Implement the GitHub OAuth provider for authentication and account linking.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ### GitHub OAuth Provider

@@ -16,14 +16,14 @@ Create summary card components that provide at-a-glance overviews of key metrics
 
 ## Acceptance Criteria
 
-- [ ] `SummaryCard.svelte` base component created
-- [ ] `MissionSummary.svelte` for mission stats
-- [ ] `HealthSummary.svelte` for system health
-- [ ] `ActivitySummary.svelte` for recent activity
-- [ ] Configurable display options
-- [ ] Responsive card layouts
-- [ ] Interactive quick actions
-- [ ] Real-time update support
+- [x] `SummaryCard.svelte` base component created
+- [x] `MissionSummary.svelte` for mission stats
+- [x] `HealthSummary.svelte` for system health
+- [x] `ActivitySummary.svelte` for recent activity
+- [x] Configurable display options
+- [x] Responsive card layouts
+- [x] Interactive quick actions
+- [x] Real-time update support
 
 ---
 

@@ -3,6 +3,10 @@
 ## Overview
 Collection of example projects demonstrating Tachikoma usage across different scenarios, languages, and complexity levels.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Requirements
 
 ### Example Categories

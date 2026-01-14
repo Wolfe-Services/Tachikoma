@@ -4,6 +4,10 @@
 
 Automatic and manual pageview tracking with support for SPAs, virtual pages, and engagement metrics.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ```rust

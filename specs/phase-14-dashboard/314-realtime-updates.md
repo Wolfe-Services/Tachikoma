@@ -16,14 +16,14 @@ Create real-time update infrastructure for the dashboard using WebSocket connect
 
 ## Acceptance Criteria
 
-- [ ] WebSocket connection management
-- [ ] Auto-reconnection with backoff
-- [ ] Message type handling
-- [ ] Store subscription updates
-- [ ] Connection status indicator
-- [ ] Notification system integration
-- [ ] Offline queue for messages
-- [ ] Heartbeat/ping-pong
+- [x] WebSocket connection management
+- [x] Auto-reconnection with backoff
+- [x] Message type handling
+- [x] Store subscription updates
+- [x] Connection status indicator
+- [x] Notification system integration
+- [x] Offline queue for messages
+- [x] Heartbeat/ping-pong
 
 ---
 

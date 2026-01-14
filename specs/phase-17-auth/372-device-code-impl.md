@@ -3,6 +3,10 @@
 ## Overview
 Implement the OAuth 2.0 Device Authorization Grant flow service for authenticating input-constrained devices.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ### Device Code Service

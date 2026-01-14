@@ -11,14 +11,14 @@
 Create a result preview system that displays emerging consensus, synthesized outputs, and preliminary conclusions before final session completion, allowing stakeholders to preview and validate results.
 
 ## Acceptance Criteria
-1. Display synthesized result as it develops through rounds
-2. Show confidence levels for different result sections
-3. Highlight areas still under deliberation
-4. Provide diff view between preview versions
-5. Enable inline feedback on preview content
-6. Support preview export for stakeholder review
-7. Track preview evolution across rounds
-8. Display supporting evidence and rationale
+- [x] Display synthesized result as it develops through rounds
+- [x] Show confidence levels for different result sections
+- [x] Highlight areas still under deliberation
+- [x] Provide diff view between preview versions
+- [x] Enable inline feedback on preview content
+- [x] Support preview export for stakeholder review
+- [x] Track preview evolution across rounds
+- [x] Display supporting evidence and rationale
 
 ## Implementation
 

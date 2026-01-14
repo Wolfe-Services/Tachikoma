@@ -11,14 +11,14 @@
 Create a profile management interface that allows users to create, switch between, and manage multiple configuration profiles for different use cases, workspaces, or team environments.
 
 ## Acceptance Criteria
-1. Create and manage multiple profiles
-2. Switch between profiles quickly
-3. Configure profile-specific settings
-4. Share profiles with team members
-5. Import/export individual profiles
-6. Set default profile
-7. Clone existing profiles
-8. View profile change history
+- [x] Create and manage multiple profiles
+- [x] Switch between profiles quickly
+- [x] Configure profile-specific settings
+- [x] Share profiles with team members
+- [x] Import/export individual profiles
+- [x] Set default profile
+- [x] Clone existing profiles
+- [x] View profile change history
 
 ## Implementation
 

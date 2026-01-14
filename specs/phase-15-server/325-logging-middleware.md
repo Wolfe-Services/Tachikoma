@@ -16,13 +16,13 @@ Implement request/response logging middleware with structured logging, request c
 
 ## Acceptance Criteria
 
-- [ ] Structured request logging
-- [ ] Response status logging
-- [ ] Request duration measurement
-- [ ] Request ID correlation
-- [ ] Sensitive data redaction
-- [ ] Configurable log levels per path
-- [ ] JSON log format option
+- [x] Structured request logging
+- [x] Response status logging
+- [x] Request duration measurement
+- [x] Request ID correlation
+- [x] Sensitive data redaction
+- [x] Configurable log levels per path
+- [x] JSON log format option
 
 ---
 

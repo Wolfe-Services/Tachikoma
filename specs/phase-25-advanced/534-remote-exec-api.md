@@ -3,6 +3,10 @@
 ## Overview
 API for secure remote command execution on Tachikoma agents, enabling distributed task orchestration with proper authentication, authorization, and auditing.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Requirements
 
 ### Execution Request Types

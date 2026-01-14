@@ -3,6 +3,10 @@
 ## Overview
 Define the SQLite schema for storing missions (high-level objectives), including tables, indexes, and relationships.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ### Schema Definition

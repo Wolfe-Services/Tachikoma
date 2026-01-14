@@ -11,14 +11,14 @@
 Create a configuration interface for defining and managing content policies, safety guidelines, and behavioral rules that govern AI participant behavior during deliberation sessions.
 
 ## Acceptance Criteria
-1. Configure content safety policies
-2. Define topic restrictions and allowlists
-3. Set output format requirements
-4. Configure citation and sourcing rules
-5. Define ethical guidelines
-6. Set up approval workflows for policy changes
-7. Create policy templates
-8. Monitor policy violations
+- [x] Configure content safety policies
+- [x] Define topic restrictions and allowlists
+- [x] Set output format requirements
+- [x] Configure citation and sourcing rules
+- [x] Define ethical guidelines
+- [x] Set up approval workflows for policy changes
+- [x] Create policy templates
+- [x] Monitor policy violations
 
 ## Implementation
 

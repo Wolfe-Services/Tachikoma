@@ -16,13 +16,13 @@ Implement JWT-based authentication middleware that validates tokens, extracts us
 
 ## Acceptance Criteria
 
-- [ ] JWT validation middleware
-- [ ] Token extraction from headers/cookies
-- [ ] User claims extraction
-- [ ] Token refresh logic
-- [ ] API key authentication support
-- [ ] Request context injection
-- [ ] Token blacklist checking
+- [x] JWT validation middleware
+- [x] Token extraction from headers/cookies
+- [x] User claims extraction
+- [x] Token refresh logic
+- [x] API key authentication support
+- [x] Request context injection
+- [x] Token blacklist checking
 
 ---
 

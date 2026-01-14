@@ -6,6 +6,7 @@ mod config;
 mod doctor;
 mod init;
 mod manpages;
+mod migrate;
 mod tools;
 
 pub use backends::BackendsCommand;
@@ -14,6 +15,7 @@ pub use config::ConfigCommand;
 pub use doctor::DoctorCommand;
 pub use init::InitCommand;
 pub use manpages::ManpagesCommand;
+pub use migrate::MigrateCommands;
 pub use tools::ToolsCommand;
 
 use async_trait::async_trait;

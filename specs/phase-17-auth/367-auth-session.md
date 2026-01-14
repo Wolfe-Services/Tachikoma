@@ -3,6 +3,10 @@
 ## Overview
 Implement session management for authenticated users including creation, validation, renewal, and revocation.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ### Session Types

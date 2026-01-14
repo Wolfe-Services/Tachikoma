@@ -11,14 +11,14 @@
 Create a notification preferences interface that allows users to configure how and when they receive notifications, including desktop notifications, sound alerts, and in-app notifications for various application events.
 
 ## Acceptance Criteria
-1. Configure notification channels (desktop, sound, in-app)
-2. Set notification preferences per event type
-3. Configure Do Not Disturb schedules
-4. Set notification grouping preferences
-5. Configure sound and volume settings
-6. Enable/disable specific notification categories
-7. Preview notifications
-8. Set notification retention period
+- [x] Configure notification channels (desktop, sound, in-app)
+- [x] Set notification preferences per event type
+- [x] Configure Do Not Disturb schedules
+- [x] Set notification grouping preferences
+- [x] Configure sound and volume settings
+- [x] Enable/disable specific notification categories
+- [x] Preview notifications
+- [x] Set notification retention period
 
 ## Implementation
 

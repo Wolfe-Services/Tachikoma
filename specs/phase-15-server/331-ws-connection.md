@@ -16,13 +16,13 @@ Implement WebSocket connection management with authentication integration, messa
 
 ## Acceptance Criteria
 
-- [ ] Connection authentication flow
-- [ ] Message routing to handlers
-- [ ] Connection pool management
-- [ ] Backpressure handling
-- [ ] Connection metrics
-- [ ] Graceful connection closure
-- [ ] Connection rate limiting
+- [x] Connection authentication flow
+- [x] Message routing to handlers
+- [x] Connection pool management
+- [x] Backpressure handling
+- [x] Connection metrics
+- [x] Graceful connection closure
+- [x] Connection rate limiting
 
 ---
 

@@ -16,14 +16,14 @@ Create chart components for visualizing token usage across missions, including b
 
 ## Acceptance Criteria
 
-- [ ] `TokenBarChart.svelte` component created
-- [ ] `TokenPieChart.svelte` for distribution
-- [ ] `TokenAreaChart.svelte` for time series
-- [ ] Input vs output token comparison
-- [ ] Model-specific breakdowns
-- [ ] Interactive tooltips
-- [ ] Responsive chart sizing
-- [ ] Animation on data updates
+- [x] `TokenBarChart.svelte` component created
+- [x] `TokenPieChart.svelte` for distribution
+- [x] `TokenAreaChart.svelte` for time series
+- [x] Input vs output token comparison
+- [x] Model-specific breakdowns
+- [x] Interactive tooltips
+- [x] Responsive chart sizing
+- [x] Animation on data updates
 
 ---
 

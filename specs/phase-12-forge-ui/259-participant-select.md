@@ -11,14 +11,14 @@
 Create a participant selection interface that allows users to choose and configure AI participants (brains) for deliberation sessions, with filtering, search, compatibility checking, and role assignment capabilities.
 
 ## Acceptance Criteria
-1. Grid and list view options for browsing available brains
-2. Search and filter by capabilities, provider, and cost tier
-3. Drag-and-drop ordering for participant priority
-4. Role assignment for specialized functions (advocate, critic, synthesizer)
-5. Compatibility indicators between selected participants
-6. Cost estimation per participant and total
-7. Minimum/maximum participant validation
-8. Preset participant groups for common configurations
+- [x] Grid and list view options for browsing available brains
+- [x] Search and filter by capabilities, provider, and cost tier
+- [x] Drag-and-drop ordering for participant priority
+- [x] Role assignment for specialized functions (advocate, critic, synthesizer)
+- [x] Compatibility indicators between selected participants
+- [x] Cost estimation per participant and total
+- [x] Minimum/maximum participant validation
+- [x] Preset participant groups for common configurations
 
 ## Implementation
 

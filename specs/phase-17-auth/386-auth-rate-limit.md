@@ -3,6 +3,10 @@
 ## Overview
 Implement rate limiting for authentication endpoints to prevent brute force attacks and abuse.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ### Rate Limiter

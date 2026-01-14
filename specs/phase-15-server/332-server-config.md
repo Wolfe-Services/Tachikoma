@@ -16,13 +16,13 @@ Implement server configuration management with environment variables, config fil
 
 ## Acceptance Criteria
 
-- [ ] Configuration struct definition
-- [ ] Environment variable loading
-- [ ] Config file support (TOML)
-- [ ] Configuration validation
-- [ ] Default values
-- [ ] Hot reload support
-- [ ] Config documentation
+- [x] Configuration struct definition
+- [x] Environment variable loading
+- [x] Config file support (TOML)
+- [x] Configuration validation
+- [x] Default values
+- [x] Hot reload support
+- [x] Config documentation
 
 ---
 

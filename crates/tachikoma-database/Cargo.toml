@@ -1,0 +1,22 @@
+[package]
+name = "tachikoma-database"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+sqlx = { version = "0.7", features = ["runtime-tokio", "sqlite", "migrate", "chrono"] }
+tokio.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+serde.workspace = true
+lazy_static = "1.4"
+chrono.workspace = true
+sha2 = "0.10"
+clap = { version = "4.0", features = ["derive"] }
+
+[dev-dependencies]
+tokio-test.workspace = true

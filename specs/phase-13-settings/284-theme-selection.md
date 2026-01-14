@@ -11,14 +11,14 @@
 Create a theme selection interface that allows users to customize the visual appearance of the application, including color schemes, light/dark modes, and custom theme creation.
 
 ## Acceptance Criteria
-1. Select from built-in light and dark themes
-2. Support system preference auto-detection
-3. Create and save custom themes
-4. Preview themes before applying
-5. Configure accent colors
-6. Export and import custom themes
-7. Schedule theme changes by time
-8. Accessibility contrast validation
+- [x] Select from built-in light and dark themes
+- [x] Support system preference auto-detection
+- [x] Create and save custom themes
+- [x] Preview themes before applying
+- [x] Configure accent colors
+- [x] Export and import custom themes
+- [x] Schedule theme changes by time
+- [x] Accessibility contrast validation
 
 ## Implementation
 

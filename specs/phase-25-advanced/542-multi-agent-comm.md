@@ -3,6 +3,10 @@
 ## Overview
 Communication protocol and message passing system for coordination between multiple Tachikoma agents, enabling distributed task execution and state synchronization.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Requirements
 
 ### Message Types

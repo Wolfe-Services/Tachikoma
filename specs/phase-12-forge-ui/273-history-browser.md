@@ -11,14 +11,14 @@
 Create a comprehensive history browser for viewing past forge sessions, including search, filtering, session replay, and analytics across historical deliberation data.
 
 ## Acceptance Criteria
-1. Display paginated list of past sessions with key metrics
-2. Provide advanced search and filtering capabilities
-3. Support session replay with round-by-round navigation
-4. Show session comparison features
-5. Display aggregate analytics and trends
-6. Enable session archival and restoration
-7. Export session data in multiple formats
-8. Track session lineage and relationships
+- [x] Display paginated list of past sessions with key metrics
+- [x] Provide advanced search and filtering capabilities
+- [x] Support session replay with round-by-round navigation
+- [x] Show session comparison features
+- [x] Display aggregate analytics and trends
+- [x] Enable session archival and restoration
+- [x] Export session data in multiple formats
+- [x] Track session lineage and relationships
 
 ## Implementation
 

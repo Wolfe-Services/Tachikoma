@@ -11,14 +11,14 @@
 Create a specialized viewer for displaying and analyzing critiques provided by AI participants during deliberation rounds, with sentiment analysis, categorization, and response tracking.
 
 ## Acceptance Criteria
-1. Display critiques with attribution to source participant
-2. Show critique target (which draft/response is being critiqued)
-3. Categorize critiques by type (technical, logical, stylistic, etc.)
-4. Visualize sentiment and severity of critiques
-5. Track critique responses and rebuttals
-6. Enable filtering by category, severity, and participant
-7. Link critiques to specific sections of drafts
-8. Aggregate critique patterns across rounds
+- [x] Display critiques with attribution to source participant
+- [x] Show critique target (which draft/response is being critiqued)
+- [x] Categorize critiques by type (technical, logical, stylistic, etc.)
+- [x] Visualize sentiment and severity of critiques
+- [x] Track critique responses and rebuttals
+- [x] Enable filtering by category, severity, and participant
+- [x] Link critiques to specific sections of drafts
+- [x] Aggregate critique patterns across rounds
 
 ## Implementation
 

@@ -11,14 +11,14 @@
 Create a settings interface for configuring default brains, managing brain preferences, setting up brain-specific parameters, and organizing brain collections for different use cases.
 
 ## Acceptance Criteria
-1. Browse and search available brains with detailed info
-2. Set default brain for chat and forge sessions
-3. Configure brain-specific parameters (temperature, tokens)
-4. Create brain presets for different tasks
-5. Manage brain favorites and recent history
-6. Display brain capabilities and costs
-7. Test brain responses with sample prompts
-8. Sync brain preferences across devices
+- [x] Browse and search available brains with detailed info
+- [x] Set default brain for chat and forge sessions
+- [x] Configure brain-specific parameters (temperature, tokens)
+- [x] Create brain presets for different tasks
+- [x] Manage brain favorites and recent history
+- [x] Display brain capabilities and costs
+- [x] Test brain responses with sample prompts
+- [x] Sync brain preferences across devices
 
 ## Implementation
 

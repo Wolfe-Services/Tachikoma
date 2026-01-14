@@ -11,14 +11,14 @@
 Create a Git integration settings interface that allows users to configure version control behavior, repository connections, commit settings, and branch management for tracking session results and configurations.
 
 ## Acceptance Criteria
-1. Configure Git repository connections
-2. Set up authentication methods (SSH, token)
-3. Configure commit behavior and templates
-4. Set branch management preferences
-5. Configure auto-commit triggers
-6. Set up remote sync behavior
-7. Configure diff and merge preferences
-8. View Git operation history
+- [x] Configure Git repository connections
+- [x] Set up authentication methods (SSH, token)
+- [x] Configure commit behavior and templates
+- [x] Set branch management preferences
+- [x] Configure auto-commit triggers
+- [x] Set up remote sync behavior
+- [x] Configure diff and merge preferences
+- [x] View Git operation history
 
 ## Implementation
 

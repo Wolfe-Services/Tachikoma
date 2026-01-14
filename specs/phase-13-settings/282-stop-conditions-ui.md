@@ -11,14 +11,14 @@
 Create a configuration interface for defining and managing stop conditions that determine when deliberation sessions should terminate, including convergence thresholds, time limits, and custom conditions.
 
 ## Acceptance Criteria
-1. Configure convergence threshold for auto-stop
-2. Set time-based stop conditions
-3. Define round-based limits
-4. Create custom stop condition rules
-5. Set up cost-based limits
-6. Configure consensus requirements
-7. Preview condition triggers
-8. Enable/disable individual conditions
+- [x] Configure convergence threshold for auto-stop
+- [x] Set time-based stop conditions
+- [x] Define round-based limits
+- [x] Create custom stop condition rules
+- [x] Set up cost-based limits
+- [x] Configure consensus requirements
+- [x] Preview condition triggers
+- [x] Enable/disable individual conditions
 
 ## Implementation
 

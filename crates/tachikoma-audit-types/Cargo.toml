@@ -1,0 +1,18 @@
+[package]
+name = "tachikoma-audit-types"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Audit event types for Tachikoma"
+
+[dependencies]
+tachikoma-common-core.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+thiserror.workspace = true
+uuid = { version = "1.6", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+strum = { version = "0.26", features = ["derive"] }
+
+[dev-dependencies]
+proptest.workspace = true

@@ -3,6 +3,10 @@
 ## Overview
 WireGuard VPN tunnel management for secure, encrypted communication between distributed Tachikoma agents across network boundaries.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Requirements
 
 ### WireGuard Interface Types

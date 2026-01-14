@@ -4,6 +4,10 @@
 
 Storage layer for analytics events supporting multiple backends including ClickHouse, PostgreSQL, and blob storage.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ```rust

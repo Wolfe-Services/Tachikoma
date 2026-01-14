@@ -16,14 +16,14 @@ Create context window visualization components that display token usage within t
 
 ## Acceptance Criteria
 
-- [ ] `ContextWindow.svelte` component created
-- [ ] Visual representation of context capacity
-- [ ] Token breakdown by category (system, user, assistant)
-- [ ] Redline threshold warnings
-- [ ] Real-time usage updates
-- [ ] Historical context usage patterns
-- [ ] Tooltip with detailed breakdown
-- [ ] Animation on usage changes
+- [x] `ContextWindow.svelte` component created
+- [x] Visual representation of context capacity
+- [x] Token breakdown by category (system, user, assistant)
+- [x] Redline threshold warnings
+- [x] Real-time usage updates
+- [x] Historical context usage patterns
+- [x] Tooltip with detailed breakdown
+- [x] Animation on usage changes
 
 ---
 

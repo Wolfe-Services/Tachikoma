@@ -26,5 +26,4 @@ export default defineConfig({
       }
     }
   }
-  // Removed renderer section since we build web separately
 })

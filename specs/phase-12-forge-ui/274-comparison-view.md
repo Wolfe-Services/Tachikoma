@@ -11,14 +11,14 @@
 Create a side-by-side comparison view for analyzing multiple forge sessions, highlighting differences in approaches, outcomes, participant performance, and convergence patterns.
 
 ## Acceptance Criteria
-1. Support comparison of 2-4 sessions simultaneously
-2. Display side-by-side metrics and outcomes
-3. Highlight key differences and similarities
-4. Show participant performance across sessions
-5. Visualize convergence pattern differences
-6. Compare decision logs and rationales
-7. Enable metric-by-metric detailed comparison
-8. Export comparison reports
+- [x] Support comparison of 2-4 sessions simultaneously
+- [x] Display side-by-side metrics and outcomes
+- [x] Highlight key differences and similarities
+- [x] Show participant performance across sessions
+- [x] Visualize convergence pattern differences
+- [x] Compare decision logs and rationales
+- [x] Enable metric-by-metric detailed comparison
+- [x] Export comparison reports
 
 ## Implementation
 

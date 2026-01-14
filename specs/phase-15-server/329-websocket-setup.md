@@ -16,13 +16,13 @@ Set up WebSocket infrastructure for real-time communication including connection
 
 ## Acceptance Criteria
 
-- [ ] WebSocket upgrade handling
-- [ ] Connection lifecycle management
-- [ ] Ping/pong heartbeat
-- [ ] Connection authentication
-- [ ] Session state management
-- [ ] Graceful disconnection
-- [ ] Reconnection support
+- [x] WebSocket upgrade handling
+- [x] Connection lifecycle management
+- [x] Ping/pong heartbeat
+- [x] Connection authentication
+- [x] Session state management
+- [x] Graceful disconnection
+- [x] Reconnection support
 
 ---
 

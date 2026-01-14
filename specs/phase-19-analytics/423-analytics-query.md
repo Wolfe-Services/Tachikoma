@@ -4,6 +4,10 @@
 
 Query interface for analytics data with support for trends, funnels, retention, and custom queries with property filtering.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ```rust

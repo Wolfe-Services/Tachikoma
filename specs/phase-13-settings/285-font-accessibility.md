@@ -11,14 +11,14 @@
 Create accessibility settings for configuring fonts, text sizing, spacing, motion preferences, and other accessibility features to ensure the application is usable by people with various needs.
 
 ## Acceptance Criteria
-1. Configure font family and size preferences
-2. Adjust line height and letter spacing
-3. Set high contrast mode options
-4. Configure reduced motion preferences
-5. Enable focus indicators customization
-6. Set up screen reader announcements
-7. Configure color blindness adaptations
-8. Preview accessibility settings live
+- [x] Configure font family and size preferences
+- [x] Adjust line height and letter spacing
+- [x] Set high contrast mode options
+- [x] Configure reduced motion preferences
+- [x] Enable focus indicators customization
+- [x] Set up screen reader announcements
+- [x] Configure color blindness adaptations
+- [x] Preview accessibility settings live
 
 ## Implementation
 

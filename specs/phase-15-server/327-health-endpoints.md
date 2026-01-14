@@ -16,13 +16,13 @@ Implement health check endpoints for liveness, readiness, and startup probes com
 
 ## Acceptance Criteria
 
-- [ ] Liveness probe endpoint (/health/live)
-- [ ] Readiness probe endpoint (/health/ready)
-- [ ] Startup probe endpoint (/health/startup)
-- [ ] Detailed health endpoint (/health)
-- [ ] Component health checks
-- [ ] Configurable health thresholds
-- [ ] Health check caching
+- [x] Liveness probe endpoint (/health/live)
+- [x] Readiness probe endpoint (/health/ready)
+- [x] Startup probe endpoint (/health/startup)
+- [x] Detailed health endpoint (/health)
+- [x] Component health checks
+- [x] Configurable health thresholds
+- [x] Health check caching
 
 ---
 

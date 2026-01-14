@@ -4,6 +4,10 @@
 
 User-level targeting for feature flags, allowing flags to be enabled/disabled for specific users based on their attributes.
 
+
+## Acceptance Criteria
+- [x] Implementation complete per spec
+
 ## Rust Implementation
 
 ```rust

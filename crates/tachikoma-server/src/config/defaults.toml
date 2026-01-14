@@ -1,0 +1,53 @@
+# Default server configuration
+
+[server]
+host = "0.0.0.0"
+port = 8080
+tls_enabled = false
+request_timeout_secs = 30
+keepalive_secs = 75
+
+[database]
+max_connections = 10
+min_connections = 1
+connect_timeout_secs = 10
+idle_timeout_secs = 600
+log_queries = false
+
+[auth]
+access_token_expiry_secs = 3600
+refresh_token_expiry_secs = 604800
+enable_api_keys = true
+
+[rate_limit]
+enabled = true
+requests_per_window = 100
+window_secs = 60
+burst = 10
+
+[logging]
+level = "info"
+format = "pretty"
+log_requests = true
+exclude_paths = ["/health", "/metrics"]
+
+[cors]
+allowed_origins = []
+allow_any_origin = false
+allow_credentials = false
+max_age_secs = 86400
+
+[websocket]
+enabled = true
+ping_interval_secs = 30
+max_message_size = 65536
+require_auth = true
+
+[cache]
+enabled = false
+default_ttl_secs = 300
+
+[features]
+metrics = true
+health = true
+openapi = false
