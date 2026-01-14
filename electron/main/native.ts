@@ -1,6 +1,7 @@
 // Placeholder for NAPI-RS native calls
 // This will be implemented when the Rust native module is ready
 
+import { randomUUID } from 'crypto';
 import type { MissionStatus, SpecFile, SpecMetadata, TachikomaConfig } from '../shared/ipc';
 
 // Native interface that will be implemented via NAPI-RS
@@ -26,7 +27,7 @@ export interface NativeInterface {
 export const native: NativeInterface = {
   async startMission(specPath: string, backend: string, mode: string): Promise<string> {
     console.log(`[NATIVE PLACEHOLDER] Starting mission: ${specPath} with ${backend} in ${mode} mode`);
-    return crypto.randomUUID();
+    return randomUUID();
   },
 
   async stopMission(missionId: string): Promise<boolean> {
