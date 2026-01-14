@@ -27,7 +27,7 @@ export {};
 
 declare module "$app/types" {
 	export interface AppTypes {
-		RouteId(): "/(auth)" | "/" | "/ai" | "/ai/history" | "/(auth)/login" | "/projects" | "/projects/[id]" | "/projects/[id]/reports" | "/projects/[id]/scans" | "/projects/[id]/targets" | "/settings" | "/settings/api-keys" | "/settings/appearance" | "/settings/general" | "/(auth)/setup" | "/tools" | "/tools/exploitation" | "/tools/reconnaissance" | "/tools/terminal";
+		RouteId(): "/(auth)" | "/" | "/ai" | "/ai/history" | "/(auth)/login" | "/mission" | "/projects" | "/projects/[id]" | "/projects/[id]/reports" | "/projects/[id]/scans" | "/projects/[id]/targets" | "/settings" | "/settings/api-keys" | "/settings/appearance" | "/settings/general" | "/(auth)/setup" | "/specs" | "/tools" | "/tools/exploitation" | "/tools/reconnaissance" | "/tools/terminal";
 		RouteParams(): {
 			"/projects/[id]": { id: string };
 			"/projects/[id]/reports": { id: string };
@@ -40,6 +40,7 @@ declare module "$app/types" {
 			"/ai": Record<string, never>;
 			"/ai/history": Record<string, never>;
 			"/(auth)/login": Record<string, never>;
+			"/mission": Record<string, never>;
 			"/projects": { id?: string };
 			"/projects/[id]": { id: string };
 			"/projects/[id]/reports": { id: string };
@@ -50,12 +51,13 @@ declare module "$app/types" {
 			"/settings/appearance": Record<string, never>;
 			"/settings/general": Record<string, never>;
 			"/(auth)/setup": Record<string, never>;
+			"/specs": Record<string, never>;
 			"/tools": Record<string, never>;
 			"/tools/exploitation": Record<string, never>;
 			"/tools/reconnaissance": Record<string, never>;
 			"/tools/terminal": Record<string, never>
 		};
-		Pathname(): "/" | "/ai" | "/ai/" | "/ai/history" | "/ai/history/" | "/login" | "/login/" | "/projects" | "/projects/" | `/projects/${string}` & {} | `/projects/${string}/` & {} | `/projects/${string}/reports` & {} | `/projects/${string}/reports/` & {} | `/projects/${string}/scans` & {} | `/projects/${string}/scans/` & {} | `/projects/${string}/targets` & {} | `/projects/${string}/targets/` & {} | "/settings" | "/settings/" | "/settings/api-keys" | "/settings/api-keys/" | "/settings/appearance" | "/settings/appearance/" | "/settings/general" | "/settings/general/" | "/setup" | "/setup/" | "/tools" | "/tools/" | "/tools/exploitation" | "/tools/exploitation/" | "/tools/reconnaissance" | "/tools/reconnaissance/" | "/tools/terminal" | "/tools/terminal/";
+		Pathname(): "/" | "/ai" | "/ai/" | "/ai/history" | "/ai/history/" | "/login" | "/login/" | "/mission" | "/mission/" | "/projects" | "/projects/" | `/projects/${string}` & {} | `/projects/${string}/` & {} | `/projects/${string}/reports` & {} | `/projects/${string}/reports/` & {} | `/projects/${string}/scans` & {} | `/projects/${string}/scans/` & {} | `/projects/${string}/targets` & {} | `/projects/${string}/targets/` & {} | "/settings" | "/settings/" | "/settings/api-keys" | "/settings/api-keys/" | "/settings/appearance" | "/settings/appearance/" | "/settings/general" | "/settings/general/" | "/setup" | "/setup/" | "/specs" | "/specs/" | "/tools" | "/tools/" | "/tools/exploitation" | "/tools/exploitation/" | "/tools/reconnaissance" | "/tools/reconnaissance/" | "/tools/terminal" | "/tools/terminal/";
 		ResolvedPathname(): `${"" | `/${string}`}${ReturnType<AppTypes['Pathname']>}`;
 		Asset(): "/favicon.png.placeholder" | string & {};
 	}

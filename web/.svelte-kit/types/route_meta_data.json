@@ -2,5 +2,11 @@
 	"/": [
 		"src/routes/+layout.ts",
 		"src/routes/+layout.ts"
+	],
+	"/mission": [
+		"src/routes/+layout.ts"
+	],
+	"/specs": [
+		"src/routes/+layout.ts"
 	]
 }
