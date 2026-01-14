@@ -701,6 +701,19 @@ Execute specs in numerical order. Each phase must complete before the next.
 | 549 | [Advanced Monitoring](phase-25-advanced/549-advanced-monitoring.md) | advanced, monitoring, observe |
 | 550 | [Advanced Feature Tests](phase-25-advanced/550-advanced-tests.md) | test, advanced, integration |
 
+## Phase 27: Ralph TUI Integration (551-556)
+
+> Lessons learned from Ralph TUI - UX polish, onboarding, and developer experience improvements.
+
+| Spec | File | Keywords |
+|------|------|----------|
+| 551 | [Application Shell](phase-27-ralph-integration/551-application-shell.md) | shell, layout, sidebar, navigation, integration |
+| 552 | [Conversational Spec Creation](phase-27-ralph-integration/552-conversational-spec-creation.md) | chat, interview, prd, create-spec, conversational |
+| 553 | [Quickstart Onboarding](phase-27-ralph-integration/553-quickstart-onboarding.md) | init, quickstart, setup, doctor, onboarding |
+| 554 | [TUI Loop Runner](phase-27-ralph-integration/554-tui-loop-runner.md) | tui, ratatui, terminal, split-pane, keyboard |
+| 555 | [Plugin System](phase-27-ralph-integration/555-plugin-system.md) | plugin, agent, tracker, template, handlebars |
+| 556 | [Simple Config Mode](phase-27-ralph-integration/556-simple-config-mode.md) | config, simple, progressive, defaults |
+
 ---
 
 ## Quick Reference
@@ -714,6 +727,7 @@ Execute specs in numerical order. Each phase must complete before the next.
 - **Server**: 316-340
 - **Database**: 341-365
 - **Auth**: 366-390
+- **Ralph Integration**: 551-556
 
 ### By Technology
 - **Rust**: 011-075, 316-390, 411-470
