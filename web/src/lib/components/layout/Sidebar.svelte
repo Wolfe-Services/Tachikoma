@@ -1,87 +1,98 @@
 <script lang="ts">
   import { page } from '$app/stores';
-  import { missionStore, isRunning } from '$lib/stores/mission';
+  import { onMount } from 'svelte';
+  import Icon from '../common/Icon.svelte';
+  import TachikomaLogo from '../common/TachikomaLogo.svelte';
   
-  export let currentRoute: string;
-  export let collapsed = false;
-
-  interface NavItem {
-    path: string;
-    icon: string;
-    label: string;
-    badge?: string;
-  }
-
-  const navItems: NavItem[] = [
-    { path: '/', icon: 'dashboard', label: 'Dashboard' },
-    { path: '/mission', icon: 'mission', label: 'Mission', badge: $isRunning ? '●' : undefined },
-    { path: '/specs', icon: 'specs', label: 'Specs' },
-    { path: '/forge', icon: 'forge', label: 'Forge' },
-    { path: '/history', icon: 'history', label: 'History' },
-    { path: '/settings', icon: 'settings', label: 'Settings' }
+  // Navigation items - Section 9 terminology
+  const navItems = [
+    { href: '/', label: 'Command', icon: 'home', description: 'Squad Overview' },
+    { href: '/missions', label: 'Deploy', icon: 'play', description: 'Task Units' },
+    { href: '/specs', label: 'Registry', icon: 'file-text', description: 'Mission Specs' },
+    { href: '/forge', label: 'Think Tank', icon: 'brain', description: 'Multi-Unit AI' },
+    { href: '/settings', label: 'Config', icon: 'settings', description: 'System Setup' }
   ];
-
-  function toggleSidebar() {
-    collapsed = !collapsed;
-  }
-
-  function isActiveRoute(itemPath: string): boolean {
-    if (itemPath === '/') {
-      return $page.route.id === '/' || $page.route.id === null;
+  
+  export let collapsed = false;
+  
+  onMount(() => {
+    const stored = localStorage.getItem('sidebar-collapsed');
+    if (stored !== null) {
+      collapsed = stored === 'true';
     }
-    return $page.route.id?.startsWith(itemPath) ?? false;
+  });
+  
+  function toggleCollapse() {
+    collapsed = !collapsed;
+    localStorage.setItem('sidebar-collapsed', String(collapsed));
   }
-
-  function getIcon(iconName: string): string {
-    const icons: Record<string, string> = {
-      dashboard: `<path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>`,
-      mission: `<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>`,
-      specs: `<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/>`,
-      forge: `<path d="M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z"/><path d="M11.24 11.24l-.94 2.06-.94-2.06-2.06-.94 2.06-.94.94-2.06.94 2.06 2.06.94z"/><path d="M16.76 6.76l-1.94-1.94L6.76 12.88a3 3 0 0 0 0 4.24l.94.94c1.16 1.16 3.08 1.16 4.24 0l8.06-8.06z"/>`,
-      history: `<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>`,
-      settings: `<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>`
-    };
-    return icons[iconName] || icons.dashboard;
+  
+  function isActiveRoute(href: string, pathname: string): boolean {
+    if (href === '/') {
+      return pathname === '/';
+    }
+    return pathname.startsWith(href);
   }
 </script>
 
 <aside class="sidebar" class:collapsed>
+  <!-- Logo Section -->
   <div class="sidebar-header">
-    <button class="sidebar-toggle" on:click={toggleSidebar} aria-label="Toggle sidebar">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M3 12h18M3 6h18M3 18h18"/>
-      </svg>
-    </button>
+    <div class="logo-container">
+      <TachikomaLogo size={collapsed ? 32 : 40} animated={true} />
+    </div>
+    {#if !collapsed}
+      <div class="brand">
+        <span class="brand-name">TACHIKOMA</span>
+        <span class="brand-tagline">SECTION 9 // AI DIVISION</span>
+      </div>
+    {/if}
   </div>
-
+  
+  <!-- Status Indicator -->
+  {#if !collapsed}
+    <div class="status-section">
+      <div class="status-badge online">
+        <span class="status-dot"></span>
+        <span class="status-text">9 UNITS READY</span>
+      </div>
+    </div>
+  {/if}
+  
+  <!-- Navigation -->
   <nav class="sidebar-nav">
     {#each navItems as item}
       <a 
-        href={item.path}
+        href={item.href}
         class="nav-item"
-        class:active={isActiveRoute(item.path)}
+        class:active={isActiveRoute(item.href, $page.url.pathname)}
         title={collapsed ? item.label : undefined}
       >
         <div class="nav-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            {@html getIcon(item.icon)}
-          </svg>
+          <Icon name={item.icon} size={20} glow={isActiveRoute(item.href, $page.url.pathname)} />
         </div>
         {#if !collapsed}
-          <span class="nav-label">{item.label}</span>
-          {#if item.badge}
-            <span class="nav-badge">{item.badge}</span>
-          {/if}
+          <div class="nav-content">
+            <span class="nav-label">{item.label}</span>
+            <span class="nav-description">{item.description}</span>
+          </div>
+        {/if}
+        {#if isActiveRoute(item.href, $page.url.pathname)}
+          <div class="active-indicator"></div>
         {/if}
       </a>
     {/each}
   </nav>
-
+  
+  <!-- Footer -->
   <div class="sidebar-footer">
+    <button class="collapse-btn" on:click={toggleCollapse} title={collapsed ? 'Expand' : 'Collapse'}>
+      <Icon name={collapsed ? 'chevron-right' : 'chevron-left'} size={16} />
+    </button>
     {#if !collapsed}
       <div class="version-info">
-        <div class="version-label">Version</div>
-        <div class="version-number">1.0.0-beta</div>
+        <span class="version">v1.0.0</span>
+        <span class="build">公安9課</span>
       </div>
     {/if}
   </div>
@@ -89,151 +100,274 @@
 
 <style>
   .sidebar {
-    width: 240px;
-    background: var(--bg-secondary);
-    border-right: 1px solid var(--border);
+    width: 260px;
+    height: 100vh;
+    background: var(--sidebar-bg, linear-gradient(180deg, #0d1117 0%, #0a0c10 100%));
+    border-right: 1px solid var(--border-color, rgba(78, 205, 196, 0.15));
     display: flex;
     flex-direction: column;
-    transition: width 0.2s ease;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
-    z-index: 10;
+    overflow: hidden;
   }
-
+  
+  /* Subtle gradient overlay */
+  .sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background: linear-gradient(180deg, rgba(78, 205, 196, 0.05) 0%, transparent 100%);
+    pointer-events: none;
+  }
+  
   .sidebar.collapsed {
-    width: 64px;
+    width: 72px;
   }
-
+  
   .sidebar-header {
-    height: 60px;
+    padding: 1.25rem;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    padding: 0 1rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .sidebar-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border: none;
-    background: transparent;
-    color: var(--text-muted);
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .sidebar-toggle:hover {
-    background: var(--bg);
-    color: var(--text);
-  }
-
-  .sidebar-nav {
-    flex: 1;
-    padding: 1rem 0;
-    overflow-y: auto;
-  }
-
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    margin: 0 0.5rem;
-    border-radius: 6px;
-    text-decoration: none;
-    color: var(--text-muted);
-    transition: all 0.2s ease;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border-color, rgba(78, 205, 196, 0.15));
+    min-height: 80px;
     position: relative;
+    z-index: 1;
   }
-
-  .nav-item:hover {
-    background: var(--bg);
-    color: var(--text);
-  }
-
-  .nav-item.active {
-    background: var(--accent);
-    color: white;
-  }
-
-  .collapsed .nav-item {
-    justify-content: center;
-    padding: 0.75rem;
-    margin: 0 0.5rem;
-  }
-
-  .nav-icon {
+  
+  .logo-container {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
   }
-
-  .nav-label {
-    font-size: 0.875rem;
-    font-weight: 500;
-    white-space: nowrap;
+  
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
   }
-
-  .nav-badge {
-    margin-left: auto;
-    background: #ef4444;
-    color: white;
-    font-size: 0.625rem;
-    padding: 0.125rem 0.375rem;
-    border-radius: 10px;
-    font-weight: 600;
-    min-width: 16px;
-    height: 16px;
+  
+  .brand-name {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--tachi-cyan, #4ecdc4);
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px var(--tachi-cyan-glow, rgba(78, 205, 196, 0.4));
+  }
+  
+  .brand-tagline {
+    font-family: var(--font-body, 'Rajdhani', sans-serif);
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--text-muted, rgba(230, 237, 243, 0.4));
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+  
+  .status-section {
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--border-color, rgba(78, 205, 196, 0.1));
+  }
+  
+  .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    background: rgba(63, 185, 80, 0.1);
+    border: 1px solid rgba(63, 185, 80, 0.2);
+    border-radius: 4px;
+  }
+  
+  .status-badge.online .status-dot {
+    background: var(--success-color, #3fb950);
+    box-shadow: 0 0 8px rgba(63, 185, 80, 0.6);
+  }
+  
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  
+  .status-text {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: var(--success-color, #3fb950);
+    letter-spacing: 1px;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  
+  .sidebar-nav {
+    flex: 1;
+    padding: 1rem 0.75rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.875rem 1rem;
+    color: var(--text-secondary, rgba(230, 237, 243, 0.7));
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .nav-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, var(--tachi-cyan, #4ecdc4), transparent);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  .nav-item:hover {
+    background: var(--hover-bg, rgba(78, 205, 196, 0.08));
+    color: var(--text-primary, #e6edf3);
+  }
+  
+  .nav-item:hover::before {
+    opacity: 0.05;
+  }
+  
+  .nav-item.active {
+    background: var(--active-bg, rgba(78, 205, 196, 0.15));
+    color: var(--tachi-cyan, #4ecdc4);
+  }
+  
+  .nav-item.active::before {
+    opacity: 0.1;
+  }
+  
+  .active-indicator {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: var(--tachi-cyan, #4ecdc4);
+    border-radius: 0 2px 2px 0;
+    box-shadow: 0 0 10px var(--tachi-cyan-glow, rgba(78, 205, 196, 0.4));
+  }
+  
+  .nav-icon {
     display: flex;
     align-items: center;
     justify-content: center;
+    min-width: 24px;
+    position: relative;
+    z-index: 1;
   }
-
+  
+  .nav-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .nav-label {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  
+  .nav-description {
+    font-size: 0.7rem;
+    color: var(--text-muted, rgba(230, 237, 243, 0.4));
+    white-space: nowrap;
+  }
+  
   .sidebar-footer {
     padding: 1rem;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--border-color, rgba(78, 205, 196, 0.15));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
   }
-
+  
+  .collapse-btn {
+    padding: 0.625rem;
+    background: var(--button-bg, rgba(78, 205, 196, 0.1));
+    border: 1px solid var(--border-color, rgba(78, 205, 196, 0.2));
+    color: var(--text-secondary, rgba(230, 237, 243, 0.7));
+    cursor: pointer;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+  
+  .collapse-btn:hover {
+    background: var(--hover-bg, rgba(78, 205, 196, 0.15));
+    color: var(--tachi-cyan, #4ecdc4);
+    border-color: var(--tachi-cyan, #4ecdc4);
+    box-shadow: 0 0 10px var(--tachi-cyan-glow, rgba(78, 205, 196, 0.3));
+  }
+  
   .version-info {
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0;
   }
-
-  .version-label {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-bottom: 0.25rem;
+  
+  .version {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.65rem;
+    color: var(--text-muted, rgba(230, 237, 243, 0.4));
   }
-
-  .version-number {
-    font-size: 0.75rem;
-    color: var(--accent);
-    font-weight: 600;
+  
+  .build {
+    font-size: 0.6rem;
+    color: var(--tachi-cyan, #4ecdc4);
+    opacity: 0.6;
+    letter-spacing: 1px;
   }
-
-  @media (max-width: 768px) {
-    .sidebar {
-      position: fixed;
-      top: 60px;
-      left: 0;
-      bottom: 0;
-      transform: translateX(-100%);
-      transition: transform 0.3s ease;
-      z-index: 50;
-    }
-
-    .sidebar:not(.collapsed) {
-      transform: translateX(0);
-      width: 280px;
-    }
-
-    .sidebar.collapsed {
-      transform: translateX(-100%);
-      width: 240px;
-    }
+  
+  /* Collapsed state adjustments */
+  .collapsed .sidebar-header {
+    justify-content: center;
+    padding: 1rem;
+  }
+  
+  .collapsed .sidebar-nav {
+    padding: 1rem 0.5rem;
+  }
+  
+  .collapsed .nav-item {
+    justify-content: center;
+    padding: 0.875rem;
+  }
+  
+  .collapsed .sidebar-footer {
+    justify-content: center;
   }
 </style>

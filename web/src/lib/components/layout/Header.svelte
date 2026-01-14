@@ -1,288 +1,367 @@
 <script lang="ts">
-  import { missionStore, isRunning } from '$lib/stores/mission';
-  import ConnectionStatus from '$lib/components/common/ConnectionStatus.svelte';
+  import { onMount } from 'svelte';
+  import { ipc } from '$lib/ipc';
+  import Icon from '../common/Icon.svelte';
   
-  let showUserMenu = false;
-  let showSettingsMenu = false;
-
-  $: status = $isRunning ? 'Running' : 'Ready';
-  $: statusClass = $isRunning ? 'status--running' : 'status--ready';
-
+  let appStatus: 'online' | 'offline' | 'syncing' = 'online';
+  let userMenuOpen = false;
+  let notifications = 0;
+  
+  onMount(async () => {
+    try {
+      await ipc.invoke('config:get', {});
+      appStatus = 'online';
+    } catch (e) {
+      console.log('Failed to get status:', e);
+      appStatus = 'offline';
+    }
+  });
+  
   function toggleUserMenu() {
-    showUserMenu = !showUserMenu;
-    showSettingsMenu = false;
+    userMenuOpen = !userMenuOpen;
   }
-
-  function toggleSettingsMenu() {
-    showSettingsMenu = !showSettingsMenu;
-    showUserMenu = false;
+  
+  function closeUserMenu() {
+    userMenuOpen = false;
   }
-
-  function closeMenus() {
-    showUserMenu = false;
-    showSettingsMenu = false;
+  
+  function handleSettings() {
+    closeUserMenu();
+    window.location.href = '/settings';
   }
+  
+  function handleHelp() {
+    closeUserMenu();
+  }
+  
+  function handleClickOutside(event: MouseEvent) {
+    const target = event.target as Element;
+    if (userMenuOpen && !target.closest('.user-menu')) {
+      closeUserMenu();
+    }
+  }
+  
+  const statusLabels = {
+    online: 'CONNECTED',
+    offline: 'OFFLINE',
+    syncing: 'SYNCING...'
+  };
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<header class="app-header" on:click={closeMenus}>
-  <div class="header-left">
-    <h1 class="app-title">Tachikoma</h1>
-    <div class="status-indicator">
-      <span class="status-dot {statusClass}"></span>
-      <span class="status-text">Status: {status}</span>
+<svelte:window on:click={handleClickOutside} />
+
+<header class="app-header">
+  <!-- Left: Logo + Title -->
+  <div class="header-brand">
+    <span class="brand-text">TACHIKOMA</span>
+    <span class="brand-divider">//</span>
+    <span class="brand-sub">公安9課</span>
+  </div>
+  
+  <!-- Center: Minimal Status -->
+  <div class="header-center">
+    <div class="status-pill" class:online={appStatus === 'online'} class:offline={appStatus === 'offline'}>
+      <span class="status-dot"></span>
+      <span class="status-text">{appStatus === 'online' ? 'ONLINE' : 'OFFLINE'}</span>
     </div>
   </div>
-
-  <div class="header-right">
-    <ConnectionStatus />
+  
+  <!-- Right: Actions -->
+  <div class="header-actions">
+    {#if notifications > 0}
+      <button class="action-btn notification-btn" title="Notifications">
+        <Icon name="bell" size={18} />
+        <span class="notification-badge">{notifications}</span>
+      </button>
+    {/if}
     
-    <div class="header-menu">
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <button 
-        class="menu-button" 
-        on:click|stopPropagation={toggleSettingsMenu}
-        aria-label="Settings"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
-        </svg>
+    <button class="action-btn" title="Terminal">
+      <Icon name="terminal" size={18} />
+    </button>
+    
+    <div class="user-menu">
+      <button class="action-btn user-btn" on:click={toggleUserMenu} title="User menu">
+        <Icon name="user" size={18} />
+        <Icon name="chevron-down" size={12} />
       </button>
-
-      {#if showSettingsMenu}
-        <div class="dropdown-menu settings-menu">
-          <a href="/settings" class="menu-item">Preferences</a>
-          <a href="/settings/backends" class="menu-item">Backends</a>
-          <a href="/settings/security" class="menu-item">Security</a>
-          <div class="menu-divider"></div>
-          <button class="menu-item menu-item--action">Export Data</button>
-          <button class="menu-item menu-item--action">Import Settings</button>
-        </div>
-      {/if}
-    </div>
-
-    <div class="header-menu">
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <button 
-        class="menu-button user-button" 
-        on:click|stopPropagation={toggleUserMenu}
-        aria-label="User menu"
-      >
-        <div class="user-avatar">T</div>
-      </button>
-
-      {#if showUserMenu}
-        <div class="dropdown-menu user-menu">
-          <div class="user-info">
-            <div class="user-name">Tachikoma User</div>
-            <div class="user-role">Operator</div>
+      
+      {#if userMenuOpen}
+        <div class="user-menu__dropdown">
+          <div class="dropdown-header">
+            <span class="dropdown-title">OPERATOR</span>
+            <span class="dropdown-subtitle">Section 9</span>
           </div>
-          <div class="menu-divider"></div>
-          <a href="/profile" class="menu-item">Profile</a>
-          <a href="/activity" class="menu-item">Activity Log</a>
-          <div class="menu-divider"></div>
-          <button class="menu-item menu-item--danger">Sign Out</button>
+          <div class="dropdown-divider"></div>
+          <button class="menu-item" on:click={handleSettings}>
+            <Icon name="settings" size={16} />
+            <span>Settings</span>
+          </button>
+          <button class="menu-item" on:click={handleHelp}>
+            <Icon name="help-circle" size={16} />
+            <span>Documentation</span>
+          </button>
+          <div class="dropdown-divider"></div>
+          <div class="menu-info">
+            <div class="info-row">
+              <span class="info-label">VERSION</span>
+              <span class="info-value">1.0.0</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">BUILD</span>
+              <span class="info-value">2024.1</span>
+            </div>
+          </div>
         </div>
       {/if}
     </div>
   </div>
+  
 </header>
 
 <style>
   .app-header {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: center;
-    height: 60px;
+    height: 48px;
     padding: 0 1.5rem;
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border);
+    background: var(--bg-secondary, #161b22);
+    border-bottom: 1px solid var(--border-color, rgba(78, 205, 196, 0.15));
+    position: relative;
+    z-index: 100;
   }
-
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-  }
-
-  .app-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--text);
-    margin: 0;
-  }
-
-  .status-indicator {
+  
+  .header-brand {
     display: flex;
     align-items: center;
     gap: 0.5rem;
   }
-
+  
+  .brand-text {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--tachi-cyan, #4ecdc4);
+    letter-spacing: 2px;
+  }
+  
+  .brand-divider {
+    color: var(--text-muted, rgba(230, 237, 243, 0.3));
+    font-size: 0.75rem;
+  }
+  
+  .brand-sub {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: var(--text-muted, rgba(230, 237, 243, 0.4));
+    letter-spacing: 1.5px;
+  }
+  
+  .header-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    background: rgba(63, 185, 80, 0.1);
+    border: 1px solid rgba(63, 185, 80, 0.3);
+    border-radius: 12px;
+  }
+  
+  .status-pill.offline {
+    background: rgba(255, 107, 107, 0.1);
+    border-color: rgba(255, 107, 107, 0.3);
+  }
+  
   .status-dot {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background: var(--text-muted);
+    background: var(--success-color, #3fb950);
+    box-shadow: 0 0 6px var(--success-color, #3fb950);
+    animation: pulse 2s ease-in-out infinite;
   }
-
-  .status-dot.status--ready {
-    background: #22c55e;
+  
+  .status-pill.offline .status-dot {
+    background: var(--error-color, #ff6b6b);
+    box-shadow: 0 0 6px var(--error-color, #ff6b6b);
   }
-
-  .status-dot.status--running {
-    background: var(--accent);
-    animation: pulse 2s infinite;
-  }
-
+  
   @keyframes pulse {
-    0% { opacity: 1; }
+    0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
-    100% { opacity: 1; }
   }
-
+  
   .status-text {
-    font-size: 0.875rem;
-    color: var(--text-muted);
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: var(--success-color, #3fb950);
+    letter-spacing: 1px;
   }
-
-  .header-right {
+  
+  .status-pill.offline .status-text {
+    color: var(--error-color, #ff6b6b);
+  }
+  
+  .header-actions {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.5rem;
   }
-
-  .header-menu {
-    position: relative;
-  }
-
-  .menu-button {
+  
+  .action-btn {
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border: none;
+    gap: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid transparent;
     background: transparent;
-    color: var(--text-muted);
+    color: var(--text-secondary, rgba(230, 237, 243, 0.7));
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
   }
-
-  .menu-button:hover {
-    background: var(--bg);
-    color: var(--text);
+  
+  .action-btn:hover {
+    background: var(--hover-bg, rgba(78, 205, 196, 0.08));
+    color: var(--tachi-cyan, #4ecdc4);
+    border-color: var(--border-color, rgba(78, 205, 196, 0.2));
   }
-
-  .user-button {
-    width: auto;
-    padding: 0.25rem;
+  
+  .notification-btn {
+    position: relative;
   }
-
-  .user-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--accent);
+  
+  .notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--tachi-red, #ff6b6b);
     color: white;
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: 0.125rem 0.375rem;
+    border-radius: 8px;
+    min-width: 16px;
+    text-align: center;
+  }
+  
+  .user-menu {
+    position: relative;
+  }
+  
+  .user-btn {
+    gap: 0.25rem;
+  }
+  
+  .user-menu__dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 220px;
+    background: var(--bg-secondary, #161b22);
+    border: 1px solid var(--border-color, rgba(78, 205, 196, 0.2));
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px var(--tachi-cyan-glow, rgba(78, 205, 196, 0.1));
+    overflow: hidden;
+    z-index: 1000;
+  }
+  
+  .dropdown-header {
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(78, 205, 196, 0.1), transparent);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .dropdown-title {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--tachi-cyan, #4ecdc4);
+    letter-spacing: 1px;
+  }
+  
+  .dropdown-subtitle {
+    font-size: 0.7rem;
+    color: var(--text-muted, rgba(230, 237, 243, 0.4));
+  }
+  
+  .dropdown-divider {
+    height: 1px;
+    background: var(--border-color, rgba(78, 205, 196, 0.15));
+  }
+  
+  .menu-item {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 0.875rem;
-  }
-
-  .dropdown-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    margin-top: 0.5rem;
-    min-width: 200px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    z-index: 50;
-    padding: 0.5rem 0;
-  }
-
-  .user-info {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 0.5rem;
-  }
-
-  .user-name {
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 0.25rem;
-  }
-
-  .user-role {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-  }
-
-  .menu-item {
-    display: block;
+    gap: 0.75rem;
     width: 100%;
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
     border: none;
     background: transparent;
-    color: var(--text);
-    text-decoration: none;
-    text-align: left;
-    font-size: 0.875rem;
+    color: var(--text-primary, #e6edf3);
+    font-family: var(--font-body, 'Rajdhani', sans-serif);
+    font-size: 0.9rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
+    text-align: left;
   }
-
+  
   .menu-item:hover {
-    background: var(--bg);
+    background: var(--hover-bg, rgba(78, 205, 196, 0.08));
+    color: var(--tachi-cyan, #4ecdc4);
   }
-
-  .menu-item--action {
-    color: var(--text-muted);
+  
+  .menu-info {
+    padding: 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
-
-  .menu-item--danger {
-    color: #ef4444;
+  
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
-
-  .menu-item--danger:hover {
-    background: rgba(239, 68, 68, 0.1);
+  
+  .info-label {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.6rem;
+    color: var(--text-muted, rgba(230, 237, 243, 0.4));
+    letter-spacing: 1px;
   }
-
-  .menu-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 0.5rem 0;
+  
+  .info-value {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.7rem;
+    color: var(--text-secondary, rgba(230, 237, 243, 0.7));
   }
-
+  
+  /* Mobile responsive */
   @media (max-width: 768px) {
     .app-header {
-      padding: 0 1rem;
+      height: 48px;
+      padding: 0 0.75rem;
     }
-
-    .header-left {
-      gap: 1rem;
-    }
-
-    .app-title {
-      font-size: 1.25rem;
-    }
-
-    .status-indicator {
+    
+    .header-decor {
       display: none;
     }
-
-    .dropdown-menu {
-      right: -1rem;
-      left: 1rem;
-      min-width: auto;
+    
+    .status-label {
+      display: none;
     }
   }
 </style>

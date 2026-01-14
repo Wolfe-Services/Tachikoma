@@ -1,61 +1,234 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { page } from '$app/stores';
   import Sidebar from './Sidebar.svelte';
   import Header from './Header.svelte';
-  import { missionStore } from '$lib/stores/mission';
-
-  export let collapseSidebar = false;
-
-  // Initialize mission store on app load
+  import { onMount } from 'svelte';
+  
+  let sidebarCollapsed = false;
+  let mounted = false;
+  
   onMount(() => {
-    // Any initialization logic can go here
+    const stored = localStorage.getItem('sidebar-collapsed');
+    if (stored !== null) {
+      sidebarCollapsed = stored === 'true';
+    }
+    // Trigger mount animation
+    setTimeout(() => mounted = true, 50);
   });
-
-  $: currentRoute = $page.route.id || '';
 </script>
 
-<div class="app-shell" class:sidebar-collapsed={collapseSidebar}>
-  <Header />
-  
-  <div class="app-body">
-    <Sidebar {currentRoute} bind:collapsed={collapseSidebar} />
-    
+<div class="app-shell" class:mounted>
+  <Sidebar bind:collapsed={sidebarCollapsed} />
+  <div class="content-area">
+    <Header />
     <main class="main-content">
-      <slot />
+      <!-- Subtle grid overlay -->
+      <div class="grid-overlay"></div>
+      
+      <!-- Large transparent Tachikoma watermark -->
+      <div class="tachi-watermark">
+        <img src="/tachi.png" alt="" aria-hidden="true" />
+      </div>
+      
+      <!-- Corner decorations -->
+      <div class="corner-decor top-left"></div>
+      <div class="corner-decor top-right"></div>
+      <div class="corner-decor bottom-left"></div>
+      <div class="corner-decor bottom-right"></div>
+      
+      <div class="content-inner">
+        <slot />
+      </div>
     </main>
   </div>
 </div>
 
 <style>
   .app-shell {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    min-height: 100vh;
+    background: var(--bg, #0a0c10);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .app-shell.mounted {
+    opacity: 1;
+  }
+  
+  .content-area {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background: var(--bg);
-    color: var(--text);
+    overflow: hidden;
   }
-
-  .app-body {
-    flex: 1;
-    display: flex;
-    min-height: 0;
-  }
-
+  
   .main-content {
     flex: 1;
-    padding: 1.5rem;
     overflow-y: auto;
-    background: var(--bg);
+    padding: 1.5rem;
+    background: var(--bg-primary, #0d1117);
+    position: relative;
   }
-
-  .sidebar-collapsed .main-content {
-    margin-left: 0;
+  
+  /* Subtle grid overlay */
+  .grid-overlay {
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(78, 205, 196, 0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(78, 205, 196, 0.015) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
   }
-
-  @media (max-width: 768px) {
-    .main-content {
-      padding: 1rem;
+  
+  /* Corner decorations */
+  .corner-decor {
+    position: fixed;
+    width: 80px;
+    height: 80px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.15;
+  }
+  
+  .corner-decor::before,
+  .corner-decor::after {
+    content: '';
+    position: absolute;
+    background: var(--tachi-cyan, #4ecdc4);
+  }
+  
+  .corner-decor::before {
+    width: 20px;
+    height: 2px;
+  }
+  
+  .corner-decor::after {
+    width: 2px;
+    height: 20px;
+  }
+  
+  .top-left {
+    top: 60px;
+    left: 280px;
+  }
+  
+  .top-left::before {
+    top: 0;
+    left: 0;
+  }
+  
+  .top-left::after {
+    top: 0;
+    left: 0;
+  }
+  
+  .top-right {
+    top: 60px;
+    right: 16px;
+  }
+  
+  .top-right::before {
+    top: 0;
+    right: 0;
+  }
+  
+  .top-right::after {
+    top: 0;
+    right: 0;
+  }
+  
+  .bottom-left {
+    bottom: 16px;
+    left: 280px;
+  }
+  
+  .bottom-left::before {
+    bottom: 0;
+    left: 0;
+  }
+  
+  .bottom-left::after {
+    bottom: 0;
+    left: 0;
+  }
+  
+  .bottom-right {
+    bottom: 16px;
+    right: 16px;
+  }
+  
+  .bottom-right::before {
+    bottom: 0;
+    right: 0;
+  }
+  
+  .bottom-right::after {
+    bottom: 0;
+    right: 0;
+  }
+  
+  /* Large transparent Tachikoma background */
+  .tachi-watermark {
+    position: fixed;
+    bottom: -10%;
+    right: -5%;
+    width: 50vw;
+    height: 50vw;
+    max-width: 600px;
+    max-height: 600px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.03;
+    filter: grayscale(30%) drop-shadow(0 0 50px rgba(78, 205, 196, 0.2));
+    animation: watermarkFloat 20s ease-in-out infinite;
+  }
+  
+  @keyframes watermarkFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(2deg); }
+  }
+  
+  .tachi-watermark img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  .content-inner {
+    position: relative;
+    z-index: 1;
+    animation: contentFadeIn 0.4s ease-out;
+  }
+  
+  @keyframes contentFadeIn {
+    from { 
+      opacity: 0; 
+      transform: translateY(10px); 
     }
+    to { 
+      opacity: 1; 
+      transform: translateY(0); 
+    }
+  }
+  
+  /* Scrollbar within main content */
+  .main-content::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .main-content::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .main-content::-webkit-scrollbar-thumb {
+    background: rgba(78, 205, 196, 0.3);
+    border-radius: 3px;
+  }
+  
+  .main-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(78, 205, 196, 0.5);
   }
 </style>

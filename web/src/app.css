@@ -1,10 +1,89 @@
+/* ============================================
+   TACHIKOMA UI - Ghost in the Shell Theme
+   Cyberpunk aesthetic with Tachikoma signature colors
+   公安9課 // PUBLIC SECURITY SECTION 9
+   ============================================ */
+
+/* Fonts loaded via app.html:
+   - Orbitron: Display font for headers and UI labels
+   - Rajdhani: Body text for readability
+   - JetBrains Mono: Code and monospace elements
+*/
+
 :root {
-  --bg: #0a0a0a;
-  --bg-secondary: #141414;
-  --text: #fafafa;
-  --text-muted: #666;
-  --accent: #00b4d8;
-  --border: #333;
+  /* Tachikoma signature colors */
+  --tachi-cyan: #4ecdc4;
+  --tachi-cyan-bright: #6ee7df;
+  --tachi-cyan-dark: #2d7a7a;
+  --tachi-cyan-glow: rgba(78, 205, 196, 0.4);
+  
+  /* Eye colors */
+  --tachi-red: #ff6b6b;
+  --tachi-yellow: #ffd93d;
+  
+  /* Cyberpunk dark backgrounds */
+  --bg: #0a0c10;
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #1c2128;
+  --bg-elevated: #21262d;
+  --bg-panel: rgba(22, 27, 34, 0.95);
+  
+  /* Text with cyberpunk feel */
+  --text: #e6edf3;
+  --text-primary: #e6edf3;
+  --text-secondary: rgba(230, 237, 243, 0.7);
+  --text-muted: rgba(230, 237, 243, 0.4);
+  --text-placeholder: rgba(230, 237, 243, 0.35);
+  
+  /* Accent colors */
+  --accent: var(--tachi-cyan);
+  --primary-color: var(--tachi-cyan);
+  --primary-hover: var(--tachi-cyan-bright);
+  --primary-color-alpha: rgba(78, 205, 196, 0.15);
+  --secondary-bg: #1c2128;
+  --success-color: #3fb950;
+  --warning-color: var(--tachi-yellow);
+  --error-color: var(--tachi-red);
+  --info-color: #58a6ff;
+  
+  /* Borders with glow potential */
+  --border: #30363d;
+  --border-color: rgba(78, 205, 196, 0.15);
+  --border-focus: var(--tachi-cyan);
+  --border-glow: 0 0 10px var(--tachi-cyan-glow);
+  
+  /* Interactive elements */
+  --sidebar-bg: linear-gradient(180deg, #0d1117 0%, #0a0c10 100%);
+  --hover-bg: rgba(78, 205, 196, 0.08);
+  --active-bg: rgba(78, 205, 196, 0.15);
+  --active-color: var(--tachi-cyan);
+  --button-bg: rgba(78, 205, 196, 0.1);
+  
+  /* Form elements */
+  --input-bg: #0d1117;
+  --input-bg-focus: #161b22;
+  --input-border: #30363d;
+  --input-text: #e6edf3;
+  
+  /* Code blocks */
+  --code-bg: #161b22;
+  
+  /* Semantic backgrounds */
+  --error-bg: rgba(255, 107, 107, 0.1);
+  --info-bg: rgba(88, 166, 255, 0.08);
+  --warning-bg: rgba(255, 217, 61, 0.1);
+  --success-bg: rgba(63, 185, 80, 0.1);
+  
+  /* Tachikoma-specific gradients */
+  --gradient-tachi: linear-gradient(135deg, #4ecdc4 0%, #44a3aa 50%, #2d7a7a 100%);
+  --gradient-cyber: linear-gradient(135deg, #0d1117 0%, #1c2128 50%, #0a0c10 100%);
+  --gradient-glow: linear-gradient(135deg, rgba(78, 205, 196, 0.2), rgba(78, 205, 196, 0.05));
+  --gradient-header: linear-gradient(90deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+  
+  /* Typography */
+  --font-display: 'Orbitron', sans-serif;
+  --font-body: 'Rajdhani', system-ui, sans-serif;
 }
 
 * {
@@ -13,8 +92,460 @@
   padding: 0;
 }
 
+html, body {
+  height: 100%;
+}
+
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-body);
+  font-weight: 500;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  /* Subtle grid pattern overlay */
+  background-image: 
+    linear-gradient(rgba(78, 205, 196, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(78, 205, 196, 0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Headings with display font */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Global input styling for dark theme */
+input, textarea, select {
+  background: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border: 1px solid var(--input-border) !important;
+  caret-color: var(--primary-color);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-placeholder) !important;
+}
+
+input:focus, textarea:focus, select:focus {
+  background: var(--input-bg-focus) !important;
+  border-color: var(--border-focus) !important;
+  outline: none;
+  box-shadow: var(--border-glow), 0 0 0 3px var(--primary-color-alpha);
+}
+
+/* Buttons with cyberpunk style */
+button {
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Links with glow effect */
+a {
+  color: var(--tachi-cyan);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  color: var(--tachi-cyan-bright);
+  text-shadow: 0 0 8px var(--tachi-cyan-glow);
+}
+
+/* Scrollbar styling - Tachikoma themed */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--tachi-cyan-dark), #1c3d3d);
+  border-radius: 4px;
+  border: 1px solid rgba(78, 205, 196, 0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--tachi-cyan), var(--tachi-cyan-dark));
+  box-shadow: 0 0 8px var(--tachi-cyan-glow);
+}
+
+/* Selection styling */
+::selection {
+  background: var(--primary-color-alpha);
+  color: var(--text-primary);
+}
+
+/* Utility classes */
+.glow-text {
+  text-shadow: 0 0 10px var(--tachi-cyan-glow);
+}
+
+.glow-border {
+  box-shadow: var(--border-glow);
+}
+
+.cyber-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+/* Animated scan line effect (optional) */
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+.scanline-effect::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(transparent, rgba(78, 205, 196, 0.1), transparent);
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ============================================
+   GLOBAL ANIMATIONS
+   ============================================ */
+
+/* Fade in animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes fadeInDown {
+  from { 
+    opacity: 0; 
+    transform: translateY(-20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes fadeInLeft {
+  from { 
+    opacity: 0; 
+    transform: translateX(-20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0); 
+  }
+}
+
+@keyframes fadeInRight {
+  from { 
+    opacity: 0; 
+    transform: translateX(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0); 
+  }
+}
+
+/* Scale animations */
+@keyframes scaleIn {
+  from { 
+    opacity: 0; 
+    transform: scale(0.9); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes glow {
+  0%, 100% { 
+    box-shadow: 0 0 5px rgba(78, 205, 196, 0.3); 
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(78, 205, 196, 0.6); 
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Cyberpunk-specific animations */
+@keyframes glitch {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+}
+
+@keyframes dataStream {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100px; }
+}
+
+@keyframes borderGlow {
+  0%, 100% { 
+    border-color: rgba(78, 205, 196, 0.2); 
+    box-shadow: 0 0 0 rgba(78, 205, 196, 0); 
+  }
+  50% { 
+    border-color: rgba(78, 205, 196, 0.5); 
+    box-shadow: 0 0 15px rgba(78, 205, 196, 0.3); 
+  }
+}
+
+/* Animation utility classes */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.4s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(78, 205, 196, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+/* Stagger delay utilities */
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+.delay-5 { animation-delay: 0.5s; }
+
+/* ============================================
+   CYBERPUNK UI ELEMENTS
+   ============================================ */
+
+/* Neon border effect */
+.neon-border {
+  border: 1px solid var(--tachi-cyan);
+  box-shadow: 
+    0 0 5px var(--tachi-cyan-glow),
+    inset 0 0 5px var(--tachi-cyan-glow);
+}
+
+/* Data panel with scan effect */
+.data-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.data-panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(
+    to bottom,
+    rgba(78, 205, 196, 0.1),
+    transparent
+  );
+  animation: scanline 4s linear infinite;
+  pointer-events: none;
+}
+
+/* Hexagon pattern background */
+.hex-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill='none' stroke='%234ecdc4' stroke-width='0.5' opacity='0.1'/%3E%3C/svg%3E");
+  background-size: 30px 30px;
+}
+
+/* Circuit board pattern */
+.circuit-pattern {
+  background-image: 
+    linear-gradient(90deg, rgba(78, 205, 196, 0.03) 1px, transparent 1px),
+    linear-gradient(rgba(78, 205, 196, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Terminal cursor blink */
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  background: var(--tachi-cyan);
+  animation: cursorBlink 1s step-end infinite;
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Status indicators */
+.status-online {
+  color: var(--success-color);
+}
+
+.status-online::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--success-color);
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  box-shadow: 0 0 8px var(--success-color);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.status-offline {
+  color: var(--error-color);
+}
+
+.status-offline::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--error-color);
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+/* Glassmorphism cards */
+.glass-card {
+  background: rgba(22, 27, 34, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(78, 205, 196, 0.1);
+  border-radius: 12px;
+}
+
+/* Focus ring for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--tachi-cyan);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   SECTION 9 BRANDING ELEMENTS
+   ============================================ */
+
+.section-9-badge {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(135deg, rgba(78, 205, 196, 0.15), transparent);
+  border: 1px solid rgba(78, 205, 196, 0.3);
+  border-radius: 4px;
+  color: var(--tachi-cyan);
+}
+
+.tachi-unit-badge {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  background: rgba(78, 205, 196, 0.2);
+  border: 1px solid var(--tachi-cyan);
+  border-radius: 3px;
+  color: var(--bg-primary);
+}
+
+/* Japanese text styling */
+.jp-text {
+  font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif;
+}
+
+/* ============================================
+   RESPONSIVE UTILITIES
+   ============================================ */
+
+@media (max-width: 768px) {
+  :root {
+    --font-size-base: 14px;
+  }
+  
+  body {
+    font-size: var(--font-size-base);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
