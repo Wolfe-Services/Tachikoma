@@ -1,15 +1,8 @@
 <script lang="ts">
   import '../app.css';
+  import AppShell from '$lib/components/layout/AppShell.svelte';
 </script>
 
-<div class="app">
+<AppShell>
   <slot />
-</div>
-
-<style>
-  .app {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-</style>
+</AppShell>
