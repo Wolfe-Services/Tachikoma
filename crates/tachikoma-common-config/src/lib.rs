@@ -2,10 +2,22 @@
 //!
 //! This crate provides the configuration types used by Tachikoma
 //! for `.tachikoma/config.yaml` files.
+//!
+//! ## Simple vs Full Configuration
+//!
+//! Tachikoma supports two configuration modes:
+//!
+//! - **Simple mode**: ~5 essential options for beginners
+//! - **Full mode**: All configuration options for power users
+//!
+//! Simple configs auto-expand to full configs at runtime.
+//! Use `tachikoma config upgrade` to convert simple → full.
 
 pub mod types;
 pub mod loader;
 pub mod env;
+pub mod detection;
+pub mod simple;
 
 #[cfg(test)]
 mod integration_test;
@@ -13,6 +25,8 @@ mod integration_test;
 pub use types::*;
 pub use loader::*;
 pub use env::*;
+pub use detection::*;
+pub use simple::*;
 
 #[cfg(test)]
 mod tests {

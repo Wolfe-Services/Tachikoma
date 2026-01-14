@@ -1,0 +1,17 @@
+# Specs Tracker Plugin
+name: specs
+version: "1.0.0"
+type: tracker
+description: Spec-file based task tracking with acceptance criteria
+author: Tachikoma Team
+builtin: true
+
+config:
+  specs_dir:
+    type: string
+    default: "specs"
+    description: Directory containing spec files
+  readme_file:
+    type: string
+    default: "README.md"
+    description: The PIN file that indexes all specs

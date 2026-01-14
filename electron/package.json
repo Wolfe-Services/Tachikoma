@@ -1,6 +1,12 @@
 {
   "name": "tachikoma-electron",
   "version": "0.1.0",
+  "description": "AI-powered autonomous development environment",
+  "author": {
+    "name": "Tachikoma Team",
+    "email": "team@tachikoma.io",
+    "url": "https://github.com/tachikoma"
+  },
   "private": true,
   "main": "dist/main/index.js",
   "scripts": {
@@ -29,16 +35,24 @@
     "test:e2e:report": "playwright show-report",
     "test:visual": "playwright test --grep=\"@visual\"",
     "test:performance": "playwright test --grep=\"@performance\"",
-    "test:fixtures": "node scripts/test-fixtures.js"
+    "test:fixtures": "node scripts/test-fixtures.js",
+    "dev:all": "concurrently \"npm run dev --prefix ../web\" \"npm run dev\"",
+    "sign:windows": "pwsh -File scripts/sign-all-windows.ps1 -Directory dist",
+    "sign:windows:single": "pwsh -File scripts/sign-windows.ps1 -FilePath",
+    "verify:windows": "pwsh -File scripts/verify-windows-signature.ps1 -FilePath",
+    "sign:azure": "pwsh -File scripts/sign-azure-kv.ps1"
   },
   "dependencies": {
     "@electron-toolkit/utils": "^4.0.0",
     "electron-updater": "^6.1.0",
+    "uuid": "^13.0.0",
     "zod": "^4.3.5"
   },
   "devDependencies": {
     "@electron-toolkit/tsconfig": "^1.0.0",
+    "@electron/notarize": "^3.1.1",
     "@types/node": "^20.10.0",
+    "@types/uuid": "^10.0.0",
     "@vitest/coverage-v8": "^4.0.17",
     "electron": "^28.0.0",
     "electron-builder": "^24.9.0",
@@ -47,6 +61,7 @@
     "memfs": "^4.51.1",
     "playwright": "^1.57.0",
     "typescript": "^5.3.0",
-    "vitest": "^4.0.17"
+    "vitest": "^4.0.17",
+    "concurrently": "^9.0.0"
   }
 }

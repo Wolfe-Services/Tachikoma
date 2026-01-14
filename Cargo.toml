@@ -64,6 +64,10 @@ test-case = "3.3"
 mockall = "0.12"
 tokio-test = "0.4"
 
+# External dependencies
+notify = "6.1"
+tempfile = "3.8"
+
 # NAPI for Electron binding
 napi = "2.14"
 napi-derive = "2.14"
@@ -75,15 +79,66 @@ tachikoma-primitives = { path = "crates/tachikoma-primitives" }
 tachikoma-common-core = { path = "crates/tachikoma-common-core" }
 tachikoma-common-config = { path = "crates/tachikoma-common-config" }
 tachikoma-test-utils = { path = "crates/tachikoma-test-utils" }
+tachikoma-test-harness = { path = "crates/tachikoma-test-harness" }
 
+# Audit crates
+tachikoma-audit-types = { path = "crates/tachikoma-audit-types" }
+tachikoma-audit-capture = { path = "crates/tachikoma-audit-capture" }
+tachikoma-audit-system-events = { path = "crates/tachikoma-audit-system-events" }
+tachikoma-audit-user-activity = { path = "crates/tachikoma-audit-user-activity" }
+tachikoma-audit-timeline = { path = "crates/tachikoma-audit-timeline" }
+tachikoma-audit-search = { path = "crates/tachikoma-audit-search" }
+tachikoma-audit-compliance = { path = "crates/tachikoma-audit-compliance" }
+tachikoma-audit-export = { path = "crates/tachikoma-audit-export" }
+tachikoma-audit-archival = { path = "crates/tachikoma-audit-archival" }
+tachikoma-audit-immutability = { path = "crates/tachikoma-audit-immutability" }
+tachikoma-audit-alerting = { path = "crates/tachikoma-audit-alerting" }
+tachikoma-plugin = { path = "crates/tachikoma-plugin" }
+
+# Build profiles
 [profile.dev]
 opt-level = 0
 debug = true
+debug-assertions = true
+overflow-checks = true
+lto = false
+panic = "unwind"
+incremental = true
+codegen-units = 256
+
+[profile.dev.package."*"]
+opt-level = 2  # Optimize dependencies even in dev
 
 [profile.release]
 opt-level = 3
+debug = false
+debug-assertions = false
+overflow-checks = false
 lto = "thin"
+panic = "abort"
+incremental = false
+codegen-units = 16
 strip = true
+
+# Distribution profile (maximum optimization)
+[profile.dist]
+inherits = "release"
+lto = "fat"
+codegen-units = 1
+strip = true
+panic = "abort"
+
+# Profile for benchmarks
+[profile.bench]
+inherits = "release"
+debug = true  # For profiling
+lto = "thin"
+
+# Profile for CI tests (balance speed and optimization)
+[profile.ci]
+inherits = "dev"
+opt-level = 1
+debug = 1
 
 [profile.release-debug]
 inherits = "release"

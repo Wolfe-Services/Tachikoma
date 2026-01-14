@@ -1,0 +1,42 @@
+[package]
+name = "tachikoma-plugin"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Plugin system for Tachikoma agents, trackers, and templates"
+
+[dependencies]
+# Async runtime
+tokio = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+
+# Error handling
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# Async utilities
+futures-util = { workspace = true }
+async-trait = "0.1"
+
+# Template engine
+handlebars = "6"
+
+# Path utilities
+walkdir = "2"
+
+# Version parsing
+semver = { workspace = true }
+
+# Binary detection
+which = "6"
+
+[dev-dependencies]
+tokio-test = { workspace = true }
+tempfile = { workspace = true }

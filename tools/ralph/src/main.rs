@@ -15,15 +15,24 @@ mod claude_client;
 mod git;
 mod primitives;
 mod spec_parser;
+mod tui;
 
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
+use std::io::{self, stdout};
 use tokio::sync::mpsc;
 use tracing_subscriber::EnvFilter;
+use crossterm::{
+    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+    execute,
+};
+use ratatui::prelude::*;
 
 use claude_client::{ClaudeClient, StopReason};
 use spec_parser::{find_next_spec, get_progress_summary, parse_readme, ParsedSpec};
+use tui::{App, EventHandler};
+use tui::app::{Task, TaskStatus, OutputLevel};
 
 /// Result of running a single spec
 #[derive(Debug, Clone, PartialEq)]
@@ -117,6 +126,29 @@ enum Commands {
 
     /// Validate specs structure
     Validate,
+
+    /// Run with TUI (split-pane terminal interface)
+    Tui {
+        /// Maximum iterations per spec (default: 50)
+        #[arg(short, long, default_value = "50")]
+        max_iterations: usize,
+
+        /// Token limit before forcing fresh context (default: 150000)
+        #[arg(long, default_value = "150000")]
+        redline: u32,
+
+        /// Maximum specs to process (default: unlimited)
+        #[arg(long)]
+        max_specs: Option<usize>,
+
+        /// Stop on consecutive failures (default: 3)
+        #[arg(long, default_value = "3")]
+        fail_streak: usize,
+
+        /// Skip auto-commit
+        #[arg(long)]
+        no_commit: bool,
+    },
 }
 
 #[tokio::main]
@@ -178,6 +210,15 @@ async fn main() -> Result<()> {
         }
         Commands::Validate => {
             validate_specs(&specs_dir)?;
+        }
+        Commands::Tui {
+            max_iterations,
+            redline,
+            max_specs,
+            fail_streak,
+            no_commit,
+        } => {
+            run_tui(&project_root, max_iterations, redline, max_specs, fail_streak, !no_commit).await?;
         }
     }
 
@@ -693,6 +734,321 @@ Begin by reading the spec file.
         incomplete.join("\n"),
         spec.entry.path.display()
     )
+}
+
+/// Run with TUI interface
+async fn run_tui(
+    project_root: &PathBuf,
+    max_iterations: usize,
+    redline_threshold: u32,
+    max_specs: Option<usize>,
+    fail_streak_limit: usize,
+    auto_commit: bool,
+) -> Result<()> {
+    let specs_dir = project_root.join("specs");
+
+    // Initialize terminal
+    enable_raw_mode()?;
+    let mut stdout = stdout();
+    execute!(stdout, EnterAlternateScreen)?;
+    let backend = CrosstermBackend::new(stdout);
+    let mut terminal = Terminal::new(backend)?;
+
+    // Create app state
+    let mut app = App::new(redline_threshold);
+    app.is_running = true;
+
+    // Load all specs as tasks
+    let entries = parse_readme(&specs_dir)?;
+    let tasks: Vec<Task> = entries.iter().map(|entry| {
+        let parsed = spec_parser::parse_spec(entry).ok();
+        let (criteria_done, criteria_total, is_complete) = if let Some(ref p) = parsed {
+            let done = p.acceptance_criteria.iter().filter(|c| c.completed).count();
+            let total = p.acceptance_criteria.len();
+            (done, total, p.all_complete)
+        } else {
+            (0, 0, false)
+        };
+        
+        Task {
+            id: entry.id,
+            name: entry.name.clone(),
+            status: if is_complete { TaskStatus::Completed } else { TaskStatus::Pending },
+            criteria_done,
+            criteria_total,
+        }
+    }).collect();
+    
+    app.set_tasks(tasks);
+
+    // Create event handler
+    let event_handler = EventHandler::new(50);
+
+    // Create channels for output
+    let (output_tx, mut output_rx) = mpsc::channel::<String>(1000);
+
+    // Clone for the spawned task
+    let project_root_clone = project_root.clone();
+    let specs_dir_clone = specs_dir.clone();
+
+    // Spawn the loop runner in a separate task
+    let loop_handle = tokio::spawn(async move {
+        run_loop_internal(
+            &project_root_clone,
+            &specs_dir_clone,
+            max_iterations,
+            redline_threshold,
+            max_specs,
+            fail_streak_limit,
+            auto_commit,
+            output_tx,
+        ).await
+    });
+
+    // Main TUI loop
+    loop {
+        // Draw UI
+        terminal.draw(|frame| {
+            tui::ui::Ui::render(frame, &app);
+        })?;
+
+        // Handle output from the loop
+        while let Ok(text) = output_rx.try_recv() {
+            // Parse the output to determine type
+            let level = if text.starts_with("---") {
+                OutputLevel::Info
+            } else if text.starts_with("[") && text.contains("Executing tool:") {
+                OutputLevel::Tool
+            } else if text.starts_with("[REDLINE") {
+                OutputLevel::Error
+            } else if text.contains("✓") || text.contains("complete") {
+                OutputLevel::Success
+            } else {
+                OutputLevel::Text
+            };
+            
+            for line in text.lines() {
+                if !line.is_empty() {
+                    app.add_output(level, line.to_string());
+                }
+            }
+        }
+
+        // Handle keyboard events
+        if let Some(key) = event_handler.poll()? {
+            event_handler.handle_key(&mut app, key);
+        }
+
+        // Check if we should quit
+        if app.should_quit {
+            break;
+        }
+
+        // Check if loop is done
+        if loop_handle.is_finished() {
+            app.is_running = false;
+            // Don't quit immediately, let user see results
+        }
+    }
+
+    // Cleanup terminal
+    disable_raw_mode()?;
+    execute!(terminal.backend_mut(), LeaveAlternateScreen)?;
+    terminal.show_cursor()?;
+
+    // Wait for loop to finish if still running
+    if !loop_handle.is_finished() {
+        loop_handle.abort();
+    }
+
+    Ok(())
+}
+
+/// Internal loop runner that sends output to channel
+async fn run_loop_internal(
+    project_root: &PathBuf,
+    specs_dir: &PathBuf,
+    max_iterations: usize,
+    redline_threshold: u32,
+    max_specs: Option<usize>,
+    fail_streak_limit: usize,
+    auto_commit: bool,
+    output_tx: mpsc::Sender<String>,
+) -> Result<()> {
+    let mut specs_completed = 0;
+    let mut consecutive_failures = 0;
+    let mut reboot_count = 0;
+    let mut no_changes_count = 0;
+    const MAX_REBOOTS_PER_SPEC: usize = 3;
+
+    let _ = output_tx.send("Starting Ralph Loop...\n".to_string()).await;
+
+    loop {
+        if let Some(max) = max_specs {
+            if specs_completed >= max {
+                let _ = output_tx.send(format!("Reached max specs limit ({})\n", max)).await;
+                break;
+            }
+        }
+
+        let spec = match find_next_spec(specs_dir)? {
+            Some(s) => s,
+            None => {
+                let _ = output_tx.send("✓ All specs are complete!\n".to_string()).await;
+                break;
+            }
+        };
+
+        let _ = output_tx.send(format!("\n→ Starting Spec {:03}: {}\n", spec.entry.id, spec.entry.name)).await;
+        reboot_count = 0;
+        no_changes_count = 0;
+
+        loop {
+            match run_single_internal(project_root, Some(spec.entry.id), max_iterations, redline_threshold, auto_commit, output_tx.clone()).await {
+                Ok(SpecResult::Completed) => {
+                    specs_completed += 1;
+                    consecutive_failures = 0;
+                    let _ = output_tx.send(format!("\n✓ Spec {:03} completed!\n", spec.entry.id)).await;
+                    break;
+                }
+                Ok(SpecResult::NeedsReboot { had_changes }) => {
+                    reboot_count += 1;
+                    if !had_changes {
+                        no_changes_count += 1;
+                    } else {
+                        no_changes_count = 0;
+                    }
+
+                    if let Ok(Some(refreshed)) = find_next_spec(specs_dir) {
+                        if refreshed.entry.id != spec.entry.id {
+                            specs_completed += 1;
+                            consecutive_failures = 0;
+                            let _ = output_tx.send(format!("\n✓ Spec {:03} was completed!\n", spec.entry.id)).await;
+                            break;
+                        }
+                    } else {
+                        specs_completed += 1;
+                        let _ = output_tx.send(format!("\n✓ Spec {:03} was completed (last spec)!\n", spec.entry.id)).await;
+                        break;
+                    }
+
+                    if no_changes_count >= 2 {
+                        let _ = output_tx.send(format!("\nAuto-marking checkboxes...\n")).await;
+                        if let Err(e) = auto_mark_spec_complete(&spec.entry.path) {
+                            let _ = output_tx.send(format!("Failed to auto-mark: {}\n", e)).await;
+                        } else {
+                            let _ = git::auto_commit_spec(project_root, spec.entry.id, &spec.entry.name);
+                            specs_completed += 1;
+                            consecutive_failures = 0;
+                            break;
+                        }
+                    }
+
+                    if reboot_count >= MAX_REBOOTS_PER_SPEC {
+                        let _ = output_tx.send(format!("\n⚠ Hit redline {} times, moving on\n", reboot_count)).await;
+                        if no_changes_count >= reboot_count {
+                            consecutive_failures += 1;
+                        } else {
+                            consecutive_failures = 0;
+                        }
+                        break;
+                    }
+                    let _ = output_tx.send(format!("\n🔄 Rebooting ({}/{})...\n", reboot_count, MAX_REBOOTS_PER_SPEC)).await;
+                    tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+                }
+                Ok(SpecResult::MaxIterations) => {
+                    consecutive_failures += 1;
+                    let _ = output_tx.send(format!("\n⚠ Max iterations reached\n")).await;
+                    break;
+                }
+                Err(e) => {
+                    consecutive_failures += 1;
+                    let _ = output_tx.send(format!("\n✗ Error: {}\n", e)).await;
+                    break;
+                }
+            }
+        }
+
+        if consecutive_failures >= fail_streak_limit {
+            let _ = output_tx.send(format!("\nStopping: {} consecutive failures\n", consecutive_failures)).await;
+            break;
+        }
+
+        tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+    }
+
+    let _ = output_tx.send(format!("\nLoop complete. {} specs done.\n", specs_completed)).await;
+    Ok(())
+}
+
+/// Run a single spec with output to channel
+async fn run_single_internal(
+    project_root: &PathBuf,
+    spec_id: Option<u32>,
+    max_iterations: usize,
+    redline_threshold: u32,
+    auto_commit: bool,
+    output_tx: mpsc::Sender<String>,
+) -> Result<SpecResult> {
+    let specs_dir = project_root.join("specs");
+
+    let spec = if let Some(id) = spec_id {
+        let entries = parse_readme(&specs_dir)?;
+        entries
+            .into_iter()
+            .find(|e| e.id == id)
+            .map(|entry| spec_parser::parse_spec(&entry))
+            .transpose()?
+            .ok_or_else(|| anyhow::anyhow!("Spec {} not found", id))?
+    } else {
+        find_next_spec(&specs_dir)?.ok_or_else(|| anyhow::anyhow!("All specs are complete!"))?
+    };
+
+    let api_key = std::env::var("ANTHROPIC_API_KEY")
+        .context("ANTHROPIC_API_KEY environment variable not set")?;
+
+    let system_prompt = build_system_prompt(project_root);
+    let task_prompt = build_task_prompt(&spec);
+
+    let client = ClaudeClient::new(api_key, project_root);
+
+    let result = client
+        .run_agentic_loop(&system_prompt, &task_prompt, max_iterations, redline_threshold, Some(output_tx.clone()))
+        .await?;
+
+    let spec_result = match result.stop_reason {
+        StopReason::Completed => {
+            if auto_commit {
+                if let Some(hash) = git::auto_commit_spec(project_root, spec.entry.id, &spec.entry.name)? {
+                    let _ = output_tx.send(format!("Committed: {}\n", hash)).await;
+                }
+            }
+            SpecResult::Completed
+        }
+        StopReason::Redline => {
+            let had_changes = if auto_commit {
+                if let Some(hash) = git::auto_commit_spec(project_root, spec.entry.id, &spec.entry.name)? {
+                    let _ = output_tx.send(format!("Committed partial: {}\n", hash)).await;
+                    true
+                } else {
+                    false
+                }
+            } else {
+                false
+            };
+            SpecResult::NeedsReboot { had_changes }
+        }
+        StopReason::MaxIterations => {
+            if auto_commit {
+                if let Some(hash) = git::auto_commit_spec(project_root, spec.entry.id, &spec.entry.name)? {
+                    let _ = output_tx.send(format!("Committed partial: {}\n", hash)).await;
+                }
+            }
+            SpecResult::MaxIterations
+        }
+    };
+
+    Ok(spec_result)
 }
 
 /// Auto-mark all checkboxes in a spec file as complete

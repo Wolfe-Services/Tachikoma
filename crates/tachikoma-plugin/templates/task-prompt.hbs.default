@@ -1,0 +1,33 @@
+## Mission: Implement Spec {{spec.id}} - {{spec.name}}
+
+### Spec File
+{{spec.path}}
+
+### Remaining Criteria
+{{#each spec.incomplete_criteria}}
+- [ ] {{this}}
+{{/each}}
+
+### Instructions
+
+1. First, read the spec file to understand the full requirements:
+   read_file path="{{spec.path}}"
+
+2. Study any referenced patterns or existing code
+
+3. Implement each unchecked acceptance criterion
+
+4. After implementing each criterion:
+   - Verify it works (run tests if applicable)
+   - Update the checkbox in the spec file from "- [ ]" to "- [x]"
+
+5. When ALL criteria are complete, summarize what was done
+
+{{#if patterns}}
+### Relevant Patterns
+{{#each patterns}}
+- {{file}}: {{description}}
+{{/each}}
+{{/if}}
+
+Begin by reading the spec file.

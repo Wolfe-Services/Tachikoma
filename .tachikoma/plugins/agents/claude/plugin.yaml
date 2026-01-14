@@ -1,0 +1,21 @@
+# Claude Agent Plugin
+name: claude
+version: "1.0.0"
+type: agent
+description: Claude AI agent integration (Anthropic)
+author: Tachikoma Team
+builtin: true
+
+requires:
+  - type: env
+    name: ANTHROPIC_API_KEY
+
+config:
+  model:
+    type: string
+    default: "claude-sonnet-4-20250514"
+    description: The Claude model to use
+  max_tokens:
+    type: integer
+    default: 8192
+    description: Maximum tokens for responses

@@ -421,8 +421,8 @@ class TachikomaApp {
 
     // Load the renderer
     if (is.dev) {
-      // In dev mode, load from the Vite dev server
-      const devServerUrl = process.env['ELECTRON_RENDERER_URL'] || 'http://127.0.0.1:1420';
+      // In dev mode, load from the Vite dev server (port 5173 for web, 1420 for Tauri)
+      const devServerUrl = process.env['ELECTRON_RENDERER_URL'] || 'http://localhost:5173';
       await this.mainWindow.loadURL(devServerUrl);
     } else {
       await this.mainWindow.loadFile(join(__dirname, '../../web/dist/index.html'));
