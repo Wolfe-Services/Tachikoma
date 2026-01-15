@@ -10,11 +10,13 @@
   let showingWizard = false;
   
   // AI Participants for the Think Tank visualization
+  // These map to the actual configured backends from tachikoma-forge crate
+  // Roles: Architect (drafts), Analyst (critiques), Synthesizer (merges), Arbiter (resolves conflicts)
   const aiModels = [
-    { id: 'claude', name: 'CLAUDE', role: 'ARCHITECT', color: '#cc785c', icon: 'brain' },
-    { id: 'gpt4', name: 'GPT-4', role: 'ANALYST', color: '#74aa9c', icon: 'cpu' },
-    { id: 'gemini', name: 'GEMINI', role: 'SYNTHESIZER', color: '#8b5cf6', icon: 'zap' },
-    { id: 'oracle', name: 'ORACLE', role: 'ARBITER', color: '#4ecdc4', icon: 'shield' },
+    { id: 'claude', name: 'CLAUDE', role: 'ARCHITECT', color: '#cc785c', icon: 'brain', provider: 'Anthropic' },
+    { id: 'gpt4', name: 'GPT-4', role: 'ANALYST', color: '#74aa9c', icon: 'cpu', provider: 'OpenAI' },
+    { id: 'gemini', name: 'GEMINI', role: 'SYNTHESIZER', color: '#8b5cf6', icon: 'zap', provider: 'Google' },
+    { id: 'ollama', name: 'OLLAMA', role: 'LOCAL', color: '#4ecdc4', icon: 'server', provider: 'Local' },
   ];
   
   onMount(async () => {
@@ -134,10 +136,19 @@
         <div class="council-description">
           <h2 class="description-title">MULTI-MODEL DELIBERATION</h2>
           <p class="description-text">
-            The Think Tank brings multiple AI models together for collaborative spec 
-            creation. Each model contributes unique perspectives, critiques proposals, 
-            and helps synthesize optimal solutions.
+            The Think Tank (Spec Forge) orchestrates multiple AI backends through structured 
+            brainstorming rounds. Models draft specs, critique proposals, and synthesize 
+            improvements until convergence is reached.
           </p>
+          <div class="forge-rounds">
+            <div class="round-step"><span class="round-num">1</span> Initial Draft</div>
+            <div class="round-arrow">→</div>
+            <div class="round-step"><span class="round-num">2</span> Critique Round</div>
+            <div class="round-arrow">→</div>
+            <div class="round-step"><span class="round-num">3</span> Synthesis</div>
+            <div class="round-arrow">→</div>
+            <div class="round-step final"><span class="round-num">✓</span> Convergence</div>
+          </div>
         </div>
       </div>
       
@@ -449,6 +460,56 @@
     color: var(--text-secondary, rgba(230, 237, 243, 0.7));
     line-height: 1.7;
     margin: 0;
+  }
+  
+  .forge-rounds {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .round-step {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-tertiary, #1c2128);
+    border: 1px solid var(--border-color, rgba(78, 205, 196, 0.2));
+    border-radius: 6px;
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--text-secondary, rgba(230, 237, 243, 0.7));
+    letter-spacing: 0.5px;
+  }
+  
+  .round-step.final {
+    border-color: var(--success-color, #3fb950);
+    color: var(--success-color, #3fb950);
+  }
+  
+  .round-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: rgba(78, 205, 196, 0.2);
+    border-radius: 50%;
+    font-size: 0.65rem;
+    color: var(--tachi-cyan, #4ecdc4);
+  }
+  
+  .round-step.final .round-num {
+    background: rgba(63, 185, 80, 0.2);
+    color: var(--success-color, #3fb950);
+  }
+  
+  .round-arrow {
+    color: var(--text-muted, rgba(230, 237, 243, 0.3));
+    font-size: 0.8rem;
   }
   
   /* Features Grid */

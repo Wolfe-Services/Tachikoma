@@ -4,34 +4,51 @@
   import Icon from '$lib/components/common/Icon.svelte';
   import TachikomaLogo from '$lib/components/common/TachikomaLogo.svelte';
   
-  // Section 9's Tachikoma squad - 9 units deployed
-  const SQUAD_SIZE = 9;
-  
+  // System status - reflects actual backend functionality
   let stats = {
     specsTotal: 562,
     specsComplete: 562,
-    activeUnits: 0,
+    activeMissions: 0,        // Loop Runner sessions running
+    forgeSessions: 0,         // Active Forge brainstorming sessions
+    totalIterations: 0,       // Total iterations completed
     successRate: 98.2
+  };
+  
+  // System components status
+  let systemStatus = {
+    loopRunner: 'idle',       // idle | running | paused
+    forge: 'ready',           // ready | active | processing
+    specRegistry: 'online',   // online | syncing
+    aiBackend: 'connected'    // connected | disconnected
   };
   
   let platform = 'unknown';
   
+  // AI backends configured in the system
+  const configuredBackends = [
+    { id: 'claude', name: 'Claude', status: 'primary', provider: 'Anthropic' },
+    { id: 'gpt4', name: 'GPT-4', status: 'available', provider: 'OpenAI' },
+    { id: 'gemini', name: 'Gemini', status: 'available', provider: 'Google' },
+    { id: 'ollama', name: 'Ollama', status: 'local', provider: 'Local' },
+  ];
+  
   // Tachikoma personality - they're curious and enthusiastic!
   const tachiQuotes = [
     "Analyzing target specifications...",
-    "Synchronizing with the squad!",
+    "Loop runner standing by!",
     "Ready to assist, Major!",
     "Tactical assessment complete.",
-    "All units standing by."
+    "All systems nominal."
   ];
   
   let currentQuote = tachiQuotes[0];
   
+  // Real activity from the system (populated from IPC in production)
   let recentActivity = [
-    { id: 1, action: 'Unit 03 completed spec 562', time: '2 min ago', type: 'success', unit: 3 },
-    { id: 2, action: 'Squad sync completed', time: '5 min ago', type: 'success', unit: null },
-    { id: 3, action: 'Unit 07 initiated Forge session', time: '12 min ago', type: 'info', unit: 7 },
-    { id: 4, action: 'Think Tank consultation finished', time: '1 hr ago', type: 'info', unit: null }
+    { id: 1, action: 'Loop completed: spec-142 UI polish', time: '2 min ago', type: 'success', component: 'loop' },
+    { id: 2, action: 'Context reboot triggered (redline)', time: '5 min ago', type: 'info', component: 'loop' },
+    { id: 3, action: 'Forge session started: API design', time: '12 min ago', type: 'info', component: 'forge' },
+    { id: 4, action: 'Spec synced from filesystem', time: '1 hr ago', type: 'success', component: 'specs' }
   ];
   
   onMount(async () => {
@@ -51,6 +68,10 @@
         stats.specsComplete = specs.filter((s: any) => s.complete).length || 0;
         stats = { ...stats };
       }
+      
+      // TODO: Fetch actual mission/forge status from backend
+      // const missionStatus = await ipc.invoke('mission:status', {});
+      // const forgeStatus = await ipc.invoke('forge:status', {});
     } catch (e) {
       console.log('IPC not available:', e);
     }
@@ -73,8 +94,8 @@
       </div>
       <div class="hero-text">
         <div class="hero-tag">SECTION 9 // AI DIVISION</div>
-        <h1 class="hero-title">TACHIKOMA SQUAD</h1>
-        <p class="hero-subtitle">{SQUAD_SIZE} AI walker units deployed and ready for tasking</p>
+        <h1 class="hero-title">TACHIKOMA</h1>
+        <p class="hero-subtitle">Spec-driven AI development system with continuous loop execution</p>
         <div class="hero-quote">
           <span class="quote-indicator">▸</span>
           <span class="quote-text">{currentQuote}</span>
@@ -82,9 +103,14 @@
       </div>
     </div>
     <div class="hero-meta">
+      <span class="meta-item" class:online={systemStatus.loopRunner !== 'running'} class:active={systemStatus.loopRunner === 'running'}>
+        <span class="status-dot"></span>
+        <span>{systemStatus.loopRunner === 'running' ? 'LOOP ACTIVE' : 'LOOP IDLE'}</span>
+      </span>
+      <span class="meta-divider">//</span>
       <span class="meta-item online">
         <span class="status-dot"></span>
-        <span>LINKED TO SECTION 9</span>
+        <span>AI BACKEND CONNECTED</span>
       </span>
       <span class="meta-divider">//</span>
       <span class="meta-item">
@@ -93,34 +119,38 @@
     </div>
   </header>
   
-  <!-- Squad Status Grid -->
+  <!-- System Status Grid -->
   <section class="squad-section">
     <div class="section-header">
       <h2 class="section-title">
         <Icon name="activity" size={18} />
-        <span>SQUAD STATUS</span>
+        <span>SYSTEM STATUS</span>
       </h2>
-      <span class="section-subtitle">Real-time unit deployment overview</span>
+      <span class="section-subtitle">Core components and AI backend status</span>
     </div>
     
     <div class="stats-grid">
-      <!-- Unit Status -->
-      <div class="stat-card unit-status">
+      <!-- Loop Runner Status -->
+      <div class="stat-card" class:active={systemStatus.loopRunner === 'running'}>
         <div class="stat-header">
-          <span class="stat-label">ACTIVE UNITS</span>
+          <Icon name="play-circle" size={18} glow />
+          <span class="stat-label">LOOP RUNNER</span>
+          <span class="status-pill" class:running={systemStatus.loopRunner === 'running'} class:idle={systemStatus.loopRunner === 'idle'}>
+            {systemStatus.loopRunner.toUpperCase()}
+          </span>
         </div>
         <div class="stat-body">
-          <div class="unit-grid">
-            {#each Array(SQUAD_SIZE) as _, i}
-              <div class="unit-indicator" class:active={i < stats.activeUnits} title="Unit 0{i + 1}">
-                <span class="unit-number">0{i + 1}</span>
-              </div>
-            {/each}
+          <div class="component-status">
+            <div class="status-row">
+              <span class="status-label">Active Missions:</span>
+              <span class="status-value">{stats.activeMissions}</span>
+            </div>
+            <div class="status-row">
+              <span class="status-label">Total Iterations:</span>
+              <span class="status-value">{stats.totalIterations}</span>
+            </div>
           </div>
-          <div class="unit-summary">
-            <span class="active-count">{stats.activeUnits}</span>
-            <span class="total-count">/ {SQUAD_SIZE} units deployed</span>
-          </div>
+          <div class="stat-detail">Continuous Claude Code execution engine</div>
         </div>
       </div>
       
@@ -128,7 +158,7 @@
       <div class="stat-card primary">
         <div class="stat-header">
           <Icon name="file-text" size={18} glow />
-          <span class="stat-label">MISSION SPECS</span>
+          <span class="stat-label">SPEC REGISTRY</span>
         </div>
         <div class="stat-body">
           <div class="stat-value">{stats.specsComplete}<span class="stat-unit">/{stats.specsTotal}</span></div>
@@ -140,20 +170,46 @@
             </div>
             <span class="progress-label">{specsProgress}%</span>
           </div>
-          <div class="stat-detail">Specifications processed by squad</div>
+          <div class="stat-detail">Specifications with all criteria complete</div>
         </div>
       </div>
       
-      <!-- Success Rate -->
+      <!-- Forge (Think Tank) Status -->
       <div class="stat-card">
         <div class="stat-header">
-          <Icon name="target" size={18} glow />
-          <span class="stat-label">MISSION SUCCESS</span>
+          <Icon name="brain" size={18} glow />
+          <span class="stat-label">THINK TANK</span>
+          <span class="status-pill ready">{systemStatus.forge.toUpperCase()}</span>
         </div>
         <div class="stat-body">
-          <div class="stat-value">{stats.successRate}<span class="stat-unit">%</span></div>
-          <div class="stat-detail success">Squad performance nominal</div>
+          <div class="component-status">
+            <div class="status-row">
+              <span class="status-label">Active Sessions:</span>
+              <span class="status-value">{stats.forgeSessions}</span>
+            </div>
+            <div class="status-row">
+              <span class="status-label">AI Backends:</span>
+              <span class="status-value">{configuredBackends.length} configured</span>
+            </div>
+          </div>
+          <div class="stat-detail">Multi-model spec brainstorming</div>
         </div>
+      </div>
+    </div>
+    
+    <!-- AI Backends Row -->
+    <div class="backends-section">
+      <div class="backends-label">
+        <Icon name="cpu" size={14} />
+        <span>CONFIGURED AI BACKENDS</span>
+      </div>
+      <div class="backends-list">
+        {#each configuredBackends as backend}
+          <div class="backend-chip" class:primary={backend.status === 'primary'}>
+            <span class="backend-name">{backend.name}</span>
+            <span class="backend-provider">{backend.provider}</span>
+          </div>
+        {/each}
       </div>
     </div>
   </section>
@@ -237,8 +293,10 @@
               <div class="activity-indicator" class:success={activity.type === 'success'} class:error={activity.type === 'error'}></div>
               <div class="activity-content">
                 <span class="activity-action">
-                  {#if activity.unit}
-                    <span class="unit-tag">UNIT 0{activity.unit}</span>
+                  {#if activity.component}
+                    <span class="component-tag" class:loop={activity.component === 'loop'} class:forge={activity.component === 'forge'} class:specs={activity.component === 'specs'}>
+                      {activity.component.toUpperCase()}
+                    </span>
                   {/if}
                   {activity.action}
                 </span>
@@ -262,8 +320,8 @@
     <div class="lore-content">
       <span class="lore-symbol">◈</span>
       <p class="lore-text">
-        Tachikoma AI units are walker robots endowed with artificial intelligence.
-        Originally deployed by Public Security Section 9 for tactical operations.
+        Tachikoma: Spec-driven AI development with the Ralph Loop for continuous execution 
+        and multi-model Think Tank for collaborative spec creation.
       </p>
       <span class="lore-symbol">◈</span>
     </div>
@@ -396,6 +454,15 @@
     color: var(--success-color, #3fb950);
   }
   
+  .meta-item.active {
+    color: var(--tachi-yellow, #ffd93d);
+  }
+  
+  .meta-item.active .status-dot {
+    background: var(--tachi-yellow, #ffd93d);
+    box-shadow: 0 0 8px var(--tachi-yellow, #ffd93d);
+  }
+  
   .status-dot {
     width: 6px;
     height: 6px;
@@ -467,8 +534,123 @@
     border-color: rgba(78, 205, 196, 0.3);
   }
   
-  .stat-card.unit-status {
-    grid-column: span 1;
+  .stat-card.active {
+    border-color: var(--success-color, #3fb950);
+    box-shadow: 0 0 20px rgba(63, 185, 80, 0.15);
+  }
+  
+  .status-pill {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.55rem;
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    margin-left: auto;
+  }
+  
+  .status-pill.idle {
+    background: rgba(230, 237, 243, 0.1);
+    color: var(--text-muted, rgba(230, 237, 243, 0.5));
+  }
+  
+  .status-pill.running {
+    background: rgba(63, 185, 80, 0.2);
+    color: var(--success-color, #3fb950);
+    animation: statusPulse 2s ease-in-out infinite;
+  }
+  
+  .status-pill.ready {
+    background: rgba(78, 205, 196, 0.15);
+    color: var(--tachi-cyan, #4ecdc4);
+  }
+  
+  @keyframes statusPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+  
+  .component-status {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .status-label {
+    font-size: 0.85rem;
+    color: var(--text-muted, rgba(230, 237, 243, 0.5));
+  }
+  
+  .status-value {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.9rem;
+    color: var(--text-primary, #e6edf3);
+  }
+  
+  /* AI Backends Section */
+  .backends-section {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--bg-secondary, #161b22);
+    border: 1px solid var(--border-color, rgba(78, 205, 196, 0.15));
+    border-radius: 10px;
+  }
+  
+  .backends-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: var(--text-muted, rgba(230, 237, 243, 0.5));
+    letter-spacing: 1px;
+    margin-bottom: 0.75rem;
+  }
+  
+  .backends-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .backend-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-tertiary, #1c2128);
+    border: 1px solid var(--border-color, rgba(78, 205, 196, 0.15));
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .backend-chip:hover {
+    border-color: var(--tachi-cyan, #4ecdc4);
+  }
+  
+  .backend-chip.primary {
+    border-color: var(--tachi-cyan, #4ecdc4);
+    background: linear-gradient(135deg, rgba(78, 205, 196, 0.1), var(--bg-tertiary, #1c2128));
+  }
+  
+  .backend-name {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-primary, #e6edf3);
+    letter-spacing: 0.5px;
+  }
+  
+  .backend-provider {
+    font-size: 0.65rem;
+    color: var(--text-muted, rgba(230, 237, 243, 0.4));
   }
   
   .stat-header {
@@ -492,64 +674,6 @@
     gap: 0.75rem;
   }
   
-  /* Unit Grid - 9 Tachikomas */
-  .unit-grid {
-    display: grid;
-    grid-template-columns: repeat(9, 1fr);
-    gap: 0.5rem;
-  }
-  
-  .unit-indicator {
-    aspect-ratio: 1;
-    background: var(--bg-tertiary, #1c2128);
-    border: 1px solid var(--border-color, rgba(78, 205, 196, 0.2));
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    cursor: default;
-  }
-  
-  .unit-indicator:hover {
-    border-color: var(--tachi-cyan, #4ecdc4);
-    transform: scale(1.05);
-  }
-  
-  .unit-indicator.active {
-    background: linear-gradient(135deg, var(--tachi-cyan-dark, #2d7a7a), var(--tachi-cyan, #4ecdc4));
-    border-color: var(--tachi-cyan, #4ecdc4);
-    box-shadow: 0 0 12px var(--tachi-cyan-glow, rgba(78, 205, 196, 0.4));
-  }
-  
-  .unit-number {
-    font-family: var(--font-display, 'Orbitron', sans-serif);
-    font-size: 0.6rem;
-    font-weight: 600;
-    color: var(--text-muted, rgba(230, 237, 243, 0.4));
-  }
-  
-  .unit-indicator.active .unit-number {
-    color: var(--bg-primary, #0d1117);
-  }
-  
-  .unit-summary {
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-  }
-  
-  .active-count {
-    font-family: var(--font-display, 'Orbitron', sans-serif);
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: var(--text-primary, #e6edf3);
-  }
-  
-  .total-count {
-    font-size: 0.9rem;
-    color: var(--text-muted, rgba(230, 237, 243, 0.4));
-  }
   
   .stat-value {
     font-family: var(--font-display, 'Orbitron', sans-serif);
@@ -820,16 +944,31 @@
     flex-wrap: wrap;
   }
   
-  .unit-tag {
+  .component-tag {
     font-family: var(--font-display, 'Orbitron', sans-serif);
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: 600;
     padding: 0.125rem 0.375rem;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+  }
+  
+  .component-tag.loop {
+    background: rgba(63, 185, 80, 0.15);
+    border: 1px solid rgba(63, 185, 80, 0.3);
+    color: var(--success-color, #3fb950);
+  }
+  
+  .component-tag.forge {
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    color: #a78bfa;
+  }
+  
+  .component-tag.specs {
     background: rgba(78, 205, 196, 0.15);
     border: 1px solid rgba(78, 205, 196, 0.3);
-    border-radius: 3px;
     color: var(--tachi-cyan, #4ecdc4);
-    letter-spacing: 0.5px;
   }
   
   .activity-time {

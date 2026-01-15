@@ -4,13 +4,13 @@
   import Icon from '../common/Icon.svelte';
   import TachikomaLogo from '../common/TachikomaLogo.svelte';
   
-  // Navigation items - Section 9 terminology
+  // Navigation items - reflects actual system functionality
   const navItems = [
-    { href: '/', label: 'Command', icon: 'home', description: 'Squad Overview' },
-    { href: '/missions', label: 'Deploy', icon: 'play', description: 'Task Units' },
-    { href: '/specs', label: 'Registry', icon: 'file-text', description: 'Mission Specs' },
-    { href: '/forge', label: 'Think Tank', icon: 'brain', description: 'Multi-Unit AI' },
-    { href: '/settings', label: 'Config', icon: 'settings', description: 'System Setup' }
+    { href: '/', label: 'Command', icon: 'home', description: 'System Dashboard' },
+    { href: '/missions', label: 'Deploy', icon: 'play', description: 'Loop Runner' },
+    { href: '/specs', label: 'Registry', icon: 'file-text', description: 'Spec Browser' },
+    { href: '/forge', label: 'Think Tank', icon: 'brain', description: 'Multi-Model AI' },
+    { href: '/settings', label: 'Config', icon: 'settings', description: 'API & Settings' }
   ];
   
   export let collapsed = false;
@@ -54,7 +54,7 @@
     <div class="status-section">
       <div class="status-badge online">
         <span class="status-dot"></span>
-        <span class="status-text">9 UNITS READY</span>
+        <span class="status-text">SYSTEM ONLINE</span>
       </div>
     </div>
   {/if}
