@@ -757,10 +757,13 @@ Execute specs in numerical order. Each phase must complete before the next.
 | 573 | [Simple Config Mode](phase-27-ralph-integration/573-simple-config-mode.md) | config, simple, progressive |
 | 574 | [Electron Dev Server](phase-26-hotfix/574-electron-dev-server.md) | electron, dev, port, crypto |
 
-## Phase 28: Forge LLM Integration (575-580)
+## Phase 28: Forge LLM Integration (575-578)
 
 **PRIORITY: P0 - Wire real LLM calls to the Forge Think Tank**
 
 | Spec | File | Keywords |
 |------|------|----------|
-| 575 | [Forge LLM Integration](phase-28-forge-llm/575-forge-llm-integration.md) | llm, claude, openai, forge, stream |
+| 575 | [LLM Provider Trait](phase-28-forge-llm/575-llm-provider-trait.md) | trait, llm, provider, types |
+| 576 | [Anthropic Provider](phase-28-forge-llm/576-anthropic-provider.md) | claude, anthropic, stream, sse |
+| 577 | [Forge Orchestrator](phase-28-forge-llm/577-forge-orchestrator.md) | orchestrator, round, deliberate |
+| 578 | [Server Integration](phase-28-forge-llm/578-server-integration.md) | server, api, websocket, routes |

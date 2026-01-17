@@ -1,6 +1,7 @@
 //! Tachikoma Forge - Multi-model brainstorming and collaboration system.
 
 pub mod error;
+pub mod llm;
 pub mod output;
 pub mod session;
 pub mod round;
