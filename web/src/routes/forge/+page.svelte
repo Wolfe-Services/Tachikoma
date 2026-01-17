@@ -1,13 +1,17 @@
 <script lang="ts">
   import PageHeader from '$lib/components/common/PageHeader.svelte';
   import Icon from '$lib/components/common/Icon.svelte';
+  import Spinner from '$lib/components/ui/Spinner/Spinner.svelte';
+  import GlassPanel from '$lib/components/ui/GlassPanel.svelte';
   import ForgeLayout from '$lib/components/forge/ForgeLayout.svelte';
   import SessionSidebar from '$lib/components/forge/SessionSidebar.svelte';
   import SessionCreationWizard from '$lib/components/forge/SessionCreationWizard.svelte';
-  import { forgeSessionStore, activeSession, sessions } from '$lib/stores/forgeSession';
+  import { forgeSessionStore, activeSession, sessions, sessionLoading, sessionError } from '$lib/stores/forgeSession';
   import { onMount } from 'svelte';
 
   let showingWizard = false;
+  let editingSessionId: string | null = null;
+  let sacMode = false;
   
   // AI Participants for the Think Tank visualization
   // These map to the actual configured backends from tachikoma-forge crate
@@ -20,31 +24,64 @@
   ];
   
   onMount(async () => {
+    // Global toggle used across the UI
+    const storedSac = localStorage.getItem('tachikoma:sacMode');
+    const legacy = localStorage.getItem('tachikoma:forgeLoreMode');
+    if (storedSac === null && legacy !== null) {
+      localStorage.setItem('tachikoma:sacMode', legacy);
+    }
+    sacMode = localStorage.getItem('tachikoma:sacMode') === 'true';
     await forgeSessionStore.loadSessions();
   });
 
   function handleStartNewSession() {
+    forgeSessionStore.clearActiveSession();
+    editingSessionId = null;
+    showingWizard = true;
+  }
+
+  function handleEditSession(event: CustomEvent<{sessionId: string}>) {
+    editingSessionId = event.detail.sessionId;
     showingWizard = true;
   }
 
   function handleSessionCreated(event: CustomEvent<{sessionId: string}>) {
     forgeSessionStore.setActiveSession(event.detail.sessionId);
     showingWizard = false;
+    editingSessionId = null;
   }
 
   function handleWizardCancelled() {
     showingWizard = false;
+    editingSessionId = null;
+    // If we were editing, re-activate the session
+    if (editingSessionId) {
+      forgeSessionStore.setActiveSession(editingSessionId);
+    }
+  }
+
+  function toggleSacMode() {
+    sacMode = !sacMode;
+    localStorage.setItem('tachikoma:sacMode', String(sacMode));
   }
 </script>
 
 <div class="forge-page">
+  <div class="polyglass-backdrop" class:enabled={sacMode} aria-hidden="true"></div>
+
   <PageHeader 
     title="THINK TANK"
     subtitle="Multi-model deliberation engine for spec creation and refinement"
     tag="SPEC FORGE"
-    icon="brain"
+    iconSrc="/icons/Iconfactory-Ghost-In-The-Shell-Fuchikoma-Blue.32.png"
+    iconSize={48}
   >
     <svelte:fragment slot="actions">
+      <button class="btn-secondary" type="button" on:click={toggleSacMode} aria-pressed={sacMode}>
+        <Icon name={sacMode ? 'check-circle' : 'help-circle'} size={16} />
+        <span>S.A.C. MODE</span>
+      </button>
+
       {#if !showingWizard && !$activeSession}
         <button class="btn-primary" on:click={handleStartNewSession}>
           <Icon name="zap" size={16} />
@@ -54,18 +91,48 @@
     </svelte:fragment>
   </PageHeader>
   
-  {#if $activeSession}
-    <ForgeLayout sessionId={$activeSession.id} />
-  {:else if showingWizard}
+  {#if $sessionError}
+    <GlassPanel accent="red" className="error-panel">
+      <div class="error-content" role="alert">
+        <div class="error-left">
+          <Icon name="alert-triangle" size={18} glow />
+          <div class="error-text">
+            <div class="error-title">Forge systems report an anomaly</div>
+            <div class="error-subtitle">{$sessionError}</div>
+          </div>
+        </div>
+        <div class="error-actions">
+          <button class="btn-secondary" type="button" on:click={() => forgeSessionStore.clearError()}>
+            Dismiss
+          </button>
+          <button class="btn-primary" type="button" on:click={() => forgeSessionStore.loadSessions()}>
+            Retry
+          </button>
+        </div>
+      </div>
+    </GlassPanel>
+  {/if}
+
+  {#if showingWizard}
     <SessionCreationWizard 
+      editSessionId={editingSessionId}
       on:created={handleSessionCreated}
       on:cancelled={handleWizardCancelled}
     />
+  {:else if $activeSession}
+    <ForgeLayout sessionId={$activeSession.id} on:newSession={handleStartNewSession} on:editSession={handleEditSession} />
   {:else}
     <!-- Think Tank Welcome Screen -->
     <div class="think-tank-welcome">
+      {#if $sessionLoading}
+        <div class="loading-row" aria-live="polite">
+          <Spinner size={18} color="var(--tachi-cyan, #4ecdc4)" />
+          <span>Synchronizing sessions…</span>
+        </div>
+      {/if}
+
       <!-- AI Council Visualization -->
-      <div class="council-section">
+      <GlassPanel className="council-section" accent="cyan">
         <div class="council-ring">
           <div class="ring-glow"></div>
           <div class="ring-track"></div>
@@ -76,6 +143,7 @@
               style="
                 --node-color: {model.color};
                 --angle: {(360 / aiModels.length) * i}deg;
+                --delay: {-i * 3.25}s;
               "
             >
               <div class="node-avatar">
@@ -91,7 +159,11 @@
           
           <div class="council-center">
             <div class="center-icon">
-              <Icon name="brain" size={32} glow />
+              <img 
+                src="/icons/Iconfactory-Ghost-In-The-Shell-Fuchikoma-Blue.32.png" 
+                alt="Tachikoma" 
+                class="center-tachi-icon"
+              />
             </div>
             <div class="center-label">FORGE</div>
           </div>
@@ -140,6 +212,11 @@
             brainstorming rounds. Models draft specs, critique proposals, and synthesize 
             improvements until convergence is reached.
           </p>
+          {#if sacMode}
+            <p class="lore-line">
+              S.A.C. protocol engaged — independent agents, shared objective, emergent consensus.
+            </p>
+          {/if}
           <div class="forge-rounds">
             <div class="round-step"><span class="round-num">1</span> Initial Draft</div>
             <div class="round-arrow">→</div>
@@ -150,11 +227,11 @@
             <div class="round-step final"><span class="round-num">✓</span> Convergence</div>
           </div>
         </div>
-      </div>
+      </GlassPanel>
       
       <!-- Features Grid -->
       <div class="features-grid">
-        <div class="feature-card">
+        <GlassPanel className="feature-card" accent="red" subtle>
           <div class="feature-icon" style="--accent: #cc785c">
             <Icon name="file-plus" size={24} />
           </div>
@@ -163,9 +240,9 @@
             Generate comprehensive specifications from high-level goals with 
             multi-model consensus.
           </p>
-        </div>
+        </GlassPanel>
         
-        <div class="feature-card">
+        <GlassPanel className="feature-card" accent="green" subtle>
           <div class="feature-icon" style="--accent: #74aa9c">
             <Icon name="activity" size={24} />
           </div>
@@ -174,9 +251,9 @@
             Each model reviews and critiques proposals, identifying gaps and 
             suggesting improvements.
           </p>
-        </div>
+        </GlassPanel>
         
-        <div class="feature-card">
+        <GlassPanel className="feature-card" accent="purple" subtle>
           <div class="feature-icon" style="--accent: #8b5cf6">
             <Icon name="refresh-cw" size={24} />
           </div>
@@ -185,9 +262,9 @@
             Recursive improvement loops until convergence is reached and 
             the spec meets quality thresholds.
           </p>
-        </div>
+        </GlassPanel>
         
-        <div class="feature-card">
+        <GlassPanel className="feature-card" accent="cyan" subtle>
           <div class="feature-icon" style="--accent: #4ecdc4">
             <Icon name="check-circle" size={24} />
           </div>
@@ -196,7 +273,7 @@
             The Oracle model mediates disagreements and makes final decisions 
             with transparent rationale.
           </p>
-        </div>
+        </GlassPanel>
       </div>
       
       <!-- Start Session CTA -->
@@ -218,14 +295,16 @@
       
       <!-- Past Sessions -->
       {#if $sessions.length > 0}
-        <div class="past-sessions">
+        <GlassPanel className="past-sessions" subtle accent="cyan" padded={false}>
           <div class="sessions-header">
             <Icon name="clock" size={18} />
             <span>PREVIOUS SESSIONS</span>
             <span class="session-count">{$sessions.length}</span>
           </div>
-          <SessionSidebar sessionId={null} />
-        </div>
+          <div class="sessions-body">
+            <SessionSidebar sessionId={null} />
+          </div>
+        </GlassPanel>
       {/if}
     </div>
   {/if}
@@ -238,6 +317,102 @@
     display: flex;
     flex-direction: column;
     min-height: calc(100vh - 200px);
+    position: relative;
+  }
+
+  .polyglass-backdrop {
+    position: absolute;
+    inset: -60px -40px -40px -40px;
+    pointer-events: none;
+    opacity: 0.7;
+    filter: blur(0.2px);
+    z-index: 0;
+  }
+
+  .polyglass-backdrop::before,
+  .polyglass-backdrop::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(78, 205, 196, 0.18), transparent 45%),
+      radial-gradient(circle at 80% 30%, rgba(139, 92, 246, 0.12), transparent 40%),
+      radial-gradient(circle at 65% 75%, rgba(255, 107, 107, 0.10), transparent 45%);
+    opacity: 0.7;
+  }
+
+  .polyglass-backdrop::after {
+    opacity: 0;
+    background:
+      linear-gradient(115deg, transparent 20%, rgba(78, 205, 196, 0.12) 45%, transparent 70%),
+      linear-gradient(160deg, rgba(255, 255, 255, 0.03), transparent);
+    clip-path: polygon(10% 0, 70% 8%, 100% 55%, 62% 100%, 0 70%);
+    transition: opacity 0.25s ease;
+  }
+
+  .polyglass-backdrop.enabled::after {
+    opacity: 0.9;
+  }
+
+  /* Keep content above backdrop */
+  :global(.forge-page > *) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .loading-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.65rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(13, 17, 23, 0.45);
+    border: 1px solid rgba(78, 205, 196, 0.14);
+    color: rgba(230, 237, 243, 0.75);
+    font-size: 0.9rem;
+    margin: 0 auto;
+  }
+
+  .error-panel {
+    margin-bottom: 1.25rem;
+  }
+
+  .error-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .error-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .error-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .error-title {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    color: rgba(230, 237, 243, 0.9);
+  }
+
+  .error-subtitle {
+    color: rgba(230, 237, 243, 0.65);
+    font-size: 0.9rem;
+  }
+
+  .error-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
   }
   
   /* Think Tank Welcome */
@@ -252,10 +427,6 @@
     display: flex;
     align-items: center;
     gap: 3rem;
-    padding: 2rem;
-    background: var(--bg-secondary, #161b22);
-    border: 1px solid var(--border-color, rgba(78, 205, 196, 0.2));
-    border-radius: 16px;
     position: relative;
     overflow: hidden;
   }
@@ -322,8 +493,28 @@
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
+
+    /* Orbit to reduce static overlaps (e.g. Gemini over the header) */
+    animation: councilOrbit 22s linear infinite;
+    animation-delay: var(--delay, 0s);
+    will-change: transform;
   }
   
+  @keyframes councilOrbit {
+    from {
+      transform:
+        rotate(var(--angle))
+        translateY(-140px)
+        rotate(calc(-1 * var(--angle)));
+    }
+    to {
+      transform:
+        rotate(calc(var(--angle) + 360deg))
+        translateY(-140px)
+        rotate(calc(-1 * (var(--angle) + 360deg)));
+    }
+  }
+
   .node-avatar {
     width: 56px;
     height: 56px;
@@ -409,6 +600,19 @@
     animation: centerGlow 3s ease-in-out infinite;
   }
   
+  .center-tachi-icon {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px var(--tachi-cyan, #4ecdc4));
+    animation: tachiGlow 3s ease-in-out infinite;
+  }
+  
+  @keyframes tachiGlow {
+    0%, 100% { filter: drop-shadow(0 0 8px var(--tachi-cyan, #4ecdc4)); }
+    50% { filter: drop-shadow(0 0 14px var(--tachi-cyan, #4ecdc4)) drop-shadow(0 0 4px var(--tachi-cyan, #4ecdc4)); }
+  }
+  
   @keyframes centerGlow {
     0%, 100% { box-shadow: 0 0 30px rgba(78, 205, 196, 0.4), inset 0 0 20px rgba(78, 205, 196, 0.1); }
     50% { box-shadow: 0 0 50px rgba(78, 205, 196, 0.6), inset 0 0 30px rgba(78, 205, 196, 0.2); }
@@ -460,6 +664,14 @@
     color: var(--text-secondary, rgba(230, 237, 243, 0.7));
     line-height: 1.7;
     margin: 0;
+  }
+
+  .lore-line {
+    margin: 0.25rem 0 0;
+    padding-left: 0.75rem;
+    border-left: 2px solid rgba(78, 205, 196, 0.4);
+    color: rgba(230, 237, 243, 0.6);
+    font-style: italic;
   }
   
   .forge-rounds {
@@ -520,10 +732,6 @@
   }
   
   .feature-card {
-    padding: 1.5rem;
-    background: var(--bg-secondary, #161b22);
-    border: 1px solid var(--border-color, rgba(78, 205, 196, 0.15));
-    border-radius: 12px;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -661,10 +869,11 @@
   
   /* Past Sessions */
   .past-sessions {
-    background: var(--bg-secondary, #161b22);
-    border: 1px solid var(--border-color, rgba(78, 205, 196, 0.15));
-    border-radius: 12px;
     overflow: hidden;
+  }
+
+  .sessions-body {
+    padding: 1rem 1rem 1.25rem;
   }
   
   .sessions-header {
@@ -710,6 +919,13 @@
     .ring-track {
       width: 220px;
       height: 220px;
+    }
+  }
+
+  /* Respect reduced motion: stop orbit + avoid loading visual noise */
+  @media (prefers-reduced-motion: reduce) {
+    .council-node {
+      animation: none;
     }
   }
 </style>

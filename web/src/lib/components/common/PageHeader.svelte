@@ -5,6 +5,8 @@
   export let subtitle: string = '';
   export let tag: string = '';
   export let icon: string = '';
+  export let iconSrc: string = '';
+  export let iconSize: number = 48;
 </script>
 
 <header class="page-header">
@@ -14,7 +16,11 @@
   
   <div class="header-content">
     <div class="header-left">
-      {#if icon}
+      {#if iconSrc}
+        <div class="header-icon header-icon-img" style="--icon-size: {iconSize}px">
+          <img src={iconSrc} alt="" class="tachi-icon" />
+        </div>
+      {:else if icon}
         <div class="header-icon">
           <Icon name={icon} size={32} glow />
         </div>
@@ -85,6 +91,27 @@
     border-radius: 12px;
     color: var(--tachi-cyan, #4ecdc4);
     flex-shrink: 0;
+  }
+  
+  .header-icon-img {
+    width: var(--icon-size, 48px);
+    height: var(--icon-size, 48px);
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .tachi-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px var(--tachi-cyan, #4ecdc4));
+    transition: filter 0.3s ease;
+  }
+  
+  .header-icon-img:hover .tachi-icon {
+    filter: drop-shadow(0 0 12px var(--tachi-cyan, #4ecdc4)) drop-shadow(0 0 4px var(--tachi-cyan, #4ecdc4));
   }
   
   .header-text {
