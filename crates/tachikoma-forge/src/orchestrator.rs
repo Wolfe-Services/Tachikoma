@@ -62,7 +62,7 @@ impl ForgeOrchestrator {
             let participant_name = pwp.participant.name.clone();
             
             let _ = self.event_tx.send(ForgeEvent::ParticipantThinking {
-                participant_id: participant_id.clone(),
+                participant_id: participant_id.to_string(),
                 participant_name: participant_name.clone(),
             });
             
@@ -94,7 +94,7 @@ impl ForgeOrchestrator {
                     Ok(chunk) => {
                         full_content.push_str(&chunk.delta);
                         let _ = self.event_tx.send(ForgeEvent::ContentDelta {
-                            participant_id: participant_id.clone(),
+                            participant_id: participant_id.to_string(),
                             delta: chunk.delta,
                         });
                     }
@@ -108,7 +108,7 @@ impl ForgeOrchestrator {
             }
             
             let _ = self.event_tx.send(ForgeEvent::ParticipantComplete {
-                participant_id: participant_id.clone(),
+                participant_id: participant_id.to_string(),
                 content: full_content,
                 tokens: crate::session::TokenUsage::default(),
             });
