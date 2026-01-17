@@ -13,18 +13,18 @@ pub fn build_prompt(
             Goal: {}\n\n\
             Propose a solution or approach to this goal. Be specific and actionable.\n\n\
             Your role: {}",
-            participant.display_name,
+            participant.name,
             goal,
-            participant.model_name
+            participant.model_config.model_name
         ),
         
         RoundType::Critique => {
             let drafts = session.rounds
                 .iter()
                 .filter_map(|r| match r {
-                    crate::round::ForgeRound::Draft(draft) => Some(format!("**{}**: {}", draft.drafter.display_name, draft.content)),
-                    crate::round::ForgeRound::Synthesis(synthesis) => Some(format!("**{}**: {}", synthesis.synthesizer.display_name, synthesis.content)),
-                    crate::round::ForgeRound::Refinement(refinement) => Some(format!("**{}**: {}", refinement.refiner.display_name, refinement.content)),
+                    crate::round::ForgeRound::Draft(draft) => Some(format!("**{}**: {}", draft.drafter.name, draft.content)),
+                    crate::round::ForgeRound::Synthesis(synthesis) => Some(format!("**{}**: {}", synthesis.synthesizer.name, synthesis.content)),
+                    crate::round::ForgeRound::Refinement(refinement) => Some(format!("**{}**: {}", refinement.refiner.name, refinement.content)),
                     _ => None,
                 })
                 .collect::<Vec<_>>()
@@ -34,7 +34,7 @@ pub fn build_prompt(
                 "You are {}.\n\n\
                 Review these proposals and provide constructive critique:\n\n{}\n\n\
                 Identify strengths, weaknesses, gaps, and potential improvements.",
-                participant.display_name,
+                participant.name,
                 drafts
             )
         }
