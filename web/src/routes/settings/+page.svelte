@@ -3,20 +3,31 @@
   import Icon from '$lib/components/common/Icon.svelte';
   import { ipc } from '$lib/ipc';
   import { onMount } from 'svelte';
+  import type { PageData } from './$types';
+  
+  export let data: PageData;
   
   let activeTab = 'general';
   let saveStatus: 'idle' | 'saving' | 'saved' | 'error' = 'idle';
   
+  // Initialize config with env values from server
   let config = {
-    anthropicKey: '',
-    openaiKey: '',
-    googleKey: '',
+    anthropicKey: data.envConfig?.anthropicKey || '',
+    openaiKey: data.envConfig?.openaiKey || '',
+    googleKey: data.envConfig?.googleKey || '',
     theme: 'tachikoma-dark',
     defaultBackend: 'claude',
     autoSave: true,
     notifications: true,
     soundEffects: false,
     telemetry: false
+  };
+  
+  // Track if keys came from .env (read-only display)
+  let envKeysLoaded = {
+    anthropic: data.envConfig?.hasAnthropicKey || false,
+    openai: data.envConfig?.hasOpenaiKey || false,
+    google: data.envConfig?.hasGoogleKey || false
   };
   
   const tabs = [
@@ -30,7 +41,15 @@
   onMount(async () => {
     try {
       const loaded = await ipc.invoke('config:get', {});
-      config = { ...config, ...loaded };
+      // Merge with env config, preferring env values for API keys
+      config = { 
+        ...config, 
+        ...loaded,
+        // Keep env values if they exist
+        anthropicKey: data.envConfig?.anthropicKey || config.anthropicKey,
+        openaiKey: data.envConfig?.openaiKey || config.openaiKey,
+        googleKey: data.envConfig?.googleKey || config.googleKey,
+      };
     } catch (e) {
       console.log('Config not available:', e);
     }
@@ -199,18 +218,26 @@
                   <span class="api-name">ANTHROPIC</span>
                   <span class="api-model">Claude Models</span>
                 </div>
-                <div class="api-status" class:connected={config.anthropicKey}>
-                  {config.anthropicKey ? 'CONNECTED' : 'NOT SET'}
+                <div class="api-status" class:connected={config.anthropicKey} class:from-env={envKeysLoaded.anthropic}>
+                  {#if envKeysLoaded.anthropic}
+                    FROM .ENV
+                  {:else if config.anthropicKey}
+                    CONNECTED
+                  {:else}
+                    NOT SET
+                  {/if}
                 </div>
               </div>
               <div class="api-input-group">
-                <label class="input-label">API KEY</label>
+                <label class="input-label">API KEY {#if envKeysLoaded.anthropic}<span class="env-badge">Environment Variable</span>{/if}</label>
                 <div class="input-wrapper">
-            <input 
-              type="password" 
-              bind:value={config.anthropicKey}
+                  <input 
+                    type="password" 
+                    bind:value={config.anthropicKey}
                     placeholder="sk-ant-api03-..."
                     class="api-input"
+                    class:from-env={envKeysLoaded.anthropic}
+                    readonly={envKeysLoaded.anthropic}
                   />
                   <button class="input-action" title="Show/Hide">
                     <Icon name="eye" size={16} />
@@ -226,18 +253,26 @@
                   <span class="api-name">OPENAI</span>
                   <span class="api-model">GPT-4 Models</span>
                 </div>
-                <div class="api-status" class:connected={config.openaiKey}>
-                  {config.openaiKey ? 'CONNECTED' : 'NOT SET'}
+                <div class="api-status" class:connected={config.openaiKey} class:from-env={envKeysLoaded.openai}>
+                  {#if envKeysLoaded.openai}
+                    FROM .ENV
+                  {:else if config.openaiKey}
+                    CONNECTED
+                  {:else}
+                    NOT SET
+                  {/if}
                 </div>
               </div>
               <div class="api-input-group">
-                <label class="input-label">API KEY</label>
+                <label class="input-label">API KEY {#if envKeysLoaded.openai}<span class="env-badge">Environment Variable</span>{/if}</label>
                 <div class="input-wrapper">
-            <input 
-              type="password" 
-              bind:value={config.openaiKey}
-              placeholder="sk-..."
+                  <input 
+                    type="password" 
+                    bind:value={config.openaiKey}
+                    placeholder="sk-..."
                     class="api-input"
+                    class:from-env={envKeysLoaded.openai}
+                    readonly={envKeysLoaded.openai}
                   />
                   <button class="input-action" title="Show/Hide">
                     <Icon name="eye" size={16} />
@@ -253,18 +288,26 @@
                   <span class="api-name">GOOGLE AI</span>
                   <span class="api-model">Gemini Models</span>
                 </div>
-                <div class="api-status" class:connected={config.googleKey}>
-                  {config.googleKey ? 'CONNECTED' : 'NOT SET'}
+                <div class="api-status" class:connected={config.googleKey} class:from-env={envKeysLoaded.google}>
+                  {#if envKeysLoaded.google}
+                    FROM .ENV
+                  {:else if config.googleKey}
+                    CONNECTED
+                  {:else}
+                    NOT SET
+                  {/if}
                 </div>
               </div>
               <div class="api-input-group">
-                <label class="input-label">API KEY</label>
+                <label class="input-label">API KEY {#if envKeysLoaded.google}<span class="env-badge">Environment Variable</span>{/if}</label>
                 <div class="input-wrapper">
                   <input 
                     type="password" 
                     bind:value={config.googleKey}
                     placeholder="AIza..."
                     class="api-input"
+                    class:from-env={envKeysLoaded.google}
+                    readonly={envKeysLoaded.google}
                   />
                   <button class="input-action" title="Show/Hide">
                     <Icon name="eye" size={16} />
@@ -889,6 +932,32 @@
   .api-status.connected {
     background: rgba(63, 185, 80, 0.15);
     color: var(--success-color, #3fb950);
+  }
+  
+  .api-status.from-env {
+    background: rgba(78, 205, 196, 0.15);
+    color: var(--tachi-cyan, #4ecdc4);
+  }
+  
+  .env-badge {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.5rem;
+    font-weight: 600;
+    padding: 0.15rem 0.4rem;
+    background: rgba(78, 205, 196, 0.15);
+    border: 1px solid rgba(78, 205, 196, 0.3);
+    border-radius: 3px;
+    color: var(--tachi-cyan, #4ecdc4);
+    margin-left: 0.5rem;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  
+  .api-input.from-env {
+    background: rgba(78, 205, 196, 0.08);
+    border-color: rgba(78, 205, 196, 0.25);
+    color: var(--tachi-cyan, #4ecdc4);
+    cursor: not-allowed;
   }
   
   .api-input-group {
