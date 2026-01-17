@@ -82,7 +82,7 @@ pub fn calculate_convergence_weighted(
     // Find the last convergence round
     let convergence_round = rounds.iter()
         .rev()
-        .find(|r| r.round_type == RoundType::Convergence);
+        .find(|r| r.round_type == DeliberationRoundType::Convergence);
     
     let Some(round) = convergence_round else {
         return ConvergenceScore {
