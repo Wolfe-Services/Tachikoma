@@ -122,12 +122,13 @@
     bottom: 0;
     background-image: url('/gints.jpeg');
     background-size: 150% auto;
-    background-position: center 65%;
+    background-position: center 20%;
     background-repeat: no-repeat;
     opacity: 0.12;
     pointer-events: none;
     z-index: 0;
     filter: grayscale(30%) contrast(1.1);
+    transform: scaleY(-1);
   }
   
   /* Subtle gradient overlay on top of image */

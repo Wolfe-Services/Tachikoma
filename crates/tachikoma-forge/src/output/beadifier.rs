@@ -1,73 +1,34 @@
-# Spec 580: Beadifier - Consensus to Tasks
+//! Beadifier - Converts consensus decisions into atomic, actionable tasks.
 
-**Priority:** P0  
-**Status:** planned  
-**Depends on:** 579  
-**Estimated Effort:** 4 hours  
-**Target Files:**
-- `crates/tachikoma-forge/src/output/beadifier.rs` (new)
-- `crates/tachikoma-forge/src/output/mod.rs` (update)
-
----
-
-## Overview
-
-The Beadifier takes a Think Tank consensus and breaks it into atomic, actionable tasks. Each task becomes either:
-1. A bead issue via `bd create` (preferred for tracking)
-2. A small markdown spec file (for Ralph loop)
-
-**Critical Design Rule**: LLMs bias toward monolithic outputs. The Beadifier FORCES decomposition by:
-- Calling the LLM with a strict "one task per response" prompt
-- Iterating until all tasks are extracted
-- Validating each task is truly atomic (single action, <100 words)
-
-Reference: [Beads](https://github.com/steveyegge/beads) - "Distributed, git-backed graph issue tracker for AI agents"
-
----
-
-## Acceptance Criteria
-
-- [x] Create `crates/tachikoma-forge/src/output/beadifier.rs`
-- [x] Define `BeadTask` struct: title, description, priority (P0-P4), dependencies, type (task/bug/feature)
-- [x] Define `BeadifyConfig`: max_tasks, target (Beads | SpecFiles), epic_id (for hierarchy)
-- [x] Implement `Beadifier::extract_tasks(summary: &ConsensusSummary, llm: &dyn LlmProvider) -> Vec<BeadTask>`
-- [x] Use iterative prompting: "Given this decision, what is the FIRST atomic task?"
-- [x] Validate each task: title < 80 chars, description < 200 chars, no compound verbs ("and", "then")
-- [x] Implement `Beadifier::to_beads(tasks: &[BeadTask]) -> Vec<String>` returning `bd create` commands
-- [x] Implement `Beadifier::to_spec_files(tasks: &[BeadTask], dir: &Path) -> Result<()>` writing markdown files
-- [x] Export from `output/mod.rs`
-- [x] Verify `cargo check -p tachikoma-forge` passes
-
----
-
-## Implementation
-
-```rust
-// crates/tachikoma-forge/src/output/beadifier.rs
-
-use crate::llm::{LlmProvider, LlmRequest, LlmMessage, MessageRole};
+use crate::llm::{LlmProvider, LlmRequest, LlmMessage, MessageRole, LlmError};
 use crate::output::ConsensusSummary;
+use serde::{Deserialize, Serialize};
 use std::path::Path;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BeadTask {
     pub title: String,         // Max 80 chars
     pub description: String,   // Max 200 chars
     pub priority: Priority,
+    #[serde(rename = "type")]
     pub task_type: TaskType,
     pub dependencies: Vec<String>,  // Other task titles this blocks on
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum Priority {
     P0, P1, P2, P3, P4
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum TaskType {
+    #[serde(rename = "task")]
     Task,
+    #[serde(rename = "bug")]
     Bug,
+    #[serde(rename = "feature")]
     Feature,
+    #[serde(rename = "docs")]
     Docs,
 }
 
@@ -108,13 +69,13 @@ impl Beadifier {
         &self,
         summary: &ConsensusSummary,
         llm: &dyn LlmProvider,
-    ) -> Result<Vec<BeadTask>, crate::llm::LlmError> {
+    ) -> Result<Vec<BeadTask>, LlmError> {
         let mut tasks = Vec::new();
-        let mut remaining_context = summary.decision.clone();
+        let remaining_context = &summary.decision;
         
         for i in 0..self.config.max_tasks {
             let prompt = EXTRACT_TASK_PROMPT
-                .replace("{decision}", &remaining_context)
+                .replace("{decision}", remaining_context)
                 .replace("{task_num}", &(i + 1).to_string());
             
             let request = LlmRequest {
@@ -131,6 +92,7 @@ impl Beadifier {
                 ],
                 temperature: Some(0.3), // Low temp for consistency
                 max_tokens: Some(300),
+                system_prompt: None,
             };
             
             let response = llm.complete(request).await?;
@@ -171,17 +133,17 @@ impl Beadifier {
     }
     
     fn parse_task_response(&self, content: &str) -> Option<BeadTask> {
-        // Parse JSON like: {"title": "...", "description": "...", "priority": "P1"}
+        // Try to parse JSON response
         serde_json::from_str(content).ok()
     }
     
     /// Generate `bd create` commands for each task
     pub fn to_beads(&self, tasks: &[BeadTask]) -> Vec<String> {
-        tasks.iter().enumerate().map(|(i, task)| {
+        tasks.iter().map(|task| {
             let mut cmd = format!(
                 "bd create \"{}\" -p {} --type {}",
                 task.title.replace('"', r#"\""#),
-                task.priority as u8,
+                task.priority.as_u8(),
                 task.task_type.as_str(),
             );
             
@@ -189,7 +151,7 @@ impl Beadifier {
                 cmd.push_str(&format!(" --parent {}", epic));
             }
             
-            // Add dependency links as a follow-up
+            // Add dependency links as a comment
             if !task.dependencies.is_empty() {
                 cmd.push_str(&format!(" # deps: {}", task.dependencies.join(", ")));
             }
@@ -256,6 +218,16 @@ impl Priority {
             Priority::P4 => "P4",
         }
     }
+    
+    fn as_u8(&self) -> u8 {
+        match self {
+            Priority::P0 => 0,
+            Priority::P1 => 1,
+            Priority::P2 => 2,
+            Priority::P3 => 3,
+            Priority::P4 => 4,
+        }
+    }
 }
 
 fn slugify(s: &str) -> String {
@@ -289,24 +261,82 @@ Decision to implement:
 Extract task #{task_num}. What is ONE atomic action needed?
 If all tasks have been extracted, respond with {"title": "DONE"}.
 "#;
-```
 
----
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-## Usage Example
-
-```rust
-// After Think Tank converges
-let summary = ConsensusSummary::generate(&session);
-let beadifier = Beadifier::new(BeadifyConfig::default());
-let tasks = beadifier.extract_tasks(&summary, &provider).await?;
-
-// Option A: Create beads issues
-for cmd in beadifier.to_beads(&tasks) {
-    println!("{}", cmd);
-    // Or: std::process::Command::new("bd").args(cmd.split_whitespace().skip(1)).spawn();
+    #[test]
+    fn test_is_atomic_rejects_compound_tasks() {
+        let beadifier = Beadifier::new(BeadifyConfig::default());
+        
+        let compound_task = BeadTask {
+            title: "Create module and add tests".to_string(),
+            description: "Create a new module and then add tests".to_string(),
+            priority: Priority::P1,
+            task_type: TaskType::Task,
+            dependencies: vec![],
+        };
+        
+        assert!(!beadifier.is_atomic(&compound_task));
+    }
+    
+    #[test]
+    fn test_is_atomic_accepts_simple_tasks() {
+        let beadifier = Beadifier::new(BeadifyConfig::default());
+        
+        let simple_task = BeadTask {
+            title: "Create module".to_string(),
+            description: "Create a new module in the codebase".to_string(),
+            priority: Priority::P1,
+            task_type: TaskType::Task,
+            dependencies: vec![],
+        };
+        
+        assert!(beadifier.is_atomic(&simple_task));
+    }
+    
+    #[test]
+    fn test_is_atomic_rejects_long_titles() {
+        let beadifier = Beadifier::new(BeadifyConfig::default());
+        
+        let long_task = BeadTask {
+            title: "A".repeat(85), // Too long
+            description: "Short description".to_string(),
+            priority: Priority::P1,
+            task_type: TaskType::Task,
+            dependencies: vec![],
+        };
+        
+        assert!(!beadifier.is_atomic(&long_task));
+    }
+    
+    #[test]
+    fn test_slugify() {
+        assert_eq!(slugify("Create Module"), "create-module");
+        assert_eq!(slugify("Fix Bug #123"), "fix-bug-123");
+        assert_eq!(slugify("Add_tests-for-API"), "add-tests-for-api");
+    }
+    
+    #[test]
+    fn test_to_beads_generates_commands() {
+        let beadifier = Beadifier::new(BeadifyConfig::default());
+        
+        let tasks = vec![
+            BeadTask {
+                title: "Create module".to_string(),
+                description: "Create a new module".to_string(),
+                priority: Priority::P1,
+                task_type: TaskType::Task,
+                dependencies: vec![],
+            }
+        ];
+        
+        let commands = beadifier.to_beads(&tasks);
+        assert_eq!(commands.len(), 1);
+        assert!(commands[0].contains("bd create"));
+        assert!(commands[0].contains("Create module"));
+        assert!(commands[0].contains("-p 1"));
+        assert!(commands[0].contains("--type task"));
+    }
 }
-
-// Option B: Create spec files for Ralph
-beadifier.to_spec_files(&tasks, Path::new("specs/phase-99-generated"), 900)?;
-```
