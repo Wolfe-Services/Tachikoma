@@ -19,12 +19,12 @@ Create the foundational LLM provider trait and types that all LLM implementation
 
 ## Acceptance Criteria
 
-- [ ] Add dependencies to `crates/tachikoma-forge/Cargo.toml`: `async-trait`, `futures`, `async-stream`, `reqwest` with `stream` feature, `tokio-stream`
-- [ ] Create `crates/tachikoma-forge/src/llm/mod.rs` that exports the module
-- [ ] Create `LlmProvider` trait with `complete()` and `complete_stream()` methods
-- [ ] Define `LlmRequest` struct with: model, messages, temperature, max_tokens, system_prompt
-- [ ] Define `LlmMessage` struct with: role (User/Assistant/System), content
-- [ ] Define `LlmResponse` with: content, role, finish_reason, usage (tokens)
+- [x] Add dependencies to `crates/tachikoma-forge/Cargo.toml`: `async-trait`, `futures`, `async-stream`, `reqwest` with `stream` feature, `tokio-stream`
+- [x] Create `crates/tachikoma-forge/src/llm/mod.rs` that exports the module
+- [x] Create `LlmProvider` trait with `complete()` and `complete_stream()` methods
+- [x] Define `LlmRequest` struct with: model, messages, temperature, max_tokens, system_prompt
+- [x] Define `LlmMessage` struct with: role (User/Assistant/System), content
+- [x] Define `LlmResponse` with: content, role, finish_reason, usage (tokens)
 - [ ] Define `LlmStreamChunk` for streaming: delta (String), is_complete (bool), finish_reason
 - [ ] Define `LlmError` enum for: MissingApiKey, NetworkError, ParseError, RateLimited
 - [ ] Export `llm` module from `crates/tachikoma-forge/src/lib.rs`
