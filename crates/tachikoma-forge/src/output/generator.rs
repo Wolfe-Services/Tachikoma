@@ -188,7 +188,7 @@ impl OutputGenerator {
                          - **Drafter:** {}\n\
                          - **Duration:** {}ms\n\
                          - **Tokens:** {} in / {} out\n\n",
-                        d.drafter.display_name,
+                        d.drafter.name,
                         d.duration_ms,
                         d.tokens.input,
                         d.tokens.output
@@ -204,7 +204,7 @@ impl OutputGenerator {
                              - Strengths: {}\n\
                              - Weaknesses: {}\n\
                              - Suggestions: {}\n\n",
-                            critique.critic.display_name,
+                            critique.critic.name,
                             critique.score,
                             critique.strengths.len(),
                             critique.weaknesses.len(),
@@ -219,7 +219,7 @@ impl OutputGenerator {
                          - **Conflicts Resolved:** {}\n\
                          - **Changes Made:** {}\n\
                          - **Duration:** {}ms\n\n",
-                        s.synthesizer.display_name,
+                        s.synthesizer.name,
                         s.resolved_conflicts.len(),
                         s.changes.len(),
                         s.duration_ms
@@ -244,7 +244,7 @@ impl OutputGenerator {
                          - **Focus Area:** {}\n\
                          - **Depth:** {}\n\
                          - **Duration:** {}ms\n\n",
-                        r.refiner.display_name,
+                        r.refiner.name,
                         r.focus_area,
                         r.depth,
                         r.duration_ms

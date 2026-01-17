@@ -46,7 +46,7 @@ pub fn build_prompt(
                 into a unified solution.\n\n\
                 Goal: {}\n\n\
                 Create a cohesive approach that addresses the critiques.",
-                participant.display_name,
+                participant.name,
                 goal
             )
         }
@@ -57,7 +57,7 @@ pub fn build_prompt(
                 Review the synthesized solution.\n\n\
                 Vote: Do you AGREE or DISAGREE that this adequately addresses the goal?\n\n\
                 Provide your reasoning. If you disagree, specify what's missing.",
-                participant.display_name
+                participant.name
             )
         }
     }

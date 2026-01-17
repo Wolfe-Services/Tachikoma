@@ -135,7 +135,7 @@ impl ConsensusSummary {
             .flat_map(|conv| &conv.votes)
             .filter(|vote| !vote.agrees)
             .map(|vote| DissentingView {
-                participant: format!("The {}", vote.participant.display_name),
+                participant: format!("The {}", vote.participant.name),
                 concern: vote.reasoning.clone(),
             })
             .collect()
