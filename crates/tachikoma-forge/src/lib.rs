@@ -4,6 +4,7 @@ pub mod error;
 pub mod llm;
 pub mod orchestrator;
 pub mod output;
+pub mod participant;
 pub mod prompts;
 pub mod session;
 pub mod round;
@@ -13,11 +14,12 @@ pub mod templates;
 // Re-export common types
 pub use error::{ForgeError, ForgeResult};
 pub use orchestrator::{ForgeOrchestrator, ForgeEvent, RoundType};
+pub use participant::{Participant, ParticipantRole, ParticipantBuilder, ModelConfig, LlmProvider};
 pub use prompts::build_prompt;
 pub use session::{ForgeSession, ForgeSessionStatus, ForgeSessionConfig, ForgeTopic, TokenUsage};
 pub use round::{ForgeRound, DraftRound, CritiqueRound, SynthesisRound, RefinementRound, ConvergenceRound};
 pub use quality::{QualityTracker, QualitySnapshot, QualityDimension, QualityTrend, QualityReport, CritiqueSummary};
-pub use templates::{TemplateEngine, Template, TemplateContext, OutputType, ParticipantRole};
+pub use templates::{TemplateEngine, Template, TemplateContext, OutputType};
 
 // Re-export from tachikoma-common-core
 pub use tachikoma_common_core::ForgeSessionId;
@@ -80,23 +82,6 @@ impl DissentLog {
             output.push_str(&format!("- **{}**: {} ({})\n", dissent.id, dissent.description, dissent.timestamp.format("%Y-%m-%d %H:%M UTC")));
         }
         output
-    }
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct Participant {
-    pub id: String,
-    pub display_name: String,
-    pub model_name: String,
-}
-
-impl Participant {
-    pub fn claude_sonnet() -> Self {
-        Self {
-            id: "claude-3-5-sonnet-20241022".to_string(),
-            display_name: "Claude 3.5 Sonnet".to_string(),
-            model_name: "claude-3-5-sonnet-20241022".to_string(),
-        }
     }
 }
 
