@@ -59,7 +59,7 @@ impl ForgeOrchestrator {
         
         for pwp in &self.participants {
             let participant_id = pwp.participant.id.clone();
-            let participant_name = pwp.participant.display_name.clone();
+            let participant_name = pwp.participant.name.clone();
             
             let _ = self.event_tx.send(ForgeEvent::ParticipantThinking {
                 participant_id: participant_id.clone(),

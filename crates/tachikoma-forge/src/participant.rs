@@ -6,8 +6,8 @@ use uuid::Uuid;
 /// A participant in a forge session with model configuration.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Participant {
-    pub id: String,
-    pub display_name: String,
+    pub id: Uuid,
+    pub name: String,
     pub role: ParticipantRole,
     pub model_config: ModelConfig,
     pub system_prompt: String,
@@ -79,8 +79,8 @@ impl Participant {
     /// Human participant (no LLM calls)
     pub fn human(name: impl Into<String>, role: ParticipantRole) -> Self {
         Self {
-            id: Uuid::new_v4().to_string(),
-            display_name: name.into(),
+            id: Uuid::new_v4(),
+            name: name.into(),
             role,
             model_config: ModelConfig::none(),
             system_prompt: String::new(),
@@ -91,7 +91,7 @@ impl Participant {
 
 /// Builder for creating participants with fluent interface.
 pub struct ParticipantBuilder {
-    display_name: String,
+    name: String,
     role: ParticipantRole,
     model_config: ModelConfig,
     system_prompt: String,
@@ -101,7 +101,7 @@ impl ParticipantBuilder {
     /// Create a new participant builder.
     pub fn new(name: impl Into<String>) -> Self {
         Self {
-            display_name: name.into(),
+            name: name.into(),
             role: ParticipantRole::Specialist,
             model_config: ModelConfig::default_claude(),
             system_prompt: String::new(),
@@ -165,8 +165,8 @@ impl ParticipantBuilder {
     /// Build the participant.
     pub fn build(self) -> Participant {
         Participant {
-            id: Uuid::new_v4().to_string(),
-            display_name: self.display_name,
+            id: Uuid::new_v4(),
+            name: self.name,
             role: self.role,
             model_config: self.model_config,
             system_prompt: self.system_prompt,
