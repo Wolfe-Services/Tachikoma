@@ -1,4 +1,4 @@
-use crate::{Participant, ForgeSession};
+use crate::ForgeSession;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

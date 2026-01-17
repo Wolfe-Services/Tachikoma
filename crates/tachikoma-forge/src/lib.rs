@@ -11,6 +11,7 @@ pub mod session;
 pub mod round;
 pub mod quality;
 pub mod deliberation;
+pub mod templates;
 
 // Re-export common types
 pub use error::{ForgeError, ForgeResult};
@@ -24,7 +25,7 @@ pub use quality::{QualityTracker, QualitySnapshot, QualityDimension, QualityTren
 pub use templates::{TemplateEngine, Template, TemplateContext, OutputType};
 pub use deliberation::{
     DeliberationEngine, DeliberationRound, Contribution, Opinion, Stance, Divergence, 
-    DivergentPosition, RoundStatus, DivergenceDetector, ConvergenceScore, calculate_convergence, 
+    DivergentPosition, RoundStatus, DeliberationRoundType, DivergenceDetector, ConvergenceScore, calculate_convergence, 
     calculate_convergence_weighted
 };
 
