@@ -398,7 +398,7 @@ mod tests {
 
         let critiques = vec![
             Critique {
-                critic: Participant::claude_sonnet(),
+                critic: Participant::claude_analyst("Critic"),
                 strengths: vec!["Good structure".to_string()],
                 weaknesses: vec!["Missing tests".to_string()],
                 suggestions: vec![
@@ -428,7 +428,7 @@ mod tests {
 
         let critiques = vec![
             Critique {
-                critic: Participant::claude_sonnet(),
+                critic: Participant::claude_analyst("Critic"),
                 strengths: vec![],
                 weaknesses: vec![],
                 suggestions: vec![
@@ -472,7 +472,7 @@ mod tests {
         // First round with score 70
         let critiques1 = vec![
             Critique {
-                critic: Participant::claude_sonnet(),
+                critic: Participant::claude_analyst("Critic"),
                 strengths: vec![], weaknesses: vec![], suggestions: vec![],
                 score: 70, raw_content: String::new(),
                 tokens: Default::default(), duration_ms: 0,
@@ -483,7 +483,7 @@ mod tests {
         // Second round with score 80 (improving)
         let critiques2 = vec![
             Critique {
-                critic: Participant::claude_sonnet(),
+                critic: Participant::claude_analyst("Critic"),
                 strengths: vec![], weaknesses: vec![], suggestions: vec![],
                 score: 80, raw_content: String::new(),
                 tokens: Default::default(), duration_ms: 0,
