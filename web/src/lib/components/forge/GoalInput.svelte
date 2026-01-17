@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { marked } from 'marked';
+  import GoalRefinementChat from './GoalRefinementChat.svelte';
 
   export let value: string = '';
   export let name: string = '';
@@ -12,6 +13,7 @@
   }>();
 
   let showPreview = false;
+  let showRefinement = false;
   let previewHtml = '';
 
   function handleGoalInput(event: Event) {
@@ -34,6 +36,26 @@
     if (showPreview) {
       updatePreview(value);
     }
+  }
+
+  function toggleRefinement() {
+    showRefinement = !showRefinement;
+    // Close preview when opening refinement
+    if (showRefinement && showPreview) {
+      showPreview = false;
+    }
+  }
+
+  function handleRefinementClose() {
+    showRefinement = false;
+  }
+
+  function handleApplySuggestions(event: CustomEvent<string>) {
+    const newGoal = event.detail;
+    value = newGoal;
+    dispatch('goalChange', newGoal);
+    updatePreview(newGoal);
+    showRefinement = false;
   }
 
   function updatePreview(content: string) {
@@ -81,6 +103,16 @@
         <span class="required">*</span>
       </label>
       <div class="goal-controls">
+        <button
+          type="button"
+          class="refine-toggle"
+          class:active={showRefinement}
+          on:click={toggleRefinement}
+          data-testid="refine-toggle"
+          title="Refine your goal with AI assistance"
+        >
+          ✨ Refine with AI
+        </button>
         <span class="char-count" class:warning={value.length > 4500}>
           {value.length}/5000
         </span>
@@ -134,6 +166,14 @@ Provide relevant context...
       Supports Markdown formatting: **bold**, *italic*, lists, links, etc.
     </div>
   </div>
+
+  {#if showRefinement}
+    <GoalRefinementChat
+      currentGoal={value}
+      on:close={handleRefinementClose}
+      on:applySuggestions={handleApplySuggestions}
+    />
+  {/if}
 
   {#if errors.length > 0}
     <div class="error-list" role="alert">
@@ -196,19 +236,24 @@ Provide relevant context...
 
   .form-input {
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
     font-size: 1rem;
-    background: var(--input-bg, white);
-    color: var(--text-primary);
-    transition: border-color 0.15s ease;
+    background: var(--input-bg);
+    color: var(--input-text);
+    transition: all 0.2s ease;
+  }
+
+  .form-input::placeholder {
+    color: var(--text-placeholder);
   }
 
   .form-input:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px var(--primary-color-alpha, rgba(59, 130, 246, 0.1));
+    background: var(--input-bg-focus);
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px var(--primary-color-alpha);
   }
 
   .goal-header {
@@ -216,12 +261,38 @@ Provide relevant context...
     justify-content: space-between;
     align-items: end;
     margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 
   .goal-controls {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .refine-toggle {
+    padding: 0.375rem 0.875rem;
+    border: 1px solid rgba(78, 205, 196, 0.35);
+    border-radius: 6px;
+    background: linear-gradient(135deg, rgba(78, 205, 196, 0.12), rgba(78, 205, 196, 0.04));
+    color: var(--tachi-cyan, #4ecdc4);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .refine-toggle:hover {
+    background: linear-gradient(135deg, rgba(78, 205, 196, 0.2), rgba(78, 205, 196, 0.08));
+    box-shadow: 0 0 12px rgba(78, 205, 196, 0.15);
+  }
+
+  .refine-toggle.active {
+    background: linear-gradient(135deg, rgba(78, 205, 196, 0.35), rgba(78, 205, 196, 0.15));
+    border-color: rgba(78, 205, 196, 0.5);
+    box-shadow: 0 0 15px rgba(78, 205, 196, 0.2);
   }
 
   .char-count {
@@ -266,18 +337,23 @@ Provide relevant context...
   .goal-textarea {
     width: 100%;
     min-height: 300px;
-    padding: 1rem;
+    padding: 1.25rem;
     border: none;
-    background: var(--input-bg, white);
-    color: var(--text-primary);
+    background: var(--input-bg);
+    color: var(--input-text);
     font-family: inherit;
-    font-size: 0.9rem;
-    line-height: 1.5;
+    font-size: 0.95rem;
+    line-height: 1.6;
     resize: vertical;
+  }
+
+  .goal-textarea::placeholder {
+    color: var(--text-placeholder);
   }
 
   .goal-textarea:focus {
     outline: none;
+    background: var(--input-bg-focus);
   }
 
   .goal-preview {
@@ -371,15 +447,16 @@ Provide relevant context...
 
   .tips-section {
     margin-top: 2rem;
-    padding: 1.5rem;
-    background: var(--info-bg, #f0f9ff);
-    border-radius: 8px;
-    border-left: 4px solid var(--info-color, #0ea5e9);
+    padding: 1.25rem 1.5rem;
+    background: var(--info-bg);
+    border-radius: 10px;
+    border: 1px solid rgba(14, 165, 233, 0.15);
+    border-left: 3px solid var(--info-color);
   }
 
   .tips-section h3 {
     margin: 0 0 1rem 0;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
     color: var(--text-primary);
   }
@@ -391,21 +468,43 @@ Provide relevant context...
   }
 
   .tips-list li {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.6rem;
     color: var(--text-secondary);
     line-height: 1.4;
     position: relative;
+    font-size: 0.875rem;
   }
 
   .tips-list li::before {
     content: '→';
     position: absolute;
     left: -1.25rem;
-    color: var(--info-color, #0ea5e9);
+    color: var(--info-color);
     font-weight: bold;
   }
 
   .tips-list li strong {
     color: var(--text-primary);
+  }
+
+  /* Goal container border color */
+  .goal-container {
+    border-color: var(--input-border);
+  }
+
+  .goal-container:focus-within {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px var(--primary-color-alpha);
+  }
+
+  /* Code blocks in preview */
+  :global(.goal-preview code) {
+    background: var(--code-bg);
+    color: #e879f9;
+  }
+
+  :global(.goal-preview pre) {
+    background: var(--code-bg);
+    border: 1px solid var(--border-color);
   }
 </style>
