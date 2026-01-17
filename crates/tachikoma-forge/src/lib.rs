@@ -10,7 +10,7 @@ pub mod roles;
 pub mod session;
 pub mod round;
 pub mod quality;
-pub mod templates;
+pub mod deliberation;
 
 // Re-export common types
 pub use error::{ForgeError, ForgeResult};
@@ -22,6 +22,11 @@ pub use session::{ForgeSession, ForgeSessionStatus, ForgeSessionConfig, ForgeTop
 pub use round::{ForgeRound, DraftRound, CritiqueRound, SynthesisRound, RefinementRound, ConvergenceRound};
 pub use quality::{QualityTracker, QualitySnapshot, QualityDimension, QualityTrend, QualityReport, CritiqueSummary};
 pub use templates::{TemplateEngine, Template, TemplateContext, OutputType};
+pub use deliberation::{
+    DeliberationEngine, DeliberationRound, Contribution, Opinion, Stance, Divergence, 
+    DivergentPosition, RoundStatus, DivergenceDetector, ConvergenceScore, calculate_convergence, 
+    calculate_convergence_weighted
+};
 
 // Re-export from tachikoma-common-core
 pub use tachikoma_common_core::ForgeSessionId;
