@@ -21,13 +21,13 @@ Implement the Anthropic (Claude) LLM provider with streaming support. This is th
 - [x] Create `crates/tachikoma-forge/src/llm/anthropic.rs`
 - [x] Implement `AnthropicProvider` struct with `client: reqwest::Client`, `api_key: String`, `model: String`
 - [x] Add `AnthropicProvider::new(model: &str)` that reads `ANTHROPIC_API_KEY` env var
-- [ ] Add convenience constructors: `claude_sonnet_4()`, `claude_3_5_sonnet()`
-- [ ] Implement `LlmProvider::complete_stream()` with SSE parsing
-- [ ] Handle Anthropic event types: `content_block_delta`, `message_delta`, `message_stop`
-- [ ] Implement `LlmProvider::complete()` for non-streaming
-- [ ] Export `AnthropicProvider` from `llm/mod.rs`
-- [ ] Write a test that mocks the API response (don't call real API in tests)
-- [ ] Verify `cargo check -p tachikoma-forge` passes
+- [x] Add convenience constructors: `claude_sonnet_4()`, `claude_3_5_sonnet()`
+- [x] Implement `LlmProvider::complete_stream()` with SSE parsing
+- [x] Handle Anthropic event types: `content_block_delta`, `message_delta`, `message_stop`
+- [x] Implement `LlmProvider::complete()` for non-streaming
+- [x] Export `AnthropicProvider` from `llm/mod.rs`
+- [x] Write a test that mocks the API response (don't call real API in tests)
+- [x] Verify `cargo check -p tachikoma-forge` passes
 
 ---
 
