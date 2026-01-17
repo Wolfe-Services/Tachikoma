@@ -19,15 +19,15 @@ Wire the frontend to receive real streaming events from the Rust backend via IPC
 
 ## Acceptance Criteria
 
-- [ ] Update `forgeService.ts` to detect when NAPI bindings are available
-- [ ] When backend is connected, `useMockMode` should be false
-- [ ] Streaming tokens from backend display in UI in real-time
-- [ ] Participant name and model are shown with each response
-- [ ] Error messages from backend display in UI
-- [ ] Add loading/thinking indicators per participant
-- [ ] Handle backend disconnection gracefully (show reconnect message)
-- [ ] Remove console.warn spam when in real mode
-- [ ] Verify deliberation works end-to-end with real LLM calls
+- [x] Update `forgeService.ts` to detect when NAPI bindings are available
+- [x] When backend is connected, `useMockMode` should be false
+- [x] Streaming tokens from backend display in UI in real-time
+- [x] Participant name and model are shown with each response
+- [x] Error messages from backend display in UI
+- [x] Add loading/thinking indicators per participant
+- [x] Handle backend disconnection gracefully (show reconnect message)
+- [x] Remove console.warn spam when in real mode
+- [x] Verify deliberation works end-to-end with real LLM calls
 
 ---
 
