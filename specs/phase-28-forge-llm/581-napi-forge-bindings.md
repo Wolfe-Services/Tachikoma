@@ -20,15 +20,15 @@ Create NAPI-RS bindings to expose `tachikoma-forge` functionality to Electron's 
 
 ## Acceptance Criteria
 
-- [ ] Create new crate `crates/tachikoma-napi` with napi-rs dependencies
-- [ ] Add crate to workspace in root `Cargo.toml`
-- [ ] Export `create_forge_session` function via NAPI
-- [ ] Export `start_deliberation` function that returns a stream handle
-- [ ] Export `stop_deliberation` function
-- [ ] Export `get_session` and `list_sessions` functions
-- [ ] Build produces `.node` file in `electron/` directory
-- [ ] Update `electron/main/native.ts` to import and use the `.node` module
-- [ ] Verify `npm run build` in electron directory succeeds
+- [x] Create new crate `crates/tachikoma-napi` with napi-rs dependencies
+- [x] Add crate to workspace in root `Cargo.toml`
+- [x] Export `create_forge_session` function via NAPI
+- [x] Export `start_deliberation` function that returns a stream handle
+- [x] Export `stop_deliberation` function
+- [x] Export `get_session` and `list_sessions` functions
+- [x] Build produces `.node` file in `electron/` directory
+- [x] Update `electron/main/native.ts` to import and use the `.node` module
+- [x] Verify `npm run build` in electron directory succeeds
 
 ---
 
