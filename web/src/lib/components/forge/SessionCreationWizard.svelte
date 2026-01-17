@@ -1,22 +1,25 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { writable, derived } from 'svelte/store';
+  import { writable, derived, get } from 'svelte/store';
+  import Icon from '$lib/components/common/Icon.svelte';
   import GoalInput from './GoalInput.svelte';
   import ParticipantSelect from './ParticipantSelect.svelte';
-  import OracleSelect from './OracleSelect.svelte';
-  import SessionConfig from './SessionConfig.svelte';
+  import OracleConfigPanel from './OracleConfigPanel.svelte';
   import SessionReview from './SessionReview.svelte';
   import StepIndicator from '$lib/components/ui/StepIndicator.svelte';
   import { forgeSessionStore } from '$lib/stores/forgeSession';
+  import { sessionLoading, sessionError } from '$lib/stores/forgeSession';
+  import Spinner from '$lib/components/ui/Spinner/Spinner.svelte';
+  import GlassPanel from '$lib/components/ui/GlassPanel.svelte';
   import { validateSessionConfig } from '$lib/utils/sessionValidation';
   import type {
     SessionDraft,
     SessionTemplate,
-    ValidationResult,
     WizardStep
   } from '$lib/types/forge';
 
   export let template: SessionTemplate | null = null;
+  export let editSessionId: string | null = null;
 
   const dispatch = createEventDispatcher<{
     created: { sessionId: string };
@@ -27,17 +30,43 @@
   const steps: WizardStep[] = [
     { id: 'goal', label: 'Define Goal', icon: 'target' },
     { id: 'participants', label: 'Select Participants', icon: 'users' },
-    { id: 'oracle', label: 'Choose Oracle', icon: 'brain' },
-    { id: 'config', label: 'Configure Session', icon: 'settings' },
+    { id: 'oracle-config', label: 'Oracle & Config', icon: 'sliders' },
     { id: 'review', label: 'Review & Start', icon: 'check' }
   ];
 
   let currentStep = writable<number>(0);
-  let sessionDraft = writable<SessionDraft>(initializeDraft(template));
+  let sessionDraft = writable<SessionDraft>(initializeDraft(template, editSessionId));
   let validationErrors = writable<Map<string, string[]>>(new Map());
   let isSubmitting = writable<boolean>(false);
+  let isEditMode = editSessionId !== null;
 
-  function initializeDraft(tmpl: SessionTemplate | null): SessionDraft {
+  function initializeDraft(tmpl: SessionTemplate | null, sessionIdToEdit: string | null): SessionDraft {
+    // Edit mode: load from existing session
+    if (sessionIdToEdit) {
+      const state = get(forgeSessionStore);
+      const existingSession = state.sessions.find(s => s.id === sessionIdToEdit);
+      if (existingSession) {
+        return {
+          name: existingSession.name,
+          goal: existingSession.goal,
+          participants: [...existingSession.participants],
+          oracle: existingSession.oracle,
+          config: existingSession.config || {
+            maxRounds: 5,
+            convergenceThreshold: 0.8,
+            allowHumanIntervention: true,
+            autoSaveInterval: 30000,
+            timeoutMinutes: 60
+          },
+          metadata: {
+            createdAt: existingSession.createdAt,
+            lastModified: new Date()
+          }
+        };
+      }
+    }
+
+    // Template mode
     if (tmpl) {
       return {
         name: `${tmpl.name} - ${new Date().toLocaleDateString()}`,
@@ -53,6 +82,7 @@
       };
     }
 
+    // New session
     return {
       name: '',
       goal: '',
@@ -83,10 +113,8 @@
           return $draft.goal.trim().length >= 10 && stepErrors.length === 0;
         case 'participants':
           return $draft.participants.length >= 2 && stepErrors.length === 0;
-        case 'oracle':
+        case 'oracle-config':
           return $draft.oracle !== null && stepErrors.length === 0;
-        case 'config':
-          return stepErrors.length === 0;
         case 'review':
           return $errors.size === 0;
         default:
@@ -168,10 +196,17 @@
         }
       }
 
-      const sessionId = await forgeSessionStore.createSession($sessionDraft);
+      let sessionId: string;
+      if (isEditMode && editSessionId) {
+        // Update existing session
+        sessionId = await forgeSessionStore.updateSession(editSessionId, $sessionDraft);
+      } else {
+        // Create new session
+        sessionId = await forgeSessionStore.createSession($sessionDraft);
+      }
       dispatch('created', { sessionId });
     } catch (error) {
-      console.error('Failed to create session:', error);
+      console.error('Failed to save session:', error);
       validationErrors.update(errors => {
         errors.set('submit', [(error as Error).message]);
         return errors;
@@ -186,23 +221,62 @@
   }
 
   function updateDraft(field: keyof SessionDraft, value: unknown) {
-    sessionDraft.update(draft => {
-      draft[field] = value as never;
-      draft.metadata.lastModified = new Date();
-      return draft;
-    });
+    sessionDraft.update(draft => ({
+      ...draft,
+      [field]: value,
+      metadata: { ...draft.metadata, lastModified: new Date() }
+    }));
   }
+
+  $: submitErrors = $validationErrors.get('submit') || [];
 </script>
 
-<div class="session-wizard" data-testid="session-creation-wizard">
+<GlassPanel
+  as="section"
+  className="session-wizard"
+  accent="cyan"
+  data-testid="session-creation-wizard"
+  aria-busy={$isSubmitting || $sessionLoading}
+>
   <header class="wizard-header">
-    <h1>Create Forge Session</h1>
+    <div class="wizard-title">
+      <div class="title-left">
+        <div class="title-icon">
+          <Icon name="brain" size={20} glow />
+        </div>
+        <div class="title-text">
+          <div class="title-tag">SPEC FORGE // 公安9課</div>
+          <h1>{isEditMode ? 'Edit Session' : 'Create Forge Session'}</h1>
+        </div>
+      </div>
+      <div class="title-right">
+        {#if $sessionLoading}
+          <div class="title-loading" aria-label="Working">
+            <Spinner size={16} color="var(--tachi-cyan, #4ecdc4)" />
+            <span>Working…</span>
+          </div>
+        {/if}
+      </div>
+    </div>
     <StepIndicator
       {steps}
       currentStep={$currentStep}
       on:stepClick={(e) => goToStep(e.detail)}
     />
   </header>
+
+  {#if submitErrors.length > 0 || $sessionError}
+    <div class="submit-banner" role="alert" aria-live="polite">
+      <Icon name="alert-triangle" size={18} />
+      <div class="submit-text">
+        <div class="submit-title">Session creation failed</div>
+        <div class="submit-subtitle">{submitErrors[0] ?? $sessionError}</div>
+      </div>
+      <button type="button" class="btn btn-secondary" on:click={() => forgeSessionStore.clearError()}>
+        Dismiss
+      </button>
+    </div>
+  {/if}
 
   <div class="wizard-content">
     {#if $currentStep === 0}
@@ -220,19 +294,15 @@
         on:change={(e) => updateDraft('participants', e.detail)}
       />
     {:else if $currentStep === 2}
-      <OracleSelect
-        selected={$sessionDraft.oracle}
+      <OracleConfigPanel
+        selectedOracle={$sessionDraft.oracle}
         participants={$sessionDraft.participants}
-        errors={$validationErrors.get('oracle') || []}
-        on:change={(e) => updateDraft('oracle', e.detail)}
+        config={$sessionDraft.config}
+        errors={$validationErrors.get('oracle-config') || []}
+        on:oracleChange={(e) => updateDraft('oracle', e.detail)}
+        on:configChange={(e) => updateDraft('config', e.detail)}
       />
     {:else if $currentStep === 3}
-      <SessionConfig
-        config={$sessionDraft.config}
-        errors={$validationErrors.get('config') || []}
-        on:change={(e) => updateDraft('config', e.detail)}
-      />
-    {:else if $currentStep === 4}
       <SessionReview
         draft={$sessionDraft}
         costEstimate={$costEstimate}
@@ -292,12 +362,16 @@
           disabled={!$canProceed || $isSubmitting}
           on:click={createSession}
         >
-          {$isSubmitting ? 'Creating...' : 'Start Session'}
+          {#if $isSubmitting}
+            {isEditMode ? 'Saving...' : 'Creating...'}
+          {:else}
+            {isEditMode ? 'Save Changes' : 'Start Session'}
+          {/if}
         </button>
       {/if}
     </div>
   </footer>
-</div>
+</GlassPanel>
 
 <style>
   .session-wizard {
@@ -306,18 +380,74 @@
     height: 100%;
     max-width: 900px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 1.75rem;
   }
 
   .wizard-header {
     margin-bottom: 2rem;
   }
 
+  .wizard-title {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .title-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.9rem;
+  }
+
+  .title-icon {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(78, 205, 196, 0.18), rgba(78, 205, 196, 0.05));
+    border: 1px solid rgba(78, 205, 196, 0.28);
+    color: var(--tachi-cyan, #4ecdc4);
+    flex-shrink: 0;
+  }
+
+  .title-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .title-tag {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.65rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: rgba(78, 205, 196, 0.9);
+  }
+
   .wizard-header h1 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    color: var(--text-primary);
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary, #e6edf3);
+    letter-spacing: 1.25px;
+    text-transform: uppercase;
+    text-shadow: 0 0 18px rgba(78, 205, 196, 0.25);
+  }
+
+  .title-loading {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.65rem;
+    border-radius: 999px;
+    background: rgba(13, 17, 23, 0.35);
+    border: 1px solid rgba(78, 205, 196, 0.14);
+    color: rgba(230, 237, 243, 0.65);
+    font-size: 0.85rem;
   }
 
   .wizard-content {
@@ -326,12 +456,48 @@
     padding: 1rem 0;
   }
 
+  .submit-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 12px;
+    background: rgba(255, 107, 107, 0.08);
+    border: 1px solid rgba(255, 107, 107, 0.25);
+    color: rgba(230, 237, 243, 0.85);
+    margin: 0 0 1rem;
+  }
+
+  .submit-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .submit-title {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    color: rgba(230, 237, 243, 0.9);
+  }
+
+  .submit-subtitle {
+    font-size: 0.9rem;
+    color: rgba(230, 237, 243, 0.65);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .wizard-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding-top: 1.5rem;
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid rgba(78, 205, 196, 0.14);
     margin-top: 1.5rem;
   }
 
@@ -364,7 +530,7 @@
 
   .btn {
     padding: 0.625rem 1.25rem;
-    border-radius: 6px;
+    border-radius: 10px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -376,25 +542,25 @@
   }
 
   .btn-primary {
-    background: var(--primary-color);
-    color: white;
-    border: none;
+    background: linear-gradient(135deg, var(--tachi-cyan-dark, #2d7a7a), var(--tachi-cyan, #4ecdc4));
+    color: var(--bg-primary, #0d1117);
+    border: 1px solid rgba(78, 205, 196, 0.5);
   }
 
   .btn-primary:hover:not(:disabled) {
-    background: var(--primary-hover);
+    background: linear-gradient(135deg, var(--tachi-cyan, #4ecdc4), var(--tachi-cyan-bright, #6ee7df));
   }
 
   .btn-secondary {
-    background: var(--secondary-bg);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
+    background: rgba(13, 17, 23, 0.25);
+    color: rgba(230, 237, 243, 0.85);
+    border: 1px solid rgba(78, 205, 196, 0.16);
   }
 
   .btn-success {
-    background: var(--success-color);
-    color: white;
-    border: none;
+    background: rgba(63, 185, 80, 0.2);
+    color: var(--success-color, #3fb950);
+    border: 1px solid rgba(63, 185, 80, 0.4);
   }
 
   .btn-ghost {

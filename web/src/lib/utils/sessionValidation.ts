@@ -33,7 +33,8 @@ export async function validateSessionConfig(
     }
   }
 
-  if (!stepId || stepId === 'oracle') {
+  // Handle both legacy step IDs and new combined oracle-config step
+  if (!stepId || stepId === 'oracle' || stepId === 'oracle-config') {
     if (!draft.oracle) {
       errors.push('An oracle must be selected');
     }
@@ -43,7 +44,7 @@ export async function validateSessionConfig(
     }
   }
 
-  if (!stepId || stepId === 'config') {
+  if (!stepId || stepId === 'config' || stepId === 'oracle-config') {
     if (draft.config.maxRounds < 1 || draft.config.maxRounds > 20) {
       errors.push('Maximum rounds must be between 1 and 20');
     }
