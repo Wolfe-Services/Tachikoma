@@ -20,13 +20,13 @@ Define agent roles using AGENTS.md-style structured prompts. Each role has clear
 
 ## Acceptance Criteria
 
-- [ ] Create `AgentRole` struct with: name, description, responsibilities, constraints, output_format
-- [ ] Create preset roles: Architect, Critic, Advocate, Synthesizer, SecurityAuditor, UxExpert
-- [ ] Each role has detailed system prompt following AGENTS.md conventions
-- [ ] Roles can be customized or extended
-- [ ] Add `AgentRole::to_system_prompt()` method
-- [ ] Export from lib.rs
-- [ ] Verify `cargo check -p tachikoma-forge` passes
+- [x] Create `AgentRole` struct with: name, description, responsibilities, constraints, output_format
+- [x] Create preset roles: Architect, Critic, Advocate, Synthesizer, SecurityAuditor, UxExpert
+- [x] Each role has detailed system prompt following AGENTS.md conventions
+- [x] Roles can be customized or extended
+- [x] Add `AgentRole::to_system_prompt()` method
+- [x] Export from lib.rs
+- [x] Verify `cargo check -p tachikoma-forge` passes
 
 ---
 
