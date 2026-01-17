@@ -265,6 +265,7 @@ If all tasks have been extracted, respond with {"title": "DONE"}.
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::env;
 
     #[test]
     fn test_is_atomic_rejects_compound_tasks() {
@@ -338,5 +339,68 @@ mod tests {
         assert!(commands[0].contains("Create module"));
         assert!(commands[0].contains("-p 1"));
         assert!(commands[0].contains("--type task"));
+    }
+    
+    #[test]
+    fn test_to_spec_files_creates_directory() {
+        let beadifier = Beadifier::new(BeadifyConfig::default());
+        
+        let tasks = vec![
+            BeadTask {
+                title: "Create test module".to_string(),
+                description: "Create a test module for verification".to_string(),
+                priority: Priority::P0,
+                task_type: TaskType::Feature,
+                dependencies: vec![],
+            }
+        ];
+        
+        let temp_dir = env::temp_dir().join("beadifier_test");
+        let _ = std::fs::remove_dir_all(&temp_dir); // Clean up if exists
+        
+        let result = beadifier.to_spec_files(&tasks, &temp_dir, 900);
+        assert!(result.is_ok());
+        
+        // Verify directory was created
+        assert!(temp_dir.exists());
+        
+        // Verify file was created
+        let expected_file = temp_dir.join("900-create-test-module.md");
+        assert!(expected_file.exists());
+        
+        // Verify file content
+        let content = std::fs::read_to_string(&expected_file).unwrap();
+        assert!(content.contains("# Spec 900: Create test module"));
+        assert!(content.contains("**Priority:** P0"));
+        assert!(content.contains("**Type:** feature"));
+        assert!(content.contains("Create a test module for verification"));
+        
+        // Clean up
+        let _ = std::fs::remove_dir_all(&temp_dir);
+    }
+    
+    #[test]
+    fn test_beadify_config_with_epic_id() {
+        let config = BeadifyConfig {
+            max_tasks: 10,
+            target: BeadifyTarget::Beads,
+            epic_id: Some("bd-a3f8".to_string()),
+        };
+        
+        let beadifier = Beadifier::new(config);
+        
+        let tasks = vec![
+            BeadTask {
+                title: "Implement feature".to_string(),
+                description: "Implement a new feature".to_string(),
+                priority: Priority::P2,
+                task_type: TaskType::Feature,
+                dependencies: vec![],
+            }
+        ];
+        
+        let commands = beadifier.to_beads(&tasks);
+        assert_eq!(commands.len(), 1);
+        assert!(commands[0].contains("--parent bd-a3f8"));
     }
 }
