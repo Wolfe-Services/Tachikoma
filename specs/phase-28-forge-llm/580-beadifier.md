@@ -207,25 +207,13 @@ impl Beadifier {
             let filename = format!("{:03}-{}.md", spec_id, slugify(&task.title));
             let path = dir.join(&filename);
             
-            let content = format!(
-                "# Spec {}: {}\n\n\
-                **Priority:** {}\n\
-                **Status:** planned\n\
-                **Type:** {}\n\n\
-                ---\n\n\
-                ## Overview\n\n\
-                {}\n\n\
-                ---\n\n\
-                ## Acceptance Criteria\n\n\
-                - [ ] {}\n\
-                - [ ] Verify implementation works\n\
-                - [ ] Run `cargo check` passes\n",
+            // Generate spec markdown content
+            let content = generate_spec_content(
                 spec_id,
-                task.title,
+                &task.title,
                 task.priority.as_str(),
                 task.task_type.as_str(),
-                task.description,
-                task.title,
+                &task.description,
             );
             
             std::fs::write(path, content)?;

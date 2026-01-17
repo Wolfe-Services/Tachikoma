@@ -116,9 +116,9 @@ impl Detection {
         // Try to get the path first
         if let Ok(output) = Command::new("which").arg(command).output() {
             if output.status.success() {
-                let path_str = String::from_utf8_lossy(&output.stdout).trim();
+                let path_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
                 if !path_str.is_empty() {
-                    tool_info.path = Some(PathBuf::from(path_str));
+                    tool_info.path = Some(PathBuf::from(&path_str));
                 }
             }
         }

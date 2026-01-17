@@ -757,7 +757,7 @@ Execute specs in numerical order. Each phase must complete before the next.
 | 573 | [Simple Config Mode](phase-27-ralph-integration/573-simple-config-mode.md) | config, simple, progressive |
 | 574 | [Electron Dev Server](phase-26-hotfix/574-electron-dev-server.md) | electron, dev, port, crypto |
 
-## Phase 28: Forge LLM Integration (575-580)
+## Phase 28: Forge LLM Integration (575-586)
 
 **PRIORITY: P0 - Wire real LLM calls to the Forge Think Tank**
 
@@ -769,3 +769,9 @@ Execute specs in numerical order. Each phase must complete before the next.
 | 578 | [Server Integration](phase-28-forge-llm/578-server-integration.md) | server, api, websocket, routes |
 | 579 | [Consensus Summary](phase-28-forge-llm/579-consensus-summary.md) | summary, output, human, decision |
 | 580 | [Beadifier](phase-28-forge-llm/580-beadifier.md) | beads, tasks, atomic, decompose |
+| 581 | [NAPI-RS Forge Bindings](phase-28-forge-llm/581-napi-forge-bindings.md) | napi, electron, bindings, rust |
+| 582 | [Participant Model Config](phase-28-forge-llm/582-participant-model-config.md) | participant, model, config, multi |
+| 583 | [Agent Role Prompts](phase-28-forge-llm/583-agent-role-prompts.md) | agent, role, prompt, AGENTS.md |
+| 584 | [Divergent Deliberation](phase-28-forge-llm/584-divergent-deliberation.md) | diverge, disagree, refine, converge |
+| 585 | [Multi-Provider Orchestrator](phase-28-forge-llm/585-multi-provider-orchestrator.md) | openai, ollama, multi, factory |
+| 586 | [Frontend-Backend Wire](phase-28-forge-llm/586-frontend-backend-wire.md) | frontend, ipc, stream, wire |

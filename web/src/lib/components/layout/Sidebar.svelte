@@ -165,12 +165,12 @@
     bottom: 0;
     background-image: url("/gints.jpeg");
     background-size: 150% auto;
-    background-position: center 25%;
+    background-position: center 12%;
     background-repeat: no-repeat;
     opacity: 0.12;
     pointer-events: none;
     z-index: 0;
-    filter: grayscale(30%) contrast(1.1);
+    filter: grayscale(20%) contrast(1.1);
     transform: scaleY(-1);
   }
 
