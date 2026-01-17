@@ -13,7 +13,7 @@ serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
 thiserror.workspace = true
 uuid = { version = "1.6", features = ["v4"] }
-rusqlite = { version = "0.31", features = ["chrono"] }
+rusqlite = { version = "0.30", features = ["bundled", "chrono"] }
 parking_lot = "0.12"
 flate2 = "1.0"
 zstd = "0.13"

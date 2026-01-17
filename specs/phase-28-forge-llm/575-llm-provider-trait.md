@@ -28,7 +28,7 @@ Create the foundational LLM provider trait and types that all LLM implementation
 - [x] Define `LlmStreamChunk` for streaming: delta (String), is_complete (bool), finish_reason
 - [x] Define `LlmError` enum for: MissingApiKey, NetworkError, ParseError, RateLimited
 - [x] Export `llm` module from `crates/tachikoma-forge/src/lib.rs`
-- [ ] Verify `cargo check -p tachikoma-forge` passes
+- [x] Verify `cargo check -p tachikoma-forge` passes
 
 ---
 
