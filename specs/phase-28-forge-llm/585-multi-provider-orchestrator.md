@@ -20,16 +20,16 @@ The orchestrator routes each participant's requests to their configured LLM prov
 
 ## Acceptance Criteria
 
-- [ ] Create `OpenAiProvider` implementing `LlmProvider` trait
-- [ ] Create `OllamaProvider` implementing `LlmProvider` trait  
-- [ ] Add `ProviderFactory::create(config: &ModelConfig) -> Box<dyn LlmProvider>`
-- [ ] Update `ForgeOrchestrator` to use `ProviderFactory` per participant
-- [ ] Each participant calls their own configured model
-- [ ] Stream responses from all providers uniformly
-- [ ] Handle provider-specific errors gracefully
-- [ ] Add fallback logic: if provider fails, try next available
-- [ ] Export all providers from llm/mod.rs
-- [ ] Verify `cargo check -p tachikoma-forge` passes
+- [x] Create `OpenAiProvider` implementing `LlmProvider` trait
+- [x] Create `OllamaProvider` implementing `LlmProvider` trait  
+- [x] Add `ProviderFactory::create(config: &ModelConfig) -> Box<dyn LlmProvider>`
+- [x] Update `ForgeOrchestrator` to use `ProviderFactory` per participant
+- [x] Each participant calls their own configured model
+- [x] Stream responses from all providers uniformly
+- [x] Handle provider-specific errors gracefully
+- [x] Add fallback logic: if provider fails, try next available
+- [x] Export all providers from llm/mod.rs
+- [x] Verify `cargo check -p tachikoma-forge` passes
 
 ---
 
