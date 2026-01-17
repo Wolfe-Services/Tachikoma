@@ -1,4 +1,4 @@
-use super::{DeliberationRound, Stance, RoundType};
+use super::{DeliberationRound, Stance, DeliberationRoundType};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -18,7 +18,7 @@ pub fn calculate_convergence(
     // Find the last convergence round
     let convergence_round = rounds.iter()
         .rev()
-        .find(|r| r.round_type == RoundType::Convergence);
+        .find(|r| r.round_type == DeliberationRoundType::Convergence);
     
     let Some(round) = convergence_round else {
         return ConvergenceScore {
