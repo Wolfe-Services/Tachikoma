@@ -23,13 +23,13 @@ Each Think Tank participant can use a different LLM model. This allows diverse p
 ## Acceptance Criteria
 
 - [x] Create `Participant` struct with: id, name, role, model_config, system_prompt
-- [ ] Create `ModelConfig` struct with: provider (anthropic/openai/ollama), model_name, temperature, max_tokens
-- [ ] Add `ParticipantBuilder` for fluent construction
-- [ ] Support at least 3 providers: Anthropic, OpenAI, Ollama
-- [ ] Each participant can have independent temperature/token settings
-- [ ] Add convenience methods: `Participant::claude_analyst()`, `Participant::gpt_critic()`, etc.
-- [ ] Export from lib.rs
-- [ ] Verify `cargo check -p tachikoma-forge` passes
+- [x] Create `ModelConfig` struct with: provider (anthropic/openai/ollama), model_name, temperature, max_tokens
+- [x] Add `ParticipantBuilder` for fluent construction
+- [x] Support at least 3 providers: Anthropic, OpenAI, Ollama
+- [x] Each participant can have independent temperature/token settings
+- [x] Add convenience methods: `Participant::claude_analyst()`, `Participant::gpt_critic()`, etc.
+- [x] Export from lib.rs
+- [x] Verify `cargo check -p tachikoma-forge` passes
 
 ---
 
