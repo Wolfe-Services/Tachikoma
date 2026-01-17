@@ -25,9 +25,9 @@ Create the foundational LLM provider trait and types that all LLM implementation
 - [x] Define `LlmRequest` struct with: model, messages, temperature, max_tokens, system_prompt
 - [x] Define `LlmMessage` struct with: role (User/Assistant/System), content
 - [x] Define `LlmResponse` with: content, role, finish_reason, usage (tokens)
-- [ ] Define `LlmStreamChunk` for streaming: delta (String), is_complete (bool), finish_reason
-- [ ] Define `LlmError` enum for: MissingApiKey, NetworkError, ParseError, RateLimited
-- [ ] Export `llm` module from `crates/tachikoma-forge/src/lib.rs`
+- [x] Define `LlmStreamChunk` for streaming: delta (String), is_complete (bool), finish_reason
+- [x] Define `LlmError` enum for: MissingApiKey, NetworkError, ParseError, RateLimited
+- [x] Export `llm` module from `crates/tachikoma-forge/src/lib.rs`
 - [ ] Verify `cargo check -p tachikoma-forge` passes
 
 ---

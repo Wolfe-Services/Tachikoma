@@ -757,7 +757,7 @@ Execute specs in numerical order. Each phase must complete before the next.
 | 573 | [Simple Config Mode](phase-27-ralph-integration/573-simple-config-mode.md) | config, simple, progressive |
 | 574 | [Electron Dev Server](phase-26-hotfix/574-electron-dev-server.md) | electron, dev, port, crypto |
 
-## Phase 28: Forge LLM Integration (575-578)
+## Phase 28: Forge LLM Integration (575-580)
 
 **PRIORITY: P0 - Wire real LLM calls to the Forge Think Tank**
 
@@ -767,3 +767,5 @@ Execute specs in numerical order. Each phase must complete before the next.
 | 576 | [Anthropic Provider](phase-28-forge-llm/576-anthropic-provider.md) | claude, anthropic, stream, sse |
 | 577 | [Forge Orchestrator](phase-28-forge-llm/577-forge-orchestrator.md) | orchestrator, round, deliberate |
 | 578 | [Server Integration](phase-28-forge-llm/578-server-integration.md) | server, api, websocket, routes |
+| 579 | [Consensus Summary](phase-28-forge-llm/579-consensus-summary.md) | summary, output, human, decision |
+| 580 | [Beadifier](phase-28-forge-llm/580-beadifier.md) | beads, tasks, atomic, decompose |
