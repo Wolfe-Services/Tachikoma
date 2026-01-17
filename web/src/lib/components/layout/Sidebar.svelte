@@ -122,7 +122,7 @@
     bottom: 0;
     background-image: url('/gints.jpeg');
     background-size: 180% auto;
-    background-position: center 20%;
+    background-position: center center;
     background-repeat: no-repeat;
     opacity: 0.12;
     pointer-events: none;
