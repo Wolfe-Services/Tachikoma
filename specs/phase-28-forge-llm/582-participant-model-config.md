@@ -22,7 +22,7 @@ Each Think Tank participant can use a different LLM model. This allows diverse p
 
 ## Acceptance Criteria
 
-- [ ] Create `Participant` struct with: id, name, role, model_config, system_prompt
+- [x] Create `Participant` struct with: id, name, role, model_config, system_prompt
 - [ ] Create `ModelConfig` struct with: provider (anthropic/openai/ollama), model_name, temperature, max_tokens
 - [ ] Add `ParticipantBuilder` for fluent construction
 - [ ] Support at least 3 providers: Anthropic, OpenAI, Ollama
