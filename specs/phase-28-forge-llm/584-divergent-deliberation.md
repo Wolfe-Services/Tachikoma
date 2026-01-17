@@ -20,13 +20,13 @@ Implement a deliberation engine that encourages divergent opinions, tracks disag
 
 ## Acceptance Criteria
 
-- [ ] Create `DeliberationEngine` struct that orchestrates rounds
-- [ ] Track `Opinion` with: stance (Agree/Disagree/Partial), reasoning, concerns
-- [ ] Implement `DivergenceDetector` that identifies conflicting views
-- [ ] Track `DissentLog` of unresolved disagreements across rounds
-- [ ] Implement refinement rounds where dissenters respond to synthesis
-- [ ] Add convergence scoring: count agreements, weight by participant role
-- [ ] Cap refinement at `max_rounds` to prevent infinite loops
+- [x] Create `DeliberationEngine` struct that orchestrates rounds
+- [x] Track `Opinion` with: stance (Agree/Disagree/Partial), reasoning, concerns
+- [x] Implement `DivergenceDetector` that identifies conflicting views
+- [x] Track `DissentLog` of unresolved disagreements across rounds
+- [x] Implement refinement rounds where dissenters respond to synthesis
+- [x] Add convergence scoring: count agreements, weight by participant role
+- [x] Cap refinement at `max_rounds` to prevent infinite loops
 - [ ] Export from lib.rs
 - [ ] Verify `cargo check -p tachikoma-forge` passes
 
