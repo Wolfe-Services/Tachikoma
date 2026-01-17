@@ -16,12 +16,12 @@ Configure Linux AppImage packaging for portable, distribution-agnostic deploymen
 
 ## Acceptance Criteria
 
-- [ ] AppImage created with all dependencies bundled
-- [ ] Desktop integration (icons, file associations)
-- [ ] FUSE-less operation supported
-- [ ] Auto-update integration
-- [ ] AppImageHub metadata included
-- [ ] Sandbox compatibility
+- [x] AppImage created with all dependencies bundled
+- [x] Desktop integration (icons, file associations)
+- [x] FUSE-less operation supported
+- [x] Auto-update integration
+- [x] AppImageHub metadata included
+- [x] Sandbox compatibility
 
 ---
 

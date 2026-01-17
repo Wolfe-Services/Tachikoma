@@ -1,0 +1,22 @@
+[package]
+name = "tachikoma-audit-system-events"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "System-level audit event capture for Tachikoma"
+
+[dependencies]
+tachikoma-audit-types.workspace = true
+tachikoma-audit-capture.workspace = true
+tachikoma-common-core.workspace = true
+tokio = { workspace = true, features = ["sync", "time", "macros", "signal"] }
+tracing.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+notify = "6.1"
+thiserror.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util", "rt-multi-thread"] }
+proptest.workspace = true
+tempfile.workspace = true

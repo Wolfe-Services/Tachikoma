@@ -11,9 +11,13 @@ class TachikomaIpc {
     if (!isIpcAvailable()) {
       throw new Error('Tachikoma IPC not available');
     }
+    const api = window.tachikoma;
+    if (!api) {
+      throw new Error('Tachikoma IPC not available');
+    }
     
     try {
-      return window.tachikoma.invoke(channel, request) as Promise<IpcChannels[K]['response']>;
+      return api.invoke(channel, request) as Promise<IpcChannels[K]['response']>;
     } catch (error) {
       throw handleIpcError(channel, error);
     }
@@ -26,18 +30,22 @@ class TachikomaIpc {
     if (!isIpcAvailable()) {
       return () => {};
     }
+    const api = window.tachikoma;
+    if (!api) {
+      return () => {};
+    }
 
     if (!this.listeners.has(channel)) {
       this.listeners.set(channel, new Set());
     }
     this.listeners.get(channel)!.add(callback);
 
-    window.tachikoma.on(channel, callback as any);
+    api.on(channel, callback as any);
 
     // Return unsubscribe function
     return () => {
       this.listeners.get(channel)?.delete(callback);
-      window.tachikoma.off(channel, callback as any);
+      api.off(channel, callback as any);
     };
   }
 }

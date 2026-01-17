@@ -16,11 +16,11 @@ Implement compliance reporting capabilities for audit data, supporting common co
 
 ## Acceptance Criteria
 
-- [ ] Compliance report generation
-- [ ] Framework-specific report templates
-- [ ] Control mapping
-- [ ] Evidence collection
-- [ ] Compliance dashboard data
+- [x] Compliance report generation
+- [x] Framework-specific report templates
+- [x] Control mapping
+- [x] Evidence collection
+- [x] Compliance dashboard data
 
 ---
 

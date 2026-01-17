@@ -16,11 +16,11 @@ Implement audit log archival for long-term storage, enabling compressed, searcha
 
 ## Acceptance Criteria
 
-- [ ] Compressed archive creation
-- [ ] Archive index for searching
-- [ ] Archive retrieval/restore
-- [ ] Cloud storage support
-- [ ] Archive verification
+- [x] Compressed archive creation
+- [x] Archive index for searching
+- [x] Archive retrieval/restore
+- [x] Cloud storage support
+- [x] Archive verification
 
 ---
 

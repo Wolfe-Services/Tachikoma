@@ -16,11 +16,11 @@ Implement a flexible query interface for retrieving audit events with filtering,
 
 ## Acceptance Criteria
 
-- [ ] Query builder pattern for audit queries
-- [ ] Pagination support (cursor and offset)
-- [ ] Filtering by all event fields
-- [ ] Aggregation queries (counts, summaries)
-- [ ] Full-text search on metadata
+- [x] Query builder pattern for audit queries
+- [x] Pagination support (cursor and offset)
+- [x] Filtering by all event fields
+- [x] Aggregation queries (counts, summaries)
+- [x] Full-text search on metadata
 
 ---
 

@@ -21,6 +21,11 @@
   <div class="content-area">
     <Header />
     <main class="main-content">
+      <!-- Cyberpunk city background -->
+      <div class="city-bg" aria-hidden="true">
+        <img src="/z4nfu0cs7yz11.jpg" alt="" class="city-bg-img" />
+      </div>
+      
       <!-- Subtle grid overlay -->
       <div class="grid-overlay"></div>
       
@@ -71,6 +76,24 @@
     position: relative;
   }
   
+  /* Cyberpunk city background */
+  .city-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .city-bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0.045;
+    filter: saturate(0.7);
+  }
+
   /* Subtle grid overlay */
   .grid-overlay {
     position: fixed;

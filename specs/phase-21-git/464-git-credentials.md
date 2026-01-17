@@ -16,11 +16,11 @@ Implement Git credential management, supporting various authentication methods f
 
 ## Acceptance Criteria
 
-- [ ] SSH key authentication
-- [ ] HTTPS with credentials
-- [ ] Credential caching
-- [ ] Platform keychain integration
-- [ ] Token-based authentication
+- [x] SSH key authentication
+- [x] HTTPS with credentials
+- [x] Credential caching
+- [x] Platform keychain integration
+- [x] Token-based authentication
 
 ---
 

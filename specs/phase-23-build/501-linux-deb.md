@@ -16,12 +16,12 @@ Configure Debian package (.deb) creation for installation on Debian, Ubuntu, and
 
 ## Acceptance Criteria
 
-- [ ] .deb package created with correct metadata
-- [ ] Dependencies properly declared
-- [ ] Post-install scripts configure system integration
-- [ ] Desktop entry and icons installed
-- [ ] File associations registered
-- [ ] APT repository compatible
+- [x] .deb package created with correct metadata
+- [x] Dependencies properly declared
+- [x] Post-install scripts configure system integration
+- [x] Desktop entry and icons installed
+- [x] File associations registered
+- [x] APT repository compatible
 
 ---
 

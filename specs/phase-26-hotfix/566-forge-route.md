@@ -11,10 +11,10 @@
 Create the /forge route that shows the multi-model brainstorming UI.
 
 ## Acceptance Criteria
-- [ ] File `web/src/routes/forge/+page.svelte` exists
-- [ ] Page uses ForgeLayout component
-- [ ] Shows session creation or active session
-- [ ] Integrates existing forge components
+- [x] File `web/src/routes/forge/+page.svelte` exists
+- [x] Page uses ForgeLayout component
+- [x] Shows session creation or active session
+- [x] Integrates existing forge components
 
 ## Implementation
 

@@ -11,11 +11,11 @@
 Create the /settings route with configuration options.
 
 ## Acceptance Criteria
-- [ ] File `web/src/routes/settings/+page.svelte` exists
-- [ ] Settings page has tabs: General, Backend, Theme, Keyboard
-- [ ] API key input for Anthropic/OpenAI
-- [ ] Theme toggle (dark/light)
-- [ ] Settings persist via IPC
+- [x] File `web/src/routes/settings/+page.svelte` exists
+- [x] Settings page has tabs: General, Backend, Theme, Keyboard
+- [x] API key input for Anthropic/OpenAI
+- [x] Theme toggle (dark/light)
+- [x] Settings persist via IPC
 
 ## Implementation
 

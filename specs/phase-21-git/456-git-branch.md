@@ -16,11 +16,11 @@ Implement Git branch operations, including creating, deleting, listing, and swit
 
 ## Acceptance Criteria
 
-- [ ] List branches (local and remote)
-- [ ] Create branches
-- [ ] Delete branches
-- [ ] Checkout/switch branches
-- [ ] Rename branches
+- [x] List branches (local and remote)
+- [x] Create branches
+- [x] Delete branches
+- [x] Checkout/switch branches
+- [x] Rename branches
 
 ---
 

@@ -16,11 +16,11 @@ Implement Git diff functionality, providing structured access to file changes be
 
 ## Acceptance Criteria
 
-- [ ] Diff between commits
-- [ ] Diff between index and working directory
-- [ ] Structured diff output
-- [ ] Diff statistics
-- [ ] Binary file detection
+- [x] Diff between commits
+- [x] Diff between index and working directory
+- [x] Structured diff output
+- [x] Diff statistics
+- [x] Binary file detection
 
 ---
 

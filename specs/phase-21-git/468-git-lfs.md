@@ -16,12 +16,12 @@ Implement Git LFS (Large File Storage) support for handling large binary files i
 
 ## Acceptance Criteria
 
-- [ ] Detect LFS installation
-- [ ] Track/untrack patterns
-- [ ] LFS file status
-- [ ] Fetch/pull LFS objects
-- [ ] Push LFS objects
-- [ ] LFS pointer handling
+- [x] Detect LFS installation
+- [x] Track/untrack patterns
+- [x] LFS file status
+- [x] Fetch/pull LFS objects
+- [x] Push LFS objects
+- [x] LFS pointer handling
 
 ---
 

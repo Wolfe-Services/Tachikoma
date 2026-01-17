@@ -40,3 +40,7 @@ Thumbs.db
 
 # Tachikoma
 .tachikoma/forge/sessions/
+
+# Ghost in the Shell icon pack (do NOT commit; license is personal desktop use only)
+web/static/gits-icons/*
+!web/static/gits-icons/README.md

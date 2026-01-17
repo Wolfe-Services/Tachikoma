@@ -235,6 +235,7 @@
   as="section"
   className="session-wizard"
   accent="cyan"
+  subtle
   data-testid="session-creation-wizard"
   aria-busy={$isSubmitting || $sessionLoading}
 >
@@ -378,9 +379,9 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 1.75rem;
+    padding: 2rem 2.5rem;
   }
 
   .wizard-header {

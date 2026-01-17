@@ -16,12 +16,12 @@ Create a user-friendly download page that automatically detects the user's platf
 
 ## Acceptance Criteria
 
-- [ ] Platform auto-detection working
-- [ ] Download links for all platforms
-- [ ] Version information displayed
-- [ ] Checksums available
-- [ ] Installation instructions provided
-- [ ] System requirements listed
+- [x] Platform auto-detection working
+- [x] Download links for all platforms
+- [x] Version information displayed
+- [x] Checksums available
+- [x] Installation instructions provided
+- [x] System requirements listed
 
 ---
 

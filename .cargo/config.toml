@@ -1,5 +1,37 @@
+[build]
+# Use sccache if available
+rustc-wrapper = "sccache"
+
+[target.x86_64-unknown-linux-gnu]
+linker = "clang"
+rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+
+[target.x86_64-apple-darwin]
+# Use system linker
+
+[target.aarch64-apple-darwin]
+# Use system linker
+
+[target.x86_64-pc-windows-msvc]
+# Use MSVC linker
+
+# Cross-compilation targets
+[target.x86_64-unknown-linux-musl]
+linker = "x86_64-linux-musl-gcc"
+
+[target.aarch64-unknown-linux-gnu]
+linker = "aarch64-linux-gnu-gcc"
+
 [alias]
 t = "test"
 c = "check"
 b = "build"
 r = "run"
+br = "build --release"
+bd = "build --profile dist"
+tr = "test --release"
+clippy = "clippy --all-targets --all-features"
+# Coverage commands
+coverage = "llvm-cov --workspace --lcov --output-path lcov.info"
+coverage-html = "llvm-cov --workspace --html"
+coverage-json = "llvm-cov --workspace --json --output-path coverage.json"

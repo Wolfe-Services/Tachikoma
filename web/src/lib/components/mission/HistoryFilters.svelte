@@ -51,7 +51,7 @@
         type="date"
         placeholder="From"
         value={filter.dateFrom || ''}
-        on:input={e => updateFilter('dateFrom', (e.target as HTMLInputElement).value)}
+        on:input={e => updateFilter('dateFrom', e.target.value)}
       />
       <input
         type="date"

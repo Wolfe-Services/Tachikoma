@@ -1,0 +1,16 @@
+backends:
+  - name: claude
+    api_key_env: ANTHROPIC_API_KEY
+    model: claude-3-opus-20240229
+    role: brain
+
+loop:
+  max_iterations: 100
+  context_threshold: 0.8
+  auto_reboot: true
+
+stop_conditions:
+  - type: test_failures
+    threshold: 3
+  - type: no_progress
+    iterations: 5

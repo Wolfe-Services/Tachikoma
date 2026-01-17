@@ -16,13 +16,13 @@ Implement the unified Git API layer, providing a consistent interface for all Gi
 
 ## Acceptance Criteria
 
-- [ ] Repository operations API
-- [ ] Branch operations API
-- [ ] Commit operations API
-- [ ] Remote operations API
-- [ ] Status and diff API
-- [ ] History and blame API
-- [ ] Async operation support
+- [x] Repository operations API
+- [x] Branch operations API
+- [x] Commit operations API
+- [x] Remote operations API
+- [x] Status and diff API
+- [x] History and blame API
+- [x] Async operation support
 
 ---
 

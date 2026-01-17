@@ -16,12 +16,12 @@ Create user-friendly release notes for each version that highlight key features,
 
 ## Acceptance Criteria
 
-- [ ] Release notes template defined
-- [ ] Key features highlighted prominently
-- [ ] Breaking changes have migration guides
-- [ ] Known issues documented
-- [ ] Download links included
-- [ ] Notes published with each release
+- [x] Release notes template defined
+- [x] Key features highlighted prominently
+- [x] Breaking changes have migration guides
+- [x] Known issues documented
+- [x] Download links included
+- [x] Notes published with each release
 
 ---
 

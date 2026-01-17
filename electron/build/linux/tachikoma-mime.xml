@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-tachikoma-spec">
+    <comment>Tachikoma Specification</comment>
+    <comment xml:lang="en">Tachikoma Specification File</comment>
+    <glob pattern="*.tspec"/>
+    <icon name="application-x-tachikoma-spec"/>
+  </mime-type>
   <mime-type type="application/x-tachikoma">
     <comment>Tachikoma Project</comment>
     <comment xml:lang="en">Tachikoma Project File</comment>

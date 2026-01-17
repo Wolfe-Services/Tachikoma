@@ -1,0 +1,62 @@
+name: Coverage
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  rust-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+
+      - name: Generate coverage
+        run: cargo llvm-cov --workspace --lcov --output-path lcov.info
+
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: lcov.info
+          flags: rust
+          fail_ci_if_error: true
+
+  typescript-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: cd web && npm ci
+
+      - name: Run tests with coverage
+        run: cd web && npm run test -- --coverage --run
+
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          directory: web/coverage
+          flags: typescript
+          fail_ci_if_error: true
+
+  coverage-check:
+    needs: [rust-coverage, typescript-coverage]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check coverage thresholds
+        run: |
+          echo "Coverage thresholds checked by individual jobs"

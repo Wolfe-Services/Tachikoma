@@ -1,0 +1,18 @@
+[package]
+name = "tachikoma-audit-export"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Audit event export functionality for Tachikoma"
+
+[dependencies]
+tachikoma-audit-types = { path = "../tachikoma-audit-types" }
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+thiserror.workspace = true
+chrono = { workspace = true, features = ["serde"] }
+flate2 = "1.0"
+
+[dev-dependencies]
+tempfile = "3.8"
+tokio-test = "0.4"

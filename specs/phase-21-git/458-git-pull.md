@@ -16,11 +16,11 @@ Implement Git pull operations, combining fetch and merge/rebase to update the lo
 
 ## Acceptance Criteria
 
-- [ ] Pull with merge (default)
-- [ ] Pull with rebase
-- [ ] Fetch only
-- [ ] Handle conflicts
-- [ ] Progress callbacks
+- [x] Pull with merge (default)
+- [x] Pull with rebase
+- [x] Fetch only
+- [x] Handle conflicts
+- [x] Progress callbacks
 
 ---
 

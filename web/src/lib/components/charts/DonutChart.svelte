@@ -42,7 +42,7 @@
       />
       
       <!-- Data segments -->
-      {#each segments as segment, index}
+      {#each segments as segment}
         <circle
           cx="0"
           cy="0"

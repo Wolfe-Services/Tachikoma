@@ -6,11 +6,11 @@
   
   // Navigation items - reflects actual system functionality
   const navItems = [
-    { href: '/', label: 'Command', icon: 'home', description: 'System Dashboard' },
-    { href: '/missions', label: 'Deploy', icon: 'play', description: 'Loop Runner' },
-    { href: '/specs', label: 'Registry', icon: 'file-text', description: 'Spec Browser' },
-    { href: '/forge', label: 'Think Tank', icon: 'brain', description: 'Multi-Model AI' },
-    { href: '/settings', label: 'Config', icon: 'settings', description: 'API & Settings' }
+    { href: '/', label: 'Command', icon: 'home', description: 'System Dashboard', jp: '司令部' },
+    { href: '/missions', label: 'Deploy', icon: 'play', description: 'Loop Runner', jp: '展開' },
+    { href: '/specs', label: 'Registry', icon: 'file-text', description: 'Spec Browser', jp: '仕様書' },
+    { href: '/forge', label: 'Think Tank', icon: 'brain', description: 'Multi-Model AI', jp: '思考戦車' },
+    { href: '/settings', label: 'Config', icon: 'settings', description: 'API & Settings', jp: '設定' }
   ];
   
   export let collapsed = false;
@@ -55,6 +55,7 @@
       <div class="status-badge online">
         <span class="status-dot"></span>
         <span class="status-text">SYSTEM ONLINE</span>
+        <span class="status-jp">稼働中</span>
       </div>
     </div>
   {/if}
@@ -73,7 +74,7 @@
         </div>
         {#if !collapsed}
           <div class="nav-content">
-            <span class="nav-label">{item.label}</span>
+            <span class="nav-label">{item.label} <span class="nav-jp">{item.jp}</span></span>
             <span class="nav-description">{item.description}</span>
           </div>
         {/if}
@@ -204,6 +205,14 @@
     color: var(--success-color, #3fb950);
     letter-spacing: 1px;
   }
+
+  .status-jp {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.6rem;
+    color: var(--success-color, #3fb950);
+    opacity: 0.7;
+    margin-left: auto;
+  }
   
   @keyframes pulse {
     0%, 100% { opacity: 1; }
@@ -295,6 +304,17 @@
     font-weight: 500;
     letter-spacing: 0.5px;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .nav-jp {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.65rem;
+    color: var(--tachi-cyan, #4ecdc4);
+    opacity: 0.6;
+    letter-spacing: 0;
   }
   
   .nav-description {

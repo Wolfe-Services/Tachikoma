@@ -1,0 +1,9 @@
+Hello {{name}},
+
+Your task is to {{task}}.
+
+Environment: {{environment}}
+Deadline: {{deadline}}
+
+Best regards,
+The Tachikoma System

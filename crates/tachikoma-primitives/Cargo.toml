@@ -37,3 +37,4 @@ regex = { version = "1.10", optional = true }
 [dev-dependencies]
 tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
 tempfile = "3.9"
+criterion = { version = "0.5", features = ["async_tokio", "html_reports"] }

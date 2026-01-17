@@ -16,12 +16,12 @@ Implement consistent version management across all components (Rust crates, npm 
 
 ## Acceptance Criteria
 
-- [ ] Single source of truth for version
-- [ ] Semantic versioning enforced
-- [ ] Version bump scripts automated
-- [ ] Pre-release versions supported
-- [ ] Build metadata included
-- [ ] All components stay in sync
+- [x] Single source of truth for version
+- [x] Semantic versioning enforced
+- [x] Version bump scripts automated
+- [x] Pre-release versions supported
+- [x] Build metadata included
+- [x] All components stay in sync
 
 ---
 

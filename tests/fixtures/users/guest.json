@@ -1,0 +1,7 @@
+{
+  "id": "user_guest_001",
+  "name": "Guest User",
+  "email": "guest@tachikoma.dev", 
+  "role": "guest",
+  "permissions": ["read"]
+}

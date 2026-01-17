@@ -16,12 +16,12 @@ Implement the client-side auto-update functionality using electron-updater, prov
 
 ## Acceptance Criteria
 
-- [ ] Automatic update checking on startup
-- [ ] User notification of available updates
-- [ ] Download progress display
-- [ ] Install on quit option
-- [ ] Manual update check available
-- [ ] Update error handling
+- [x] Automatic update checking on startup
+- [x] User notification of available updates
+- [x] Download progress display
+- [x] Install on quit option
+- [x] Manual update check available
+- [x] Update error handling
 
 ---
 

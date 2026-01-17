@@ -16,11 +16,11 @@ Define the core types for Git integration using the git2 crate, providing safe R
 
 ## Acceptance Criteria
 
-- [ ] `tachikoma-git` crate created
-- [ ] Git object ID wrapper type
-- [ ] Repository wrapper type
-- [ ] Reference types
-- [ ] Error types for Git operations
+- [x] `tachikoma-git` crate created
+- [x] Git object ID wrapper type
+- [x] Repository wrapper type
+- [x] Reference types
+- [x] Error types for Git operations
 
 ---
 

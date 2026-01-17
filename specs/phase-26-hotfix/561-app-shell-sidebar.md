@@ -11,13 +11,13 @@
 Create the main application shell with a collapsible sidebar. This is the foundational layout that ALL other pages will use.
 
 ## Acceptance Criteria
-- [ ] File `web/src/lib/components/layout/AppShell.svelte` exists
-- [ ] File `web/src/lib/components/layout/Sidebar.svelte` exists
-- [ ] Sidebar has navigation links: Dashboard, Missions, Specs, Forge, Settings
-- [ ] Sidebar can collapse to icon-only mode
-- [ ] Collapse state persists in localStorage
-- [ ] Active route is highlighted in sidebar
-- [ ] AppShell uses CSS Grid with sidebar + main content areas
+- [x] File `web/src/lib/components/layout/AppShell.svelte` exists
+- [x] File `web/src/lib/components/layout/Sidebar.svelte` exists
+- [x] Sidebar has navigation links: Dashboard, Missions, Specs, Forge, Settings
+- [x] Sidebar can collapse to icon-only mode
+- [x] Collapse state persists in localStorage
+- [x] Active route is highlighted in sidebar
+- [x] AppShell uses CSS Grid with sidebar + main content areas
 
 ## Implementation
 

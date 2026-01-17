@@ -1,0 +1,31 @@
+{
+  "rust": {
+    "thresholds": {
+      "lines": 70,
+      "functions": 70,
+      "branches": 60
+    },
+    "exclude": [
+      "*/tests/*",
+      "*_test.rs",
+      "*/benches/*"
+    ]
+  },
+  "typescript": {
+    "thresholds": {
+      "lines": 70,
+      "functions": 70,
+      "branches": 60,
+      "statements": 70
+    },
+    "exclude": [
+      "src/test/**",
+      "**/*.d.ts",
+      "**/*.test.ts"
+    ]
+  },
+  "global": {
+    "minimumCoverage": 65,
+    "failOnDecrease": true
+  }
+}

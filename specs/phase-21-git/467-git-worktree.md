@@ -16,11 +16,11 @@ Implement Git worktree management, allowing multiple working directories for a s
 
 ## Acceptance Criteria
 
-- [ ] List worktrees
-- [ ] Add worktrees
-- [ ] Remove worktrees
-- [ ] Prune stale worktrees
-- [ ] Lock/unlock worktrees
+- [x] List worktrees
+- [x] Add worktrees
+- [x] Remove worktrees
+- [x] Prune stale worktrees
+- [x] Lock/unlock worktrees
 
 ---
 

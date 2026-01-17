@@ -16,12 +16,12 @@ Implement load testing infrastructure using k6 to stress test the Tachikoma serv
 
 ## Acceptance Criteria
 
-- [ ] k6 scripts for critical API endpoints
-- [ ] Configurable load profiles (smoke, load, stress, soak)
-- [ ] Response time and error rate thresholds
-- [ ] CI integration for regression detection
-- [ ] Grafana dashboards for result visualization
-- [ ] Documentation for running load tests
+- [x] k6 scripts for critical API endpoints
+- [x] Configurable load profiles (smoke, load, stress, soak)
+- [x] Response time and error rate thresholds
+- [x] CI integration for regression detection
+- [x] Grafana dashboards for result visualization
+- [x] Documentation for running load tests
 
 ---
 

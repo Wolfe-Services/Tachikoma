@@ -16,11 +16,11 @@ Implement Git blame functionality, showing the commit that last modified each li
 
 ## Acceptance Criteria
 
-- [ ] Blame for entire file
-- [ ] Blame for line range
-- [ ] Include commit details
-- [ ] Handle renames
-- [ ] Incremental blame
+- [x] Blame for entire file
+- [x] Blame for line range
+- [x] Include commit details
+- [x] Handle renames
+- [x] Incremental blame
 
 ---
 

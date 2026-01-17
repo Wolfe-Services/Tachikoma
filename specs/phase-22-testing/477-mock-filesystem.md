@@ -16,12 +16,12 @@ Create a mock file system abstraction that allows testing file operations withou
 
 ## Acceptance Criteria
 
-- [ ] Mock filesystem provides full read/write/delete operations
-- [ ] Directory structure can be initialized from test data
-- [ ] File permissions can be simulated
-- [ ] Error conditions (not found, permission denied) can be triggered
-- [ ] File system state can be inspected after operations
-- [ ] Both sync and async interfaces supported
+- [x] Mock filesystem provides full read/write/delete operations
+- [x] Directory structure can be initialized from test data
+- [x] File permissions can be simulated
+- [x] Error conditions (not found, permission denied) can be triggered
+- [x] File system state can be inspected after operations
+- [x] Both sync and async interfaces supported
 
 ---
 

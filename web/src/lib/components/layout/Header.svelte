@@ -88,8 +88,8 @@
       {#if userMenuOpen}
         <div class="user-menu__dropdown">
           <div class="dropdown-header">
-            <span class="dropdown-title">OPERATOR</span>
-            <span class="dropdown-subtitle">Section 9</span>
+            <span class="dropdown-title">OPERATOR <span class="jp-accent">作戦員</span></span>
+            <span class="dropdown-subtitle">Section 9 // 公安9課</span>
           </div>
           <div class="dropdown-divider"></div>
           <button class="menu-item" on:click={handleSettings}>
@@ -289,6 +289,15 @@
     font-weight: 600;
     color: var(--tachi-cyan, #4ecdc4);
     letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .jp-accent {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.7rem;
+    opacity: 0.7;
   }
   
   .dropdown-subtitle {

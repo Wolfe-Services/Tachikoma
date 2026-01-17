@@ -9,61 +9,138 @@
     change: Participant[];
   }>();
 
+  const brokenAvatarIds = new Set<string>();
+
+  function parseAvatar(avatar?: string): { src?: string; emoji?: string } {
+    if (!avatar) return {};
+    if (avatar.startsWith('asset:')) {
+      const raw = avatar.slice('asset:'.length);
+      const [src, emoji] = raw.split('|');
+      return { src, emoji };
+    }
+    if (avatar.startsWith('/') || avatar.startsWith('http')) {
+      return { src: avatar };
+    }
+    return { emoji: avatar };
+  }
+
+  function markAvatarBroken(id: string) {
+    brokenAvatarIds.add(id);
+  }
+
   // Mock available participants - in real implementation would come from API
+  // Theme: Ghost in the Shell / Public Security Section 9
+  // Icons from web/static/icons/ (Iconfactory GitS set)
   const availableParticipants: Participant[] = [
     {
-      id: 'human-1',
-      name: 'Alice Johnson',
+      id: 'human-kusanagi',
+      name: 'Major Motoko Kusanagi',
       type: 'human',
-      role: 'Product Manager',
+      role: 'Visionary / Systems Architect',
       status: 'active',
-      avatar: '👩‍💼',
+      avatar: 'asset:/icons/Iconfactory-Ghost-In-The-Shell-Motoko-Kusanagi.32.png|🕶️',
       estimatedCostPerRound: 0
     },
     {
-      id: 'human-2', 
-      name: 'Bob Smith',
+      id: 'human-batou',
+      name: 'Batou',
       type: 'human',
-      role: 'Engineering Lead',
+      role: 'Deployment Specialist / Reliability',
       status: 'active',
-      avatar: '👨‍💻',
+      avatar: 'asset:/icons/Iconfactory-Ghost-In-The-Shell-Bateau.32.png|🦾',
       estimatedCostPerRound: 0
     },
     {
-      id: 'ai-1',
-      name: 'Claude Sonnet',
-      type: 'ai',
-      role: 'Strategic Advisor',
+      id: 'human-togusa',
+      name: 'Togusa',
+      type: 'human',
+      role: 'QA Lead / Product Critic',
       status: 'active',
-      avatar: '🤖',
-      estimatedCostPerRound: 0.05
+      avatar: 'asset:/icons/Iconfactory-Ghost-In-The-Shell-Togusa.32.png|🕵️',
+      estimatedCostPerRound: 0
     },
     {
-      id: 'ai-2',
-      name: 'GPT-4',
-      type: 'ai', 
-      role: 'Creative Ideator',
+      id: 'human-aramaki',
+      name: 'Daisuke Aramaki',
+      type: 'human',
+      role: 'Stakeholder / Strategy & Risk',
       status: 'active',
-      avatar: '🧠',
-      estimatedCostPerRound: 0.08
+      avatar: '🎖️',
+      estimatedCostPerRound: 0
     },
     {
-      id: 'ai-3',
-      name: 'Gemini Pro',
-      type: 'ai',
-      role: 'Technical Analyst', 
+      id: 'human-ishikawa',
+      name: 'Ishikawa',
+      type: 'human',
+      role: 'Observability / Telemetry',
       status: 'active',
-      avatar: '💎',
+      avatar: 'asset:/icons/Iconfactory-Ghost-In-The-Shell-Ishikawa.32.png|📡',
+      estimatedCostPerRound: 0
+    },
+    {
+      id: 'human-saito',
+      name: 'Saito',
+      type: 'human',
+      role: 'Security / Threat Modeling',
+      status: 'active',
+      avatar: '🎯',
+      estimatedCostPerRound: 0
+    },
+
+    // AI participants (multi-agent think tanks)
+    {
+      id: 'ai-fuchikoma-blue',
+      name: 'Fuchikoma Blue',
+      type: 'ai',
+      role: 'Implementation Agent',
+      status: 'active',
+      avatar: 'asset:/icons/Iconfactory-Ghost-In-The-Shell-Fuchikoma-Blue.32.png|🕷️',
+      estimatedCostPerRound: 0.03
+    },
+    {
+      id: 'ai-fuchikoma-red',
+      name: 'Fuchikoma Red',
+      type: 'ai',
+      role: 'Testing & Validation Agent',
+      status: 'active',
+      avatar: 'asset:/icons/Iconfactory-Ghost-In-The-Shell-Fuchikoma-Red.32.png|🔴',
+      estimatedCostPerRound: 0.03
+    },
+    {
+      id: 'ai-fuchikoma-purple',
+      name: 'Fuchikoma Purple',
+      type: 'ai',
+      role: 'Research & Analysis Agent',
+      status: 'active',
+      avatar: 'asset:/icons/Iconfactory-Ghost-In-The-Shell-Fuchikoma-Purple.32.png|🟣',
+      estimatedCostPerRound: 0.03
+    },
+    {
+      id: 'ai-arakone',
+      name: 'Arakone Unit',
+      type: 'ai',
+      role: 'Heavy Processing / Synthesis',
+      status: 'active',
+      avatar: 'asset:/icons/Iconfactory-Ghost-In-The-Shell-Arakone-Unit.32.png|🦂',
       estimatedCostPerRound: 0.06
     },
     {
-      id: 'human-3',
-      name: 'Carol Davis',
-      type: 'human',
-      role: 'UX Designer',
+      id: 'ai-laughing-man',
+      name: 'Laughing Man',
+      type: 'ai',
+      role: 'Adversarial Reviewer',
       status: 'active',
-      avatar: '👩‍🎨',
-      estimatedCostPerRound: 0
+      avatar: '🌀',
+      estimatedCostPerRound: 0.06
+    },
+    {
+      id: 'ai-puppet-master',
+      name: 'Puppet Master',
+      type: 'ai',
+      role: 'Orchestration & Arbitration',
+      status: 'active',
+      avatar: '🧬',
+      estimatedCostPerRound: 0.08
     }
   ];
 
@@ -116,9 +193,18 @@
     {#if selected.length > 0}
       <div class="selected-list">
         {#each selected as participant (participant.id)}
+          {@const a = parseAvatar(participant.avatar)}
           <div class="selected-item" data-testid="selected-participant-{participant.id}">
             <div class="participant-avatar">
-              {participant.avatar || '👤'}
+              {#if a.src && !brokenAvatarIds.has(participant.id)}
+                <img
+                  src={a.src}
+                  alt=""
+                  on:error={() => markAvatarBroken(participant.id)}
+                />
+              {:else}
+                <span class="avatar-emoji" aria-hidden="true">{a.emoji || '👤'}</span>
+              {/if}
             </div>
             <div class="participant-info">
               <div class="participant-name">{participant.name}</div>
@@ -215,6 +301,7 @@
     {#if filteredParticipants.length > 0}
       <div class="participant-grid">
         {#each filteredParticipants as participant (participant.id)}
+          {@const a = parseAvatar(participant.avatar)}
           <button
             type="button"
             class="participant-card"
@@ -224,7 +311,15 @@
           >
             <div class="card-header">
               <div class="participant-avatar">
-                {participant.avatar || '👤'}
+                {#if a.src && !brokenAvatarIds.has(participant.id)}
+                  <img
+                    src={a.src}
+                    alt=""
+                    on:error={() => markAvatarBroken(participant.id)}
+                  />
+                {:else}
+                  <span class="avatar-emoji" aria-hidden="true">{a.emoji || '👤'}</span>
+                {/if}
               </div>
               <div class="participant-type" class:human={participant.type === 'human'} class:ai={participant.type === 'ai'}>
                 {participant.type.toUpperCase()}
@@ -266,7 +361,7 @@
 
 <style>
   .participant-select-step {
-    max-width: 800px;
+    max-width: 960px;
     margin: 0 auto;
   }
 
@@ -278,11 +373,13 @@
     font-size: 1.5rem;
     font-weight: 600;
     margin-bottom: 0.75rem;
-    color: var(--text-primary);
+    color: var(--text-primary, #e6edf3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
   }
 
   .step-description {
-    color: var(--text-secondary);
+    color: var(--text-secondary, rgba(230, 237, 243, 0.7));
     line-height: 1.5;
   }
 
@@ -296,14 +393,16 @@
     font-size: 1.25rem;
     font-weight: 600;
     margin-bottom: 1rem;
-    color: var(--text-primary);
+    color: var(--text-primary, #e6edf3);
   }
 
   .selected-list {
-    border: 2px dashed var(--border-color);
-    border-radius: 8px;
+    border: 1px dashed rgba(78, 205, 196, 0.28);
+    border-radius: 14px;
     padding: 1rem;
-    background: var(--secondary-bg);
+    background: rgba(13, 17, 23, 0.22);
+    -webkit-backdrop-filter: blur(12px) saturate(1.15);
+    backdrop-filter: blur(12px) saturate(1.15);
   }
 
   .selected-item {
@@ -311,10 +410,11 @@
     align-items: center;
     gap: 1rem;
     padding: 0.75rem;
-    background: white;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
+    background: rgba(22, 27, 34, 0.45);
+    border: 1px solid rgba(78, 205, 196, 0.14);
+    border-radius: 12px;
     margin-bottom: 0.5rem;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25) inset;
   }
 
   .selected-item:last-child {
@@ -328,8 +428,23 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--avatar-bg, #f3f4f6);
+    background: rgba(13, 17, 23, 0.55);
+    border: 1px solid rgba(78, 205, 196, 0.14);
     border-radius: 50%;
+    color: var(--text-primary, #e6edf3);
+    overflow: hidden;
+  }
+
+  .participant-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    filter: saturate(1.05) contrast(1.05);
+  }
+
+  .avatar-emoji {
+    line-height: 1;
   }
 
   .participant-info {
@@ -338,13 +453,13 @@
 
   .participant-name {
     font-weight: 500;
-    color: var(--text-primary);
+    color: var(--text-primary, #e6edf3);
     margin-bottom: 0.25rem;
   }
 
   .participant-role {
     font-size: 0.875rem;
-    color: var(--text-secondary);
+    color: var(--text-secondary, rgba(230, 237, 243, 0.7));
   }
 
   .participant-meta {
@@ -360,30 +475,36 @@
     padding: 0.125rem 0.5rem;
     border-radius: 12px;
     text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    border: 1px solid rgba(78, 205, 196, 0.18);
+    background: rgba(13, 17, 23, 0.35);
   }
 
   .participant-type.human {
-    background: var(--human-bg, #ecfdf5);
-    color: var(--human-color, #059669);
+    background: rgba(63, 185, 80, 0.12);
+    color: rgba(63, 185, 80, 0.95);
+    border-color: rgba(63, 185, 80, 0.35);
   }
 
   .participant-type.ai {
-    background: var(--ai-bg, #eff6ff);
-    color: var(--ai-color, #2563eb);
+    background: rgba(88, 166, 255, 0.12);
+    color: rgba(88, 166, 255, 0.95);
+    border-color: rgba(88, 166, 255, 0.35);
   }
 
   .participant-cost {
     font-size: 0.75rem;
-    color: var(--text-muted);
-    font-family: monospace;
+    color: var(--text-muted, rgba(230, 237, 243, 0.5));
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 
   .remove-btn {
     width: 1.5rem;
     height: 1.5rem;
     border: none;
-    background: var(--error-bg, #fef2f2);
-    color: var(--error-color, #dc2626);
+    background: rgba(255, 107, 107, 0.12);
+    color: rgba(255, 107, 107, 0.95);
     border-radius: 50%;
     cursor: pointer;
     display: flex;
@@ -394,8 +515,8 @@
   }
 
   .remove-btn:hover {
-    background: var(--error-color, #dc2626);
-    color: white;
+    background: rgba(255, 107, 107, 0.25);
+    color: rgba(255, 255, 255, 0.9);
   }
 
   .cost-summary {
@@ -404,24 +525,24 @@
     align-items: center;
     margin-top: 0.75rem;
     padding-top: 0.75rem;
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid rgba(78, 205, 196, 0.14);
     font-weight: 500;
   }
 
   .cost-label {
-    color: var(--text-secondary);
+    color: var(--text-secondary, rgba(230, 237, 243, 0.7));
   }
 
   .cost-value {
-    color: var(--text-primary);
-    font-family: monospace;
+    color: var(--text-primary, #e6edf3);
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 
   .empty-state,
   .no-results {
     text-align: center;
     padding: 2rem;
-    color: var(--text-muted);
+    color: var(--text-muted, rgba(230, 237, 243, 0.45));
   }
 
   .empty-icon,
@@ -456,17 +577,17 @@
   .search-input {
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 12px;
     font-size: 0.875rem;
-    background: white;
-    color: var(--text-primary);
+    background: rgba(13, 17, 23, 0.35);
+    border: 1px solid rgba(78, 205, 196, 0.14);
+    color: var(--text-primary, #e6edf3);
   }
 
   .search-input:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px var(--primary-color-alpha, rgba(59, 130, 246, 0.1));
+    border-color: rgba(78, 205, 196, 0.55);
+    box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.12);
   }
 
   .search-clear {
@@ -477,19 +598,20 @@
     width: 1.5rem;
     height: 1.5rem;
     border: none;
-    background: var(--secondary-bg);
+    background: rgba(13, 17, 23, 0.45);
+    border: 1px solid rgba(78, 205, 196, 0.14);
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1rem;
-    color: var(--text-muted);
+    color: var(--text-muted, rgba(230, 237, 243, 0.5));
   }
 
   .search-clear:hover {
-    background: var(--border-color);
-    color: var(--text-primary);
+    background: rgba(78, 205, 196, 0.12);
+    color: rgba(230, 237, 243, 0.85);
   }
 
   .filter-controls {
@@ -499,10 +621,10 @@
 
   .filter-btn {
     padding: 0.5rem 1rem;
-    border: 1px solid var(--border-color);
-    background: var(--secondary-bg);
-    color: var(--text-secondary);
-    border-radius: 6px;
+    border: 1px solid rgba(78, 205, 196, 0.14);
+    background: rgba(13, 17, 23, 0.25);
+    color: var(--text-secondary, rgba(230, 237, 243, 0.7));
+    border-radius: 12px;
     cursor: pointer;
     font-size: 0.875rem;
     transition: all 0.15s ease;
@@ -510,13 +632,15 @@
 
   .filter-btn:hover {
     background: var(--hover-bg);
-    color: var(--text-primary);
+    color: var(--text-primary, #e6edf3);
+    border-color: rgba(78, 205, 196, 0.28);
   }
 
   .filter-btn.active {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(45, 122, 122, 0.9), rgba(78, 205, 196, 0.9));
+    color: rgba(13, 17, 23, 0.95);
+    border-color: rgba(78, 205, 196, 0.65);
+    box-shadow: 0 0 18px rgba(78, 205, 196, 0.2);
   }
 
   .participant-grid {
@@ -528,22 +652,35 @@
   .participant-card {
     position: relative;
     padding: 1rem;
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    background: white;
+    border: 1px solid rgba(78, 205, 196, 0.14);
+    border-radius: 14px;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01)),
+      rgba(13, 17, 23, 0.35);
     cursor: pointer;
     transition: all 0.15s ease;
     text-align: left;
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.25) inset,
+      0 12px 35px rgba(0, 0, 0, 0.25);
+    -webkit-backdrop-filter: blur(12px) saturate(1.1);
+    backdrop-filter: blur(12px) saturate(1.1);
   }
 
   .participant-card:hover {
-    border-color: var(--primary-color);
-    box-shadow: 0 4px 12px var(--shadow-color, rgba(0, 0, 0, 0.1));
+    border-color: rgba(78, 205, 196, 0.5);
+    transform: translateY(-1px);
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.25) inset,
+      0 18px 50px rgba(0, 0, 0, 0.3),
+      0 0 22px rgba(78, 205, 196, 0.12);
   }
 
   .participant-card.selected {
-    border-color: var(--success-color, #10b981);
-    background: var(--success-bg, #f0fdf4);
+    border-color: rgba(78, 205, 196, 0.75);
+    box-shadow:
+      0 0 0 3px rgba(78, 205, 196, 0.14),
+      0 18px 55px rgba(0, 0, 0, 0.35);
   }
 
   .card-header {
@@ -575,14 +712,15 @@
     right: 0.5rem;
     width: 1.5rem;
     height: 1.5rem;
-    background: var(--success-color, #10b981);
-    color: white;
+    background: rgba(78, 205, 196, 0.9);
+    color: rgba(13, 17, 23, 0.95);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.75rem;
     font-weight: bold;
+    box-shadow: 0 0 16px rgba(78, 205, 196, 0.25);
   }
 
   .error-list {
@@ -594,11 +732,20 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem;
-    background: var(--error-bg, #fef2f2);
-    color: var(--error-color, #dc2626);
-    border-radius: 6px;
+    background: rgba(255, 107, 107, 0.08);
+    color: rgba(230, 237, 243, 0.85);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 107, 107, 0.25);
     margin-bottom: 0.5rem;
     font-size: 0.875rem;
+  }
+
+  .participant-card:focus-visible,
+  .filter-btn:focus-visible,
+  .remove-btn:focus-visible,
+  .search-clear:focus-visible {
+    outline: 2px solid rgba(78, 205, 196, 0.85);
+    outline-offset: 2px;
   }
 
   .error-icon {

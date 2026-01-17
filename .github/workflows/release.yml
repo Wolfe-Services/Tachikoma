@@ -6,7 +6,60 @@ on:
       - 'v*'
 
 jobs:
+  validate-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.parse.outputs.version }}
+      prerelease: ${{ steps.parse.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Parse tag
+        id: parse
+        run: |
+          TAG=${GITHUB_REF#refs/tags/v}
+          echo "version=$TAG" >> $GITHUB_OUTPUT
+
+          if [[ "$TAG" =~ -(alpha|beta|rc)\. ]]; then
+            echo "prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate version format
+        run: |
+          VERSION=${{ steps.parse.outputs.version }}
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-z]+\.[0-9]+)?$ ]]; then
+            echo "Invalid version format: $VERSION"
+            exit 1
+          fi
+
+      - name: Validate changelog entry exists
+        run: |
+          VERSION=${{ steps.parse.outputs.version }}
+          if ! grep -q "## \[$VERSION\]" CHANGELOG.md; then
+            echo "No changelog entry found for version $VERSION"
+            echo "Please update CHANGELOG.md with release notes before tagging"
+            exit 1
+          fi
+
+      - name: Generate and validate changelog
+        run: |
+          VERSION=${{ steps.parse.outputs.version }}
+          npx ts-node scripts/generate-changelog.ts $VERSION > /tmp/generated-changelog.txt
+          echo "Generated changelog section for validation:"
+          cat /tmp/generated-changelog.txt
+
   build:
+    needs: validate-tag
     name: Build (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
@@ -41,18 +94,103 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Package
+      - name: Package (without signing for Windows)
+        if: matrix.os != 'windows-latest'
         run: cd electron && npm run package
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload release assets
-        uses: softprops/action-gh-release@v1
+      - name: Package Windows (unsigned)
+        if: matrix.os == 'windows-latest'
+        run: cd electron && npm run package
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Disable signing during packaging - we'll sign separately
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Upload unsigned Windows artifacts
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
         with:
-          files: |
+          name: windows-unsigned
+          path: electron/release/
+          retention-days: 7
+
+      - name: Upload non-Windows artifacts
+        if: matrix.os != 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}-artifacts
+          path: |
             electron/release/*.dmg
-            electron/release/*.exe
             electron/release/*.AppImage
             electron/release/*.deb
+            electron/release/*.rpm
+          retention-days: 30
+
+  # Sign Windows artifacts separately
+  sign-windows:
+    name: Sign Windows Artifacts
+    needs: [validate-tag, build]
+    if: ${{ needs.build.result == 'success' }}
+    uses: ./.github/workflows/sign-windows.yml
+    with:
+      artifact-name: windows-unsigned
+    secrets:
+      WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+      WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+
+  # Create final release
+  release:
+    name: Create Release
+    needs: [validate-tag, build, sign-windows]
+    runs-on: ubuntu-latest
+    if: always() && (needs.build.result == 'success')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: List all artifacts
+        run: |
+          find ./artifacts -type f -name "*" | sort
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release-assets
+          
+          # Copy signed Windows artifacts (if signing succeeded)
+          if [ -d "./artifacts/windows-unsigned-signed" ]; then
+            cp ./artifacts/windows-unsigned-signed/* release-assets/ || true
+          else
+            echo "Warning: Windows signing failed, using unsigned artifacts"
+            cp ./artifacts/windows-unsigned/* release-assets/ || true
+          fi
+          
+          # Copy other platform artifacts
+          find ./artifacts -name "*.dmg" -exec cp {} release-assets/ \; || true
+          find ./artifacts -name "*.AppImage" -exec cp {} release-assets/ \; || true
+          find ./artifacts -name "*.deb" -exec cp {} release-assets/ \; || true
+          find ./artifacts -name "*.rpm" -exec cp {} release-assets/ \; || true
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release-assets/*
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ needs.validate-tag.outputs.prerelease == 'true' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload signing report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-signing-report
+          path: ./artifacts/windows-signing-report/signing-report.txt
+          retention-days: 365

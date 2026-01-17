@@ -16,12 +16,12 @@ Implement visual regression testing using Playwright's screenshot comparison cap
 
 ## Acceptance Criteria
 
-- [ ] Baseline screenshots captured for key views
-- [ ] Visual diffs generated on failures
-- [ ] Theme variations tested (light, dark, tachikoma)
-- [ ] Responsive breakpoints covered
-- [ ] CI integration with artifact storage
-- [ ] Update workflow for intentional changes
+- [x] Baseline screenshots captured for key views
+- [x] Visual diffs generated on failures
+- [x] Theme variations tested (light, dark, tachikoma)
+- [x] Responsive breakpoints covered
+- [x] CI integration with artifact storage
+- [x] Update workflow for intentional changes
 
 ---
 

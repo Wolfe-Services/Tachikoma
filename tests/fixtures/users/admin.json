@@ -1,0 +1,7 @@
+{
+  "id": "user_admin_001",
+  "name": "Admin User", 
+  "email": "admin@tachikoma.dev",
+  "role": "admin",
+  "permissions": ["read", "write", "admin"]
+}

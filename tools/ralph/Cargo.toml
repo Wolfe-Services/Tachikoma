@@ -45,6 +45,10 @@ uuid = { version = "1.10", features = ["v4"] }
 # Time handling
 chrono = { version = "0.4", features = ["serde"] }
 
+# TUI dependencies
+ratatui = "0.30"
+crossterm = "0.28"
+
 [[bin]]
 name = "ralph"
 path = "src/main.rs"

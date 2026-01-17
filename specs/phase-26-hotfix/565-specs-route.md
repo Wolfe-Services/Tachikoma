@@ -11,11 +11,11 @@
 Create the /specs route that shows the spec browser with tree navigation.
 
 ## Acceptance Criteria
-- [ ] File `web/src/routes/specs/+page.svelte` exists
-- [ ] Page uses SpecBrowserLayout component
-- [ ] Shows spec tree navigation on left
-- [ ] Shows spec content on right
-- [ ] Search functionality works
+- [x] File `web/src/routes/specs/+page.svelte` exists
+- [x] Page uses SpecBrowserLayout component
+- [x] Shows spec tree navigation on left
+- [x] Shows spec content on right
+- [x] Search functionality works
 
 ## Implementation
 

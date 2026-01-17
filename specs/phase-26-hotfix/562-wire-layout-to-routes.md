@@ -11,10 +11,10 @@
 Update the root layout (`+layout.svelte`) to use the AppShell component so ALL routes get the sidebar navigation.
 
 ## Acceptance Criteria
-- [ ] `web/src/routes/+layout.svelte` imports and uses AppShell
-- [ ] All child routes render inside the AppShell
-- [ ] Theme variables are defined in root layout CSS
-- [ ] Body has dark theme by default
+- [x] `web/src/routes/+layout.svelte` imports and uses AppShell
+- [x] All child routes render inside the AppShell
+- [x] Theme variables are defined in root layout CSS
+- [x] Body has dark theme by default
 
 ## Implementation
 

@@ -1,15 +1,15 @@
 [Desktop Entry]
 Name=Tachikoma
-GenericName=Development Environment
-Comment=Modern development environment for building applications
-Exec=tachikoma %F
+GenericName=AI Development Environment
+Comment=AI-powered autonomous development tool
+Exec=tachikoma %U
 Icon=tachikoma
 Type=Application
 Categories=Development;IDE;
-Keywords=development;code;editor;ide;programming;
+Keywords=ai;development;coding;llm;automation;
 StartupNotify=true
 StartupWMClass=tachikoma
-MimeType=application/x-tachikoma;x-scheme-handler/tachikoma;
+MimeType=application/x-tachikoma-spec;x-scheme-handler/tachikoma;
 Actions=new-window;
 
 [Desktop Action new-window]

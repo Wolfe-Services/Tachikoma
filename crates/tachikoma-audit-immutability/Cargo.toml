@@ -1,0 +1,24 @@
+[package]
+name = "tachikoma-audit-immutability"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Audit immutability and integrity verification for Tachikoma"
+
+[dependencies]
+tachikoma-common-core.workspace = true
+tachikoma-audit-types.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+thiserror.workspace = true
+chrono = { workspace = true, features = ["serde"] }
+sha2 = "0.10"
+parking_lot = "0.12"
+tokio = { workspace = true, features = ["time"] }
+tracing.workspace = true
+async-trait = "0.1"
+
+[dev-dependencies]
+tachikoma-test-utils.workspace = true
+proptest.workspace = true
+tokio-test.workspace = true

@@ -16,11 +16,11 @@ Implement SSH-specific Git operations, including SSH key management and SSH URL 
 
 ## Acceptance Criteria
 
-- [ ] SSH URL parsing
-- [ ] SSH key generation
-- [ ] SSH config parsing
-- [ ] Known hosts management
-- [ ] SSH agent interaction
+- [x] SSH URL parsing
+- [x] SSH key generation
+- [x] SSH config parsing
+- [x] Known hosts management
+- [x] SSH agent interaction
 
 ---
 

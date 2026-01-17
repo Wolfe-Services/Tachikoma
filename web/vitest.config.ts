@@ -17,16 +17,67 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+
+    // Reporter configuration for comprehensive test reporting
+    reporters: [
+      'default',
+      'json',
+      'junit',
+      'html',
+    ],
+
+    outputFile: {
+      json: './test-results/results.json',
+      junit: './test-results/junit.xml',
+      html: './test-results/index.html',
+    },
+
     coverage: {
+      // Use v8 provider for accurate coverage
       provider: 'v8',
-      reporter: ['text', 'json'],
-      include: ['src/lib/**/*.{js,ts}'],
+
+      // Enable coverage collection
+      enabled: true,
+
+      // Output formats
+      reporter: ['text', 'json', 'html', 'lcov'],
+
+      // Output directory
+      reportsDirectory: './coverage',
+
+      // Files to include
+      include: ['src/**/*.{ts,svelte}'],
+
+      // Files to exclude
       exclude: [
         'node_modules/',
         'src/test/',
-        '**/*.test.{js,ts}',
-        '**/*.spec.{js,ts}'
-      ]
-    }
-  }
+        '**/*.d.ts',
+        '**/*.test.ts',
+        '**/*.spec.ts',
+        '**/index.ts',
+      ],
+
+      // Coverage thresholds
+      thresholds: {
+        lines: 70,
+        functions: 70,
+        branches: 60,
+        statements: 70,
+      },
+
+      // Fail if thresholds not met
+      thresholdAutoUpdate: false,
+
+      // Show uncovered lines in output
+      all: true,
+    },
+
+    // Include timing information
+    benchmark: {
+      include: ['**/*.bench.{js,ts}'],
+      reporters: ['default', 'json'],
+      outputFile: './test-results/benchmark.json',
+    },
+  },
 });

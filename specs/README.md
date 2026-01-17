@@ -701,19 +701,6 @@ Execute specs in numerical order. Each phase must complete before the next.
 | 549 | [Advanced Monitoring](phase-25-advanced/549-advanced-monitoring.md) | advanced, monitoring, observe |
 | 550 | [Advanced Feature Tests](phase-25-advanced/550-advanced-tests.md) | test, advanced, integration |
 
-## Phase 27: Ralph TUI Integration (551-556)
-
-> Lessons learned from Ralph TUI - UX polish, onboarding, and developer experience improvements.
-
-| Spec | File | Keywords |
-|------|------|----------|
-| 551 | [Application Shell](phase-27-ralph-integration/551-application-shell.md) | shell, layout, sidebar, navigation, integration |
-| 552 | [Conversational Spec Creation](phase-27-ralph-integration/552-conversational-spec-creation.md) | chat, interview, prd, create-spec, conversational |
-| 553 | [Quickstart Onboarding](phase-27-ralph-integration/553-quickstart-onboarding.md) | init, quickstart, setup, doctor, onboarding |
-| 554 | [TUI Loop Runner](phase-27-ralph-integration/554-tui-loop-runner.md) | tui, ratatui, terminal, split-pane, keyboard |
-| 555 | [Plugin System](phase-27-ralph-integration/555-plugin-system.md) | plugin, agent, tracker, template, handlebars |
-| 556 | [Simple Config Mode](phase-27-ralph-integration/556-simple-config-mode.md) | config, simple, progressive, defaults |
-
 ---
 
 ## Quick Reference
@@ -727,7 +714,6 @@ Execute specs in numerical order. Each phase must complete before the next.
 - **Server**: 316-340
 - **Database**: 341-365
 - **Auth**: 366-390
-- **Ralph Integration**: 551-556
 
 ### By Technology
 - **Rust**: 011-075, 316-390, 411-470
@@ -739,3 +725,42 @@ Execute specs in numerical order. Each phase must complete before the next.
 1. **MVP**: 001-010 → 031-050 → 056-060 → 096-115 → 161-175 → 186-215
 2. **Forge**: 136-160 → 256-275
 3. **Full Stack**: MVP → 316-390 → 341-365
+
+
+## Phase 26: Hotfix - Critical UI (561-570)
+
+**PRIORITY: P0 - These specs fix the broken UI that was neglected**
+
+| Spec | File | Keywords |
+|------|------|----------|
+| 561 | [App Shell Sidebar](phase-26-hotfix/561-app-shell-sidebar.md) | layout, sidebar, shell, navigation |
+| 562 | [Wire Layout to Routes](phase-26-hotfix/562-wire-layout-to-routes.md) | layout, routes, wire |
+| 563 | [Dashboard Page](phase-26-hotfix/563-dashboard-page.md) | dashboard, home, stats |
+| 564 | [Missions Route](phase-26-hotfix/564-missions-route.md) | missions, route, history |
+| 565 | [Specs Route](phase-26-hotfix/565-specs-route.md) | specs, browser, route |
+| 566 | [Forge Route](phase-26-hotfix/566-forge-route.md) | forge, brainstorm, route |
+| 567 | [Settings Route](phase-26-hotfix/567-settings-route.md) | settings, config, route |
+| 551 | [Wire Main Layout](phase-09-ui-foundation/551-wire-main-layout.md) | layout, critical |
+| 552 | [Electron Dev Fixes](phase-08-electron/552-electron-dev-fixes.md) | electron, dev, fixes |
+
+## Phase 27: Ralph TUI Integration (568-573)
+
+**PRIORITY: P1 - UX polish inspired by Ralph TUI**
+
+| Spec | File | Keywords |
+|------|------|----------|
+| 568 | [Application Shell](phase-27-ralph-integration/568-application-shell.md) | shell, integration, layout, crypto |
+| 569 | [Conversational Spec Creation](phase-27-ralph-integration/569-conversational-spec-creation.md) | chat, prd, interview, spec |
+| 570 | [Quickstart Onboarding](phase-27-ralph-integration/570-quickstart-onboarding.md) | init, setup, doctor, onboard |
+| 571 | [TUI Loop Runner](phase-27-ralph-integration/571-tui-loop-runner.md) | tui, ratatui, loop, terminal |
+| 572 | [Plugin System](phase-27-ralph-integration/572-plugin-system.md) | plugins, agents, trackers, templates |
+| 573 | [Simple Config Mode](phase-27-ralph-integration/573-simple-config-mode.md) | config, simple, progressive |
+| 574 | [Electron Dev Server](phase-26-hotfix/574-electron-dev-server.md) | electron, dev, port, crypto |
+
+## Phase 28: Forge LLM Integration (575-580)
+
+**PRIORITY: P0 - Wire real LLM calls to the Forge Think Tank**
+
+| Spec | File | Keywords |
+|------|------|----------|
+| 575 | [Forge LLM Integration](phase-28-forge-llm/575-forge-llm-integration.md) | llm, claude, openai, forge, stream |

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  import Icon from '$lib/components/common/Icon.svelte';
   import type { WizardStep } from '$lib/types/forge';
 
   export let steps: WizardStep[] = [];
@@ -44,19 +45,11 @@
           data-testid="step-{index}"
         >
           <span class="step-icon" aria-hidden="true">
-            {#if getStepIcon(step, index) === 'check'}
-              ✓
-            {:else if step.icon === 'target'}
-              🎯
-            {:else if step.icon === 'users'}
-              👥
-            {:else if step.icon === 'brain'}
-              🧠
-            {:else if step.icon === 'settings'}
-              ⚙️
-            {:else}
-              ✓
-            {/if}
+            <Icon
+              name={getStepIcon(step, index)}
+              size={18}
+              glow={getStepStatus(index) !== 'upcoming'}
+            />
           </span>
           <span class="step-label">{step.label}</span>
         </button>
@@ -94,9 +87,9 @@
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    padding: 1rem;
-    background: none;
-    border: none;
+    padding: 0.75rem 0.9rem;
+    background: transparent;
+    border: 1px solid transparent;
     cursor: pointer;
     transition: all 0.2s ease;
     border-radius: 8px;
@@ -109,7 +102,8 @@
   }
 
   .step-button:hover:not(:disabled) {
-    background: var(--hover-bg, rgba(255, 255, 255, 0.05));
+    background: var(--hover-bg, rgba(78, 205, 196, 0.08));
+    border-color: rgba(78, 205, 196, 0.18);
   }
 
   .step-icon {
@@ -121,12 +115,16 @@
     border-radius: 50%;
     font-size: 1.25rem;
     transition: all 0.2s ease;
+    background: rgba(13, 17, 23, 0.55);
+    border: 1px solid rgba(78, 205, 196, 0.15);
+    color: var(--tachi-cyan, #4ecdc4);
   }
 
   .step-label {
     font-size: 0.875rem;
     font-weight: 500;
     transition: color 0.2s ease;
+    color: var(--text-secondary, rgba(230, 237, 243, 0.7));
   }
 
   .step-connector {
@@ -134,51 +132,56 @@
     height: 2px;
     margin: 0 0.5rem;
     transition: background-color 0.2s ease;
+    background: rgba(78, 205, 196, 0.12);
   }
 
   /* Completed state */
   .step-item.completed .step-icon {
-    background: var(--success-color, #10b981);
-    color: white;
+    background: rgba(63, 185, 80, 0.12);
+    border-color: rgba(63, 185, 80, 0.5);
+    color: var(--success-color, #3fb950);
+    box-shadow: 0 0 0 3px rgba(63, 185, 80, 0.12);
   }
 
   .step-item.completed .step-label {
-    color: var(--success-color, #10b981);
+    color: var(--success-color, #3fb950);
   }
 
   .step-item.completed .step-connector {
-    background: var(--success-color, #10b981);
+    background: rgba(63, 185, 80, 0.6);
   }
 
   /* Current state */
   .step-item.current .step-icon {
-    background: var(--primary-color, #3b82f6);
-    color: white;
-    box-shadow: 0 0 0 3px var(--primary-color-alpha, rgba(59, 130, 246, 0.2));
+    background: rgba(78, 205, 196, 0.14);
+    border-color: rgba(78, 205, 196, 0.65);
+    color: var(--tachi-cyan, #4ecdc4);
+    box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.16);
   }
 
   .step-item.current .step-label {
-    color: var(--primary-color, #3b82f6);
+    color: var(--tachi-cyan, #4ecdc4);
     font-weight: 600;
   }
 
   .step-item.current .step-connector {
-    background: var(--border-color, #e5e7eb);
+    background: rgba(78, 205, 196, 0.18);
   }
 
   /* Upcoming state */
   .step-item.upcoming .step-icon {
-    background: var(--secondary-bg, #f3f4f6);
-    color: var(--text-muted, #6b7280);
-    border: 2px solid var(--border-color, #e5e7eb);
+    background: rgba(13, 17, 23, 0.35);
+    color: var(--text-muted, rgba(230, 237, 243, 0.35));
+    border: 1px solid rgba(78, 205, 196, 0.1);
+    opacity: 0.6;
   }
 
   .step-item.upcoming .step-label {
-    color: var(--text-muted, #6b7280);
+    color: var(--text-muted, rgba(230, 237, 243, 0.45));
   }
 
   .step-item.upcoming .step-connector {
-    background: var(--border-color, #e5e7eb);
+    background: rgba(78, 205, 196, 0.08);
   }
 
   /* Remove connector from last item */

@@ -16,12 +16,12 @@ Implement a consistent git tagging strategy for releases that triggers CI/CD pip
 
 ## Acceptance Criteria
 
-- [ ] Git tags follow v{version} format
-- [ ] Tags are annotated with release info
-- [ ] Tags trigger release workflows
-- [ ] Branch protection for release tags
-- [ ] Tag signing for verified releases
-- [ ] Tag rollback procedure documented
+- [x] Git tags follow v{version} format
+- [x] Tags are annotated with release info
+- [x] Tags trigger release workflows
+- [x] Branch protection for release tags
+- [x] Tag signing for verified releases
+- [x] Tag rollback procedure documented
 
 ---
 

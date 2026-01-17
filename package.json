@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently -k -n web,electron \"npm run dev:web\" \"npm run dev:electron\"",
     "dev:web": "cd web && npm run dev",
-    "dev:electron": "wait-on http://localhost:1420 && cd electron && npm run dev",
+    "dev:electron": "wait-on http://localhost:5173 && cd electron && npm run dev",
     "dev:rust": "source ~/.cargo/env 2>/dev/null || true && cargo watch -x check -x test",
     "build": "npm run build:rust && npm run build:web && npm run build:electron",
     "build:dev": "npm run build:rust:dev && npm run build:web && npm run build:electron",
@@ -17,6 +17,7 @@
     "test": "npm run test:rust && npm run test:web",
     "test:rust": "source ~/.cargo/env 2>/dev/null || true && cargo test --workspace",
     "test:web": "cd web && npm test",
+    "test:e2e": "cd electron && npm run test:e2e",
     "lint": "npm run lint:rust && npm run lint:web",
     "lint:rust": "source ~/.cargo/env 2>/dev/null || true && cargo clippy --workspace -- -D warnings && cargo fmt --all -- --check",
     "lint:web": "cd web && npm run lint && npm run check",
@@ -26,11 +27,25 @@
     "docs": "npm run docs:rust && npm run docs:web",
     "docs:rust": "source ~/.cargo/env 2>/dev/null || true && cargo doc --workspace --no-deps --document-private-items",
     "docs:web": "cd web && npx typedoc",
-    "docs:serve": "npx serve docs"
+    "docs:serve": "npx serve docs",
+    "version:sync": "npx ts-node scripts/version.ts sync",
+    "version:bump:major": "npx ts-node scripts/version.ts bump major",
+    "version:bump:minor": "npx ts-node scripts/version.ts bump minor",
+    "version:bump:patch": "npx ts-node scripts/version.ts bump patch",
+    "version:bump:prerelease": "npx ts-node scripts/version.ts bump prerelease",
+    "version:set": "npx ts-node scripts/version.ts set",
+    "version:get": "npx ts-node scripts/version.ts get",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.3.1",
+    "@commitlint/config-conventional": "^20.3.1",
+    "@types/node": "^25.0.8",
     "concurrently": "^8.2.0",
+    "husky": "^9.1.7",
     "serve": "^14.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
     "wait-on": "^7.2.0"
   }
 }

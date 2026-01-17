@@ -1,0 +1,9 @@
+# This is a placeholder for the DMG background image
+# Actual file should be a 660x400 PNG image with:
+# - Dark background color: #1a1a2e
+# - Tachikoma branding at top
+# - Visual guides for app icon and Applications folder positioning
+# - "Drag to install" instruction text
+# - Professional design matching Tachikoma's brand identity
+
+PLACEHOLDER_DMG_BACKGROUND

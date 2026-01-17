@@ -16,11 +16,11 @@ Implement real-time alerting based on audit events, enabling immediate notificat
 
 ## Acceptance Criteria
 
-- [ ] Alert rule definition
-- [ ] Real-time event matching
-- [ ] Alert notification channels
-- [ ] Alert throttling/deduplication
-- [ ] Alert acknowledgment tracking
+- [x] Alert rule definition
+- [x] Real-time event matching
+- [x] Alert notification channels
+- [x] Alert throttling/deduplication
+- [x] Alert acknowledgment tracking
 
 ---
 

@@ -16,11 +16,11 @@ Implement full-text search capabilities for audit events, enabling complex searc
 
 ## Acceptance Criteria
 
-- [ ] SQLite FTS5 integration
-- [ ] Search query parsing
-- [ ] Highlighted search results
-- [ ] Search suggestions/autocomplete
-- [ ] Search result ranking
+- [x] SQLite FTS5 integration
+- [x] Search query parsing
+- [x] Highlighted search results
+- [x] Search suggestions/autocomplete
+- [x] Search result ranking
 
 ---
 

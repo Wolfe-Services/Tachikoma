@@ -16,12 +16,12 @@ Configure comprehensive test coverage collection and reporting for both Rust (us
 
 ## Acceptance Criteria
 
-- [ ] Rust coverage via cargo-llvm-cov configured
-- [ ] TypeScript coverage via v8 provider configured
-- [ ] Coverage thresholds enforced in CI
-- [ ] HTML and LCOV report formats generated
-- [ ] Coverage badges generated for README
-- [ ] Merged coverage report across all languages
+- [x] Rust coverage via cargo-llvm-cov configured
+- [x] TypeScript coverage via v8 provider configured
+- [x] Coverage thresholds enforced in CI
+- [x] HTML and LCOV report formats generated
+- [x] Coverage badges generated for README
+- [x] Merged coverage report across all languages
 
 ---
 

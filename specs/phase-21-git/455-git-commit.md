@@ -16,11 +16,11 @@ Implement Git commit operations, including staging files, creating commits, and 
 
 ## Acceptance Criteria
 
-- [ ] Stage individual files
-- [ ] Stage all changes
-- [ ] Unstage files
-- [ ] Create commits
-- [ ] Amend commits
+- [x] Stage individual files
+- [x] Stage all changes
+- [x] Unstage files
+- [x] Create commits
+- [x] Amend commits
 
 ---
 

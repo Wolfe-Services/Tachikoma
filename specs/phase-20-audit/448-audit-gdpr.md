@@ -16,11 +16,11 @@ Implement GDPR-specific features for audit data, including data subject access r
 
 ## Acceptance Criteria
 
-- [ ] Data subject access request handling
-- [ ] Right to erasure (with audit trail)
-- [ ] Data portability export
-- [ ] Consent tracking
-- [ ] Processing activity records
+- [x] Data subject access request handling
+- [x] Right to erasure (with audit trail)
+- [x] Data portability export
+- [x] Consent tracking
+- [x] Processing activity records
 
 ---
 

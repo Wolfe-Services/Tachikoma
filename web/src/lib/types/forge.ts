@@ -78,6 +78,7 @@ export interface ForgeSession {
   phase: SessionPhase;
   participants: Participant[];
   oracle: Oracle | null;
+  config?: SessionConfig;
   rounds: Round[];
   hasResults: boolean;
   createdAt: Date;

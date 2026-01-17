@@ -16,11 +16,11 @@ Implement Git history traversal, enabling viewing commit history with filtering 
 
 ## Acceptance Criteria
 
-- [ ] Commit log with pagination
-- [ ] History for specific file
-- [ ] Graph/topology information
-- [ ] Search commits
-- [ ] Date range filtering
+- [x] Commit log with pagination
+- [x] History for specific file
+- [x] Graph/topology information
+- [x] Search commits
+- [x] Date range filtering
 
 ---
 

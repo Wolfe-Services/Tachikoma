@@ -16,11 +16,11 @@ Implement automatic capture of system-level events including startup, shutdown, 
 
 ## Acceptance Criteria
 
-- [ ] Application lifecycle events
-- [ ] Configuration change tracking
-- [ ] Error event capture
-- [ ] Health/status events
-- [ ] Resource usage events
+- [x] Application lifecycle events
+- [x] Configuration change tracking
+- [x] Error event capture
+- [x] Health/status events
+- [x] Resource usage events
 
 ---
 

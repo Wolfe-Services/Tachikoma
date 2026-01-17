@@ -16,12 +16,12 @@ Configure electron-builder for packaging the Tachikoma application into distribu
 
 ## Acceptance Criteria
 
-- [ ] electron-builder configuration for all platforms
-- [ ] Native dependencies properly bundled
-- [ ] Assets and resources correctly included
-- [ ] Auto-update configuration prepared
-- [ ] File associations configured
-- [ ] Deep linking protocol registered
+- [x] electron-builder configuration for all platforms
+- [x] Native dependencies properly bundled
+- [x] Assets and resources correctly included
+- [x] Auto-update configuration prepared
+- [x] File associations configured
+- [x] Deep linking protocol registered
 
 ---
 

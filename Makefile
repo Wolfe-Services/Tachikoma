@@ -56,3 +56,20 @@ install:
 	npm install
 	cd web && npm install
 	cd electron && npm install
+
+# Release tagging
+.PHONY: tag tag-signed tag-list tag-delete
+
+tag:
+	@read -p "Version: " VERSION && ./scripts/tag-release.sh $$VERSION
+
+tag-signed:
+	@read -p "Version: " VERSION && ./scripts/tag-release-signed.sh $$VERSION
+
+tag-list:
+	@git tag -l "v*" --sort=-version:refname | head -10
+
+tag-delete:
+	@read -p "Tag to delete (e.g., v1.0.0): " TAG && \
+		git tag -d $$TAG && \
+		echo "Local tag deleted. To delete remote: git push origin :refs/tags/$$TAG"

@@ -3,7 +3,7 @@
   import { marked } from 'marked';
   import { goalRefinementStore } from '$lib/services/goalRefinement';
   import type { RefinementMessage } from '$lib/services/goalRefinement';
-  import Spinner from '$lib/components/ui/Spinner/Spinner.svelte';
+  import Icon from '$lib/components/common/Icon.svelte';
 
   export let currentGoal: string = '';
 
@@ -21,14 +21,15 @@
   let refinementState = {
     isActive: false,
     isStreaming: false,
-    currentQuestionIndex: 0,
-    structuredGoal: { objective: '', context: '', constraints: '', successCriteria: '' },
+    initialGoal: '',
+    contextGaps: [] as { category: string; description: string; question: string; priority: string; filled: boolean }[],
+    currentGapIndex: 0,
+    refinedGoal: '',
     error: null as string | null
   };
 
   const unsubMessages = goalRefinementStore.messages.subscribe(m => {
     messages = m;
-    // Auto-scroll on new messages
     setTimeout(scrollToBottom, 50);
   });
 
@@ -37,7 +38,7 @@
   });
 
   onMount(() => {
-    goalRefinementStore.startRefinement();
+    goalRefinementStore.startRefinement(currentGoal);
     inputElement?.focus();
   });
 
@@ -55,7 +56,6 @@
 
   function handleSubmit() {
     if (!inputValue.trim() || refinementState.isStreaming) return;
-    
     goalRefinementStore.submitAnswer(inputValue.trim());
     inputValue = '';
   }
@@ -73,11 +73,8 @@
   }
 
   function handleApplySuggestions() {
-    const markdown = goalRefinementStore.getStructuredGoalMarkdown();
-    const newGoal = currentGoal 
-      ? `${currentGoal}\n\n---\n\n${markdown}`
-      : markdown;
-    dispatch('applySuggestions', newGoal);
+    const markdown = goalRefinementStore.getRefinedGoalMarkdown();
+    dispatch('applySuggestions', markdown);
   }
 
   function renderMarkdown(content: string): string {
@@ -88,424 +85,384 @@
     }
   }
 
-  $: hasStructuredGoal = refinementState.structuredGoal.objective.length > 0;
-  $: allQuestionsAnswered = refinementState.currentQuestionIndex >= 3 && !refinementState.isStreaming;
+  $: hasRefinedGoal = refinementState.refinedGoal.length > 0;
+  $: filledCount = refinementState.contextGaps.filter(g => g.filled).length;
+  $: totalGaps = refinementState.contextGaps.length;
 </script>
 
-<div class="refinement-chat" data-testid="goal-refinement-chat">
-  <header class="chat-header">
-    <div class="header-left">
-      <span class="header-icon">🤖</span>
-      <div class="header-text">
-        <h3>AI Refinement Assistant</h3>
-        <p class="header-subtitle">Let's clarify your session goal</p>
-      </div>
+<div class="refinement-panel" data-testid="goal-refinement-chat">
+  <!-- Panel Header -->
+  <header class="panel-header">
+    <div class="header-title">
+      <Icon name="message-circle" size={16} />
+      <span>Q&A REFINEMENT</span>
     </div>
+    {#if totalGaps > 0}
+      <div class="progress-badge">
+        {filledCount}/{totalGaps}
+      </div>
+    {/if}
     <button 
       type="button" 
       class="close-btn" 
       on:click={handleClose}
-      aria-label="Close refinement chat"
+      aria-label="Close"
     >
-      ×
+      <Icon name="x" size={14} />
     </button>
   </header>
 
-  <div class="messages-container" bind:this={messagesContainer}>
+  <!-- Progress Track -->
+  {#if totalGaps > 0}
+    <div class="progress-track">
+      <div class="progress-fill" style="width: {(filledCount / totalGaps) * 100}%"></div>
+    </div>
+  {/if}
+
+  <!-- Messages Area -->
+  <div class="messages-area" bind:this={messagesContainer}>
     {#each messages as message (message.id)}
-      <div 
-        class="message" 
-        class:assistant={message.role === 'assistant'}
-        class:user={message.role === 'user'}
-        class:streaming={message.status === 'streaming'}
-      >
-        <div class="message-avatar">
+      <div class="message" class:is-user={message.role === 'user'}>
+        <div class="message-indicator">
           {#if message.role === 'assistant'}
-            🤖
+            <Icon name="cpu" size={14} />
           {:else}
-            👤
+            <Icon name="user" size={14} />
           {/if}
         </div>
-        <div class="message-bubble">
+        <div class="message-content">
           {#if message.status === 'pending'}
-            <div class="thinking-indicator">
-              <span class="dot"></span>
-              <span class="dot"></span>
-              <span class="dot"></span>
+            <div class="typing-dots">
+              <span></span><span></span><span></span>
             </div>
           {:else if message.content}
-            <div class="message-content">
+            <div class="message-text">
               {@html renderMarkdown(message.content)}
             </div>
           {/if}
         </div>
       </div>
     {/each}
-
-    {#if refinementState.isStreaming && messages.length > 0}
-      <div class="typing-indicator">
-        <Spinner size={12} color="var(--tachi-cyan, #4ecdc4)" />
-        <span>Assistant is typing...</span>
-      </div>
-    {/if}
   </div>
 
+  <!-- Input Area -->
   <div class="input-area">
-    <div class="input-wrapper">
-      <input
-        bind:this={inputElement}
-        bind:value={inputValue}
-        type="text"
-        class="chat-input"
-        placeholder="Type your response..."
-        disabled={refinementState.isStreaming}
-        on:keydown={handleKeydown}
-        data-testid="refinement-input"
-      />
-      <button
-        type="button"
-        class="send-btn"
-        disabled={!inputValue.trim() || refinementState.isStreaming}
-        on:click={handleSubmit}
-        aria-label="Send message"
-      >
-        ▶
+    <input
+      bind:this={inputElement}
+      bind:value={inputValue}
+      type="text"
+      class="chat-input"
+      placeholder="Type your response..."
+      disabled={refinementState.isStreaming}
+      on:keydown={handleKeydown}
+      data-testid="refinement-input"
+    />
+    <button
+      type="button"
+      class="send-btn"
+      disabled={!inputValue.trim() || refinementState.isStreaming}
+      on:click={handleSubmit}
+      aria-label="Send"
+    >
+      <Icon name="send" size={14} />
+    </button>
+  </div>
+
+  <!-- Actions -->
+  {#if hasRefinedGoal}
+    <div class="actions-bar">
+      <button type="button" class="btn-secondary" on:click={() => inputElement?.focus()}>
+        Continue
+      </button>
+      <button type="button" class="btn-primary" on:click={handleApplySuggestions}>
+        <Icon name="check" size={14} />
+        Apply to Goal
       </button>
     </div>
-  </div>
-
-  <footer class="chat-footer">
-    <button
-      type="button"
-      class="btn btn-primary"
-      disabled={!hasStructuredGoal}
-      on:click={handleApplySuggestions}
-    >
-      Apply Suggestions to Goal
-    </button>
-    <button
-      type="button"
-      class="btn btn-secondary"
-      on:click={() => inputElement?.focus()}
-    >
-      Continue Refining
-    </button>
-  </footer>
+  {/if}
 </div>
 
 <style>
-  .refinement-chat {
+  .refinement-panel {
     display: flex;
     flex-direction: column;
-    background: rgba(13, 17, 23, 0.6);
-    border: 1px solid rgba(78, 205, 196, 0.25);
+    background: rgba(22, 27, 34, 0.75);
+    border: 1px solid var(--border-color, rgba(78, 205, 196, 0.15));
     border-radius: 12px;
     overflow: hidden;
-    max-height: 500px;
     margin-top: 1rem;
-    animation: slideIn 0.3s ease;
+    max-height: 480px;
+    backdrop-filter: blur(8px);
   }
 
-  @keyframes slideIn {
-    from { 
-      opacity: 0; 
-      transform: translateY(-10px); 
-    }
-    to { 
-      opacity: 1; 
-      transform: translateY(0); 
-    }
-  }
-
-  .chat-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.875rem 1rem;
-    background: linear-gradient(135deg, rgba(78, 205, 196, 0.12), rgba(78, 205, 196, 0.04));
-    border-bottom: 1px solid rgba(78, 205, 196, 0.18);
-  }
-
-  .header-left {
+  /* Header */
+  .panel-header {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(90deg, rgba(78, 205, 196, 0.08), transparent);
+    border-bottom: 1px solid var(--border-color, rgba(78, 205, 196, 0.15));
   }
 
-  .header-icon {
-    font-size: 1.5rem;
-  }
-
-  .header-text h3 {
-    margin: 0;
-    font-size: 0.95rem;
+  .header-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.7rem;
     font-weight: 600;
     color: var(--tachi-cyan, #4ecdc4);
-    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  .progress-badge {
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    background: rgba(78, 205, 196, 0.1);
+    border: 1px solid rgba(78, 205, 196, 0.2);
+    border-radius: 4px;
+    color: var(--text-muted, rgba(230, 237, 243, 0.5));
     letter-spacing: 0.5px;
   }
 
-  .header-subtitle {
-    margin: 0.15rem 0 0 0;
-    font-size: 0.75rem;
-    color: rgba(230, 237, 243, 0.5);
-  }
-
   .close-btn {
-    width: 28px;
-    height: 28px;
+    margin-left: auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 107, 107, 0.1);
-    border: 1px solid rgba(255, 107, 107, 0.25);
-    border-radius: 6px;
-    color: rgba(255, 107, 107, 0.8);
-    font-size: 1.25rem;
+    width: 24px;
+    height: 24px;
+    background: transparent;
+    border: 1px solid var(--border-color, rgba(78, 205, 196, 0.15));
+    border-radius: 4px;
+    color: var(--text-muted, rgba(230, 237, 243, 0.5));
     cursor: pointer;
     transition: all 0.15s ease;
   }
 
   .close-btn:hover {
-    background: rgba(255, 107, 107, 0.2);
-    color: rgba(255, 107, 107, 1);
+    background: rgba(255, 107, 107, 0.1);
+    border-color: rgba(255, 107, 107, 0.3);
+    color: var(--tachi-red, #ff6b6b);
   }
 
-  .messages-container {
+  /* Progress Track */
+  .progress-track {
+    height: 2px;
+    background: var(--bg-tertiary, #1c2128);
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--tachi-cyan, #4ecdc4);
+    transition: width 0.4s ease;
+  }
+
+  /* Messages */
+  .messages-area {
     flex: 1;
     overflow-y: auto;
-    padding: 1rem;
+    padding: 1rem 1.25rem;
     display: flex;
     flex-direction: column;
-    gap: 0.875rem;
+    gap: 0.75rem;
     min-height: 200px;
-    max-height: 280px;
+    max-height: 320px;
   }
 
   .message {
     display: flex;
     align-items: flex-start;
     gap: 0.625rem;
-    animation: fadeIn 0.25s ease;
   }
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .message.user {
+  .message.is-user {
     flex-direction: row-reverse;
   }
 
-  .message-avatar {
-    width: 32px;
-    height: 32px;
+  .message-indicator {
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    font-size: 1rem;
+    border-radius: 6px;
     flex-shrink: 0;
+    background: var(--bg-tertiary, #1c2128);
+    border: 1px solid var(--border-color, rgba(78, 205, 196, 0.1));
+    color: var(--text-muted, rgba(230, 237, 243, 0.5));
   }
 
-  .message.assistant .message-avatar {
-    background: linear-gradient(135deg, rgba(88, 166, 255, 0.25), rgba(88, 166, 255, 0.08));
-    border: 1px solid rgba(88, 166, 255, 0.35);
-  }
-
-  .message.user .message-avatar {
-    background: linear-gradient(135deg, rgba(63, 185, 80, 0.25), rgba(63, 185, 80, 0.08));
-    border: 1px solid rgba(63, 185, 80, 0.35);
-  }
-
-  .message-bubble {
-    max-width: 85%;
-    padding: 0.75rem 1rem;
-    border-radius: 12px;
-    font-size: 0.875rem;
-    line-height: 1.55;
-  }
-
-  .message.assistant .message-bubble {
-    background: rgba(22, 27, 34, 0.8);
-    border: 1px solid rgba(78, 205, 196, 0.15);
-    color: rgba(230, 237, 243, 0.9);
-    border-bottom-left-radius: 4px;
-  }
-
-  .message.user .message-bubble {
-    background: linear-gradient(135deg, rgba(78, 205, 196, 0.18), rgba(78, 205, 196, 0.08));
-    border: 1px solid rgba(78, 205, 196, 0.3);
-    color: rgba(230, 237, 243, 0.95);
-    border-bottom-right-radius: 4px;
-  }
-
-  .message.streaming .message-bubble {
-    border-color: rgba(78, 205, 196, 0.4);
-    box-shadow: 0 0 12px rgba(78, 205, 196, 0.1);
-  }
-
-  .message-content :global(p) {
-    margin: 0 0 0.5rem 0;
-  }
-
-  .message-content :global(p:last-child) {
-    margin-bottom: 0;
-  }
-
-  .message-content :global(h2) {
-    margin: 0.75rem 0 0.5rem 0;
-    font-size: 0.95rem;
+  .message.is-user .message-indicator {
+    background: rgba(78, 205, 196, 0.1);
+    border-color: rgba(78, 205, 196, 0.2);
     color: var(--tachi-cyan, #4ecdc4);
   }
 
-  .message-content :global(h2:first-child) {
-    margin-top: 0;
+  .message-content {
+    max-width: 85%;
+    padding: 0.625rem 0.875rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    background: var(--bg-tertiary, #1c2128);
+    border: 1px solid var(--border-color, rgba(78, 205, 196, 0.1));
+    color: var(--text-secondary, rgba(230, 237, 243, 0.8));
   }
 
-  .message-content :global(ul),
-  .message-content :global(ol) {
-    margin: 0.5rem 0;
-    padding-left: 1.25rem;
-  }
-
-  .message-content :global(li) {
-    margin-bottom: 0.25rem;
-  }
-
-  .message-content :global(em) {
-    color: rgba(230, 237, 243, 0.6);
-  }
-
-  .message-content :global(strong) {
+  .message.is-user .message-content {
+    background: rgba(78, 205, 196, 0.08);
+    border-color: rgba(78, 205, 196, 0.2);
     color: var(--text-primary, #e6edf3);
   }
 
-  .thinking-indicator {
+  .message-text :global(p) {
+    margin: 0 0 0.5rem 0;
+  }
+
+  .message-text :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .message-text :global(h2) {
+    margin: 0.625rem 0 0.375rem 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--tachi-cyan, #4ecdc4);
+  }
+
+  .message-text :global(h2:first-child) {
+    margin-top: 0;
+  }
+
+  .message-text :global(ul),
+  .message-text :global(ol) {
+    margin: 0.375rem 0;
+    padding-left: 1.125rem;
+  }
+
+  .message-text :global(li) {
+    margin-bottom: 0.125rem;
+  }
+
+  .message-text :global(strong) {
+    color: var(--text-primary, #e6edf3);
+  }
+
+  .message-text :global(hr) {
+    border: none;
+    border-top: 1px solid var(--border-color, rgba(78, 205, 196, 0.15));
+    margin: 0.625rem 0;
+  }
+
+  /* Typing Animation */
+  .typing-dots {
     display: flex;
-    align-items: center;
-    gap: 0.3rem;
+    gap: 4px;
     padding: 0.25rem 0;
   }
 
-  .thinking-indicator .dot {
-    width: 6px;
-    height: 6px;
+  .typing-dots span {
+    width: 5px;
+    height: 5px;
     border-radius: 50%;
     background: var(--tachi-cyan, #4ecdc4);
-    animation: thinking 1.4s infinite ease-in-out;
+    animation: dotPulse 1.2s infinite ease-in-out;
   }
 
-  .thinking-indicator .dot:nth-child(2) {
-    animation-delay: 0.2s;
-  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
 
-  .thinking-indicator .dot:nth-child(3) {
-    animation-delay: 0.4s;
-  }
-
-  @keyframes thinking {
-    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+  @keyframes dotPulse {
+    0%, 80%, 100% { opacity: 0.25; transform: scale(0.85); }
     40% { opacity: 1; transform: scale(1); }
   }
 
-  .typing-indicator {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    background: rgba(78, 205, 196, 0.06);
-    border: 1px solid rgba(78, 205, 196, 0.12);
-    border-radius: 8px;
-    color: var(--tachi-cyan, #4ecdc4);
-    font-size: 0.75rem;
-    align-self: flex-start;
-  }
-
+  /* Input Area */
   .input-area {
-    padding: 0.875rem 1rem;
-    border-top: 1px solid rgba(78, 205, 196, 0.12);
-    background: rgba(13, 17, 23, 0.4);
-  }
-
-  .input-wrapper {
     display: flex;
     gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--border-color, rgba(78, 205, 196, 0.1));
+    background: var(--bg-tertiary, #1c2128);
   }
 
   .chat-input {
     flex: 1;
-    padding: 0.625rem 1rem;
-    background: rgba(22, 27, 34, 0.6);
-    border: 1px solid rgba(78, 205, 196, 0.18);
-    border-radius: 8px;
-    color: rgba(230, 237, 243, 0.9);
-    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-secondary, #161b22);
+    border: 1px solid var(--border-color, rgba(78, 205, 196, 0.15));
+    border-radius: 6px;
+    color: var(--text-primary, #e6edf3);
+    font-size: 0.85rem;
     transition: all 0.15s ease;
   }
 
   .chat-input::placeholder {
-    color: rgba(230, 237, 243, 0.35);
+    color: var(--text-muted, rgba(230, 237, 243, 0.35));
   }
 
   .chat-input:focus {
     outline: none;
-    border-color: rgba(78, 205, 196, 0.45);
+    border-color: var(--tachi-cyan, #4ecdc4);
     box-shadow: 0 0 0 2px rgba(78, 205, 196, 0.1);
   }
 
   .chat-input:disabled {
     opacity: 0.5;
-    cursor: not-allowed;
   }
 
   .send-btn {
-    width: 40px;
-    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(78, 205, 196, 0.25), rgba(78, 205, 196, 0.1));
-    border: 1px solid rgba(78, 205, 196, 0.35);
-    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    background: rgba(78, 205, 196, 0.1);
+    border: 1px solid rgba(78, 205, 196, 0.25);
+    border-radius: 6px;
     color: var(--tachi-cyan, #4ecdc4);
-    font-size: 0.875rem;
     cursor: pointer;
     transition: all 0.15s ease;
   }
 
   .send-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, rgba(78, 205, 196, 0.35), rgba(78, 205, 196, 0.15));
-    box-shadow: 0 0 12px rgba(78, 205, 196, 0.2);
+    background: rgba(78, 205, 196, 0.2);
+    border-color: var(--tachi-cyan, #4ecdc4);
   }
 
   .send-btn:disabled {
-    opacity: 0.4;
+    opacity: 0.35;
     cursor: not-allowed;
   }
 
-  .chat-footer {
+  /* Actions Bar */
+  .actions-bar {
     display: flex;
     gap: 0.75rem;
-    padding: 0.875rem 1rem;
-    border-top: 1px solid rgba(78, 205, 196, 0.12);
-    background: rgba(78, 205, 196, 0.03);
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--border-color, rgba(78, 205, 196, 0.1));
+    background: linear-gradient(90deg, rgba(78, 205, 196, 0.04), transparent);
   }
 
-  .btn {
+  .btn-primary,
+  .btn-secondary {
     flex: 1;
-    padding: 0.625rem 1rem;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
     cursor: pointer;
     transition: all 0.15s ease;
-  }
-
-  .btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
   }
 
   .btn-primary {
@@ -514,19 +471,18 @@
     border: 1px solid rgba(78, 205, 196, 0.5);
   }
 
-  .btn-primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--tachi-cyan, #4ecdc4), var(--tachi-cyan-bright, #6ee7df));
-    box-shadow: 0 0 15px rgba(78, 205, 196, 0.25);
+  .btn-primary:hover {
+    box-shadow: 0 0 12px rgba(78, 205, 196, 0.25);
   }
 
   .btn-secondary {
-    background: rgba(13, 17, 23, 0.4);
-    color: rgba(230, 237, 243, 0.75);
-    border: 1px solid rgba(78, 205, 196, 0.16);
+    background: var(--bg-tertiary, #1c2128);
+    color: var(--text-secondary, rgba(230, 237, 243, 0.7));
+    border: 1px solid var(--border-color, rgba(78, 205, 196, 0.15));
   }
 
-  .btn-secondary:hover:not(:disabled) {
+  .btn-secondary:hover {
     background: rgba(78, 205, 196, 0.08);
-    color: rgba(230, 237, 243, 0.9);
+    color: var(--text-primary, #e6edf3);
   }
 </style>

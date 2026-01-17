@@ -1,0 +1,95 @@
+[profile.default]
+# Standard test configuration
+retries = 0
+slow-timeout = { period = "60s", terminate-after = 2 }
+fail-fast = false
+
+# Test output configuration
+status-level = "pass"
+final-status-level = "slow"
+
+# Capture test output
+failure-output = "immediate-final"
+success-output = "never"
+
+# Timing configuration
+slow-timeout = { period = "30s" }
+
+[profile.ci]
+# CI-specific configuration with retries and timing
+retries = 2
+fail-fast = false
+
+# More verbose output for CI
+status-level = "pass"
+final-status-level = "all"
+
+# Capture all output for debugging
+failure-output = "immediate-final"
+success-output = "final"
+
+# Stricter timing for CI
+slow-timeout = { period = "45s", terminate-after = 3 }
+
+# Test filtering
+[[profile.ci.overrides]]
+filter = 'test(flaky)'
+retries = 3
+
+[[profile.ci.overrides]]
+filter = 'test(integration)'
+slow-timeout = { period = "120s" }
+
+# Flaky test profile with more retries for detection
+[profile.flaky-detection]
+retries = 5
+fail-fast = false
+status-level = "all"
+final-status-level = "all"
+failure-output = "immediate-final"
+success-output = "final"
+slow-timeout = { period = "120s", terminate-after = 2 }
+
+# Override for known flaky tests in CI
+[[profile.ci.overrides]]
+filter = 'test(::network::)'
+retries = 2
+
+[[profile.ci.overrides]]
+filter = 'test(::timeout::)'
+retries = 2
+slow-timeout = { period = "300s" }
+
+[profile.reporting]
+# Configuration optimized for test reporting
+retries = 0
+fail-fast = false
+
+# Comprehensive output for reporting
+status-level = "all"
+final-status-level = "all"
+failure-output = "immediate-final"
+success-output = "final"
+
+# Detailed timing information
+slow-timeout = { period = "30s", terminate-after = 1 }
+
+# Test categorization for better reporting
+[[profile.reporting.overrides]]
+filter = 'test(unit)'
+slow-timeout = { period = "5s" }
+
+[[profile.reporting.overrides]]
+filter = 'test(integration)'
+slow-timeout = { period = "60s" }
+
+[[profile.reporting.overrides]]
+filter = 'test(benchmark)'
+slow-timeout = { period = "300s" }
+
+[junit]
+# JUnit XML output configuration
+path = "junit.xml"
+report-name = "Tachikoma Rust Tests"
+store-success-output = true
+store-failure-output = true

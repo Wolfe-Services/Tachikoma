@@ -16,12 +16,12 @@ Implement snapshot testing using insta for Rust and vitest snapshots for TypeScr
 
 ## Acceptance Criteria
 
-- [ ] insta configured for all Rust crates with YAML/JSON support
-- [ ] Vitest snapshots configured for TypeScript tests
-- [ ] Snapshot review workflow documented
-- [ ] Inline snapshots supported where appropriate
-- [ ] Snapshot naming conventions established
-- [ ] CI fails on pending snapshot reviews
+- [x] insta configured for all Rust crates with YAML/JSON support
+- [x] Vitest snapshots configured for TypeScript tests
+- [x] Snapshot review workflow documented
+- [x] Inline snapshots supported where appropriate
+- [x] Snapshot naming conventions established
+- [x] CI fails on pending snapshot reviews
 
 ---
 

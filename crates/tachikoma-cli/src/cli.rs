@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use clap::{ArgAction, ColorChoice, Parser, Subcommand, ValueHint};
 
 use crate::commands::{
-    BackendsCommand, ConfigCommand, DoctorCommand, 
+    BackendsCommand, ChatCommand, ConfigCommand, DoctorCommand, 
     InitCommand, ToolsCommand, CompletionsCommand, ManpagesCommand,
     MigrateCommands,
 };
@@ -159,6 +159,9 @@ pub enum Command {
     /// Generate man pages
     #[command(hide = true)]
     Manpages(ManpagesCommand),
+
+    /// Conversational spec creation
+    Chat(ChatCommand),
 }
 
 /// Shell completions generation
@@ -223,6 +226,7 @@ impl Cli {
                 cmd.execute(&ctx)?;
                 Ok(())
             },
+            Command::Chat(cmd) => cmd.execute(&ctx).await,
             _ => {
                 eprintln!("Command not yet implemented");
                 std::process::exit(1);

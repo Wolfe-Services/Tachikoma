@@ -16,11 +16,11 @@ Implement configurable retention policies for audit events, enabling automatic c
 
 ## Acceptance Criteria
 
-- [ ] Configurable retention periods per category
-- [ ] Automatic cleanup scheduler
-- [ ] Retention policy enforcement
-- [ ] Pre-deletion archival option
-- [ ] Compliance holds support
+- [x] Configurable retention periods per category
+- [x] Automatic cleanup scheduler
+- [x] Retention policy enforcement
+- [x] Pre-deletion archival option
+- [x] Compliance holds support
 
 ---
 

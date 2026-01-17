@@ -16,11 +16,11 @@ Define the storage schema for audit events, supporting both SQLite persistence a
 
 ## Acceptance Criteria
 
-- [ ] SQLite schema for audit events
-- [ ] Append-only log file format
-- [ ] Schema versioning support
-- [ ] Index definitions for common queries
-- [ ] Migration support
+- [x] SQLite schema for audit events
+- [x] Append-only log file format
+- [x] Schema versioning support
+- [x] Index definitions for common queries
+- [x] Migration support
 
 ---
 

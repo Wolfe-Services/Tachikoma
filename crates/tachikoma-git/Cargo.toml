@@ -1,0 +1,28 @@
+[package]
+name = "tachikoma-git"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Git integration for Tachikoma"
+
+[dependencies]
+tachikoma-common-core.workspace = true
+git2 = { version = "0.18", features = ["vendored-libgit2"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+thiserror.workspace = true
+chrono = { version = "0.4", features = ["serde"] }
+tokio = { workspace = true, features = ["fs", "process"] }
+tracing.workspace = true
+parking_lot = "0.12"
+dirs = "5.0"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+security-framework = "2.9"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+winapi = { version = "0.3", features = ["wincred", "minwindef", "winnt"] }
+
+[dev-dependencies]
+tempfile = "3.10"
+proptest.workspace = true

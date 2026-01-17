@@ -16,12 +16,12 @@ Create test data generators using fake-rs for Rust and faker.js for TypeScript t
 
 ## Acceptance Criteria
 
-- [ ] Generators for all major domain types
-- [ ] Seeded generation for reproducible tests
-- [ ] Locale-aware data (names, addresses)
-- [ ] Domain-specific generators (API keys, tokens, paths)
-- [ ] Batch generation for performance testing
-- [ ] Integration with property testing frameworks
+- [x] Generators for all major domain types
+- [x] Seeded generation for reproducible tests
+- [x] Locale-aware data (names, addresses)
+- [x] Domain-specific generators (API keys, tokens, paths)
+- [x] Batch generation for performance testing
+- [x] Integration with property testing frameworks
 
 ---
 
@@ -598,9 +598,9 @@ ${generators.paragraph()}
 
 ## Acceptance Criteria
 
-- [ ] ${generators.sentence()}
-- [ ] ${generators.sentence()}
-- [ ] ${generators.sentence()}
+- [x] ${generators.sentence()}
+- [x] ${generators.sentence()}
+- [x] ${generators.sentence()}
 `,
     phase: String(generators.number(0, 24)).padStart(2, '0'),
     status: 'Planned',

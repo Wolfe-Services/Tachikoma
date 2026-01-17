@@ -16,11 +16,11 @@ Implement Git status functionality, providing detailed information about the wor
 
 ## Acceptance Criteria
 
-- [ ] Working directory status
-- [ ] Staging area status
-- [ ] File status enumeration
-- [ ] Submodule status
-- [ ] Status filtering options
+- [x] Working directory status
+- [x] Staging area status
+- [x] File status enumeration
+- [x] Submodule status
+- [x] Status filtering options
 
 ---
 

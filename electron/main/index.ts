@@ -225,17 +225,25 @@ class TachikomaApp {
     const defaultSession = session.defaultSession;
 
     // Configure Content Security Policy
+    // In dev mode, allow inline scripts for SvelteKit HMR
+    const scriptSrc = is.dev 
+      ? "'self' 'unsafe-inline' 'unsafe-eval'" 
+      : "'self' 'unsafe-eval'";
+    const connectSrc = is.dev 
+      ? "'self' http: https: ws: wss:" 
+      : "'self' https: wss:";
+    
     defaultSession.webRequest.onHeadersReceived((details, callback) => {
       callback({
         responseHeaders: {
           ...details.responseHeaders,
           'Content-Security-Policy': [
             "default-src 'self'; " +
-            "script-src 'self' 'unsafe-eval'; " +
+            `script-src ${scriptSrc}; ` +
             "style-src 'self' 'unsafe-inline'; " +
-            "img-src 'self' data: https:; " +
+            "img-src 'self' data: https: http:; " +
             "font-src 'self' data:; " +
-            "connect-src 'self' https: wss:; " +
+            `connect-src ${connectSrc}; ` +
             "frame-src 'none';"
           ],
         },
@@ -383,6 +391,7 @@ class TachikomaApp {
     });
 
     this.mainWindow.on('ready-to-show', () => {
+      logger.info('ready-to-show event fired');
       if (windowConfig.maximized) {
         this.mainWindow?.maximize();
       }
@@ -395,6 +404,17 @@ class TachikomaApp {
 
       logger.info('Main window shown');
     });
+
+    // Fallback: show window after timeout if ready-to-show doesn't fire
+    setTimeout(() => {
+      if (this.mainWindow && !this.mainWindow.isVisible()) {
+        logger.warn('Window not visible after timeout, forcing show');
+        this.mainWindow.show();
+        if (is.dev) {
+          this.mainWindow.webContents.openDevTools();
+        }
+      }
+    }, 5000);
 
     this.mainWindow.on('close', (event) => {
       // Save window state
@@ -419,10 +439,20 @@ class TachikomaApp {
       logger.info('Main window closed');
     });
 
+    // Log web contents errors
+    this.mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+      logger.error('Failed to load', { errorCode, errorDescription, validatedURL });
+    });
+
+    this.mainWindow.webContents.on('did-finish-load', () => {
+      logger.info('Page finished loading');
+    });
+
     // Load the renderer
     if (is.dev) {
       // In dev mode, load from the Vite dev server (port 5173 for web, 1420 for Tauri)
       const devServerUrl = process.env['ELECTRON_RENDERER_URL'] || 'http://localhost:5173';
+      logger.info('Loading dev server URL', { devServerUrl });
       await this.mainWindow.loadURL(devServerUrl);
     } else {
       await this.mainWindow.loadFile(join(__dirname, '../../web/dist/index.html'));

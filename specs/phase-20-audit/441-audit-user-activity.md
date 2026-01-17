@@ -16,11 +16,11 @@ Implement user activity tracking and reporting, providing per-user audit trails 
 
 ## Acceptance Criteria
 
-- [ ] Per-user activity queries
-- [ ] User activity summaries
-- [ ] Session tracking
-- [ ] Activity anomaly detection
-- [ ] User activity reports
+- [x] Per-user activity queries
+- [x] User activity summaries
+- [x] Session tracking
+- [x] Activity anomaly detection
+- [x] User activity reports
 
 ---
 

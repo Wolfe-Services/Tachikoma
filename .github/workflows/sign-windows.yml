@@ -1,0 +1,148 @@
+name: Sign Windows
+
+on:
+  workflow_call:
+    inputs:
+      artifact-name:
+        description: 'Name of the artifact to sign'
+        required: true
+        type: string
+      certificate-subject:
+        description: 'Certificate subject name (optional)'
+        required: false
+        type: string
+        default: 'Tachikoma Team'
+    secrets:
+      WINDOWS_CERTIFICATE:
+        description: 'Base64-encoded Windows code signing certificate (.pfx)'
+        required: true
+      WINDOWS_CERTIFICATE_PASSWORD:
+        description: 'Password for the Windows code signing certificate'
+        required: true
+
+jobs:
+  sign-windows:
+    name: Sign Windows Executables
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download unsigned artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ./unsigned
+
+      - name: List files to sign
+        shell: powershell
+        run: |
+          Write-Host "Files in unsigned directory:"
+          Get-ChildItem -Path ./unsigned -Recurse -Include "*.exe","*.dll","*.node" | ForEach-Object {
+            Write-Host "  $($_.FullName)"
+          }
+
+      - name: Import certificate to temporary file
+        shell: powershell
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CERTIFICATE }}
+          CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: |
+          $certBytes = [Convert]::FromBase64String($env:CERTIFICATE_BASE64)
+          $certPath = "$env:TEMP\certificate.pfx"
+          [IO.File]::WriteAllBytes($certPath, $certBytes)
+          Write-Host "Certificate saved to: $certPath"
+          
+          # Set environment variables for signing script
+          Add-Content $env:GITHUB_ENV "CSC_LINK=$certPath"
+          Add-Content $env:GITHUB_ENV "CSC_KEY_PASSWORD=$env:CERTIFICATE_PASSWORD"
+          Add-Content $env:GITHUB_ENV "WIN_CERT_SUBJECT_NAME=${{ inputs.certificate-subject }}"
+
+      - name: Install Windows SDK (for signtool)
+        uses: GuillaumeFalourd/setup-windows-sdk@v1.2
+
+      - name: Sign executables
+        shell: powershell
+        working-directory: ./unsigned
+        run: |
+          $ScriptPath = Join-Path $env:GITHUB_WORKSPACE "electron\scripts\sign-all-windows.ps1"
+          & $ScriptPath -Directory "."
+
+      - name: Verify all signatures
+        shell: powershell
+        working-directory: ./unsigned
+        run: |
+          $VerifyScript = Join-Path $env:GITHUB_WORKSPACE "electron\scripts\verify-windows-signature.ps1"
+          $HasFailures = $false
+          
+          Get-ChildItem -Recurse -Include "*.exe","*.dll","*.node" | ForEach-Object {
+            Write-Host ""
+            Write-Host "=== Verifying $($_.Name) ===" -ForegroundColor Cyan
+            try {
+              & $VerifyScript -FilePath $_.FullName
+              Write-Host "✓ $($_.Name) verification passed" -ForegroundColor Green
+            } catch {
+              Write-Host "✗ $($_.Name) verification failed: $($_.Exception.Message)" -ForegroundColor Red
+              $HasFailures = $true
+            }
+          }
+          
+          if ($HasFailures) {
+            throw "One or more signature verifications failed"
+          }
+
+      - name: Clean up certificate
+        shell: powershell
+        if: always()
+        run: |
+          $certPath = "$env:TEMP\certificate.pfx"
+          if (Test-Path $certPath) {
+            Remove-Item $certPath -Force
+            Write-Host "Certificate file cleaned up"
+          }
+
+      - name: Upload signed artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}-signed
+          path: ./unsigned
+          retention-days: 30
+
+      - name: Generate signing report
+        shell: powershell
+        run: |
+          $ReportPath = "signing-report.txt"
+          $Report = @()
+          $Report += "Windows Code Signing Report"
+          $Report += "==========================="
+          $Report += "Date: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss UTC')"
+          $Report += "Certificate Subject: ${{ inputs.certificate-subject }}"
+          $Report += "Timestamp Server: http://timestamp.digicert.com"
+          $Report += ""
+          $Report += "Signed Files:"
+          
+          Get-ChildItem -Path ./unsigned -Recurse -Include "*.exe","*.dll","*.node" | ForEach-Object {
+            $sig = Get-AuthenticodeSignature $_.FullName
+            $Report += "  - $($_.Name): $($sig.Status)"
+            if ($sig.SignerCertificate) {
+              $Report += "    Subject: $($sig.SignerCertificate.Subject)"
+              $Report += "    Expires: $($sig.SignerCertificate.NotAfter)"
+            }
+            if ($sig.TimeStamperCertificate) {
+              $Report += "    Timestamp: Yes"
+            } else {
+              $Report += "    Timestamp: No"
+            }
+            $Report += ""
+          }
+          
+          $Report | Out-File -FilePath $ReportPath -Encoding UTF8
+          Write-Host "Signing report saved to: $ReportPath"
+
+      - name: Upload signing report
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-signing-report
+          path: signing-report.txt
+          retention-days: 90

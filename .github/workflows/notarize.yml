@@ -1,0 +1,78 @@
+name: Notarize macOS
+
+on:
+  workflow_call:
+    inputs:
+      artifact-name:
+        required: true
+        type: string
+    secrets:
+      APPLE_ID:
+        required: true
+      APPLE_APP_SPECIFIC_PASSWORD:
+        required: true
+      APPLE_TEAM_ID:
+        required: true
+
+jobs:
+  notarize:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download signed artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ./signed
+
+      - name: Notarize app
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          APP_PATH=$(find ./signed -name "*.app" -type d | head -1)
+          if [ -n "$APP_PATH" ]; then
+            ./electron/scripts/notarize-manual.sh "$APP_PATH"
+          else
+            echo "No .app bundle found to notarize"
+            exit 1
+          fi
+
+      - name: Notarize DMG (if exists)
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          DMG_PATH=$(find ./signed -name "*.dmg" | head -1)
+          if [ -n "$DMG_PATH" ]; then
+            echo "Found DMG: $DMG_PATH"
+            ./electron/scripts/notarize-dmg.sh "$DMG_PATH"
+          else
+            echo "No DMG found, skipping DMG notarization"
+          fi
+
+      - name: Verify Gatekeeper
+        run: |
+          APP_PATH=$(find ./signed -name "*.app" -type d | head -1)
+          if [ -n "$APP_PATH" ]; then
+            echo "Verifying Gatekeeper assessment for: $APP_PATH"
+            spctl --assess --type execute "$APP_PATH"
+            echo "✓ Gatekeeper approved the app"
+          fi
+
+          DMG_PATH=$(find ./signed -name "*.dmg" | head -1)
+          if [ -n "$DMG_PATH" ]; then
+            echo "Verifying Gatekeeper assessment for: $DMG_PATH"
+            spctl --assess --type open --context context:primary-signature "$DMG_PATH"
+            echo "✓ Gatekeeper approved the DMG"
+          fi
+
+      - name: Upload notarized artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}-notarized
+          path: ./signed

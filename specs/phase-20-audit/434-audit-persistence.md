@@ -16,11 +16,11 @@ Implement durable persistence for audit events using SQLite for structured queri
 
 ## Acceptance Criteria
 
-- [ ] SQLite persistence with transactions
-- [ ] Append-only log file writing
-- [ ] Write-ahead logging (WAL) mode
-- [ ] Batch persistence for performance
-- [ ] Checksummed chain integrity
+- [x] SQLite persistence with transactions
+- [x] Append-only log file writing
+- [x] Write-ahead logging (WAL) mode
+- [x] Batch persistence for performance
+- [x] Checksummed chain integrity
 
 ---
 

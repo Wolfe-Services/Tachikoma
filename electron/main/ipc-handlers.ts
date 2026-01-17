@@ -47,4 +47,45 @@ export function registerIpcHandlers(): void {
     const success = await native.setConfig(request.key, request.value);
     return { success };
   });
+
+  // Forge handlers
+  handle('forge:createSession', async (_event, request) => {
+    return await native.createForgeSession(request);
+  });
+
+  handle('forge:getSession', async (_event, request) => {
+    return await native.getForgeSession(request.sessionId);
+  });
+
+  handle('forge:listSessions', async (_event, _request) => {
+    return await native.listForgeSessions();
+  });
+
+  handle('forge:deleteSession', async (_event, request) => {
+    const success = await native.deleteForgeSession(request.sessionId);
+    return { success };
+  });
+
+  handle('forge:startDeliberation', async (_event, request) => {
+    const success = await native.startDeliberation(request.sessionId, request.phase);
+    return { success };
+  });
+
+  handle('forge:stopDeliberation', async (_event, request) => {
+    const success = await native.stopDeliberation(request.sessionId);
+    return { success };
+  });
+
+  handle('forge:submitMessage', async (_event, request) => {
+    const messageId = await native.submitForgeMessage(
+      request.sessionId, 
+      request.content, 
+      request.participantId
+    );
+    return { messageId };
+  });
+
+  handle('forge:generateOutput', async (_event, request) => {
+    return await native.generateForgeOutput(request);
+  });
 }

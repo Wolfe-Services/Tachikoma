@@ -16,11 +16,11 @@ Implement Git conflict detection and resolution tools, enabling users to view an
 
 ## Acceptance Criteria
 
-- [ ] Detect conflict state
-- [ ] List conflicted files
-- [ ] Read conflict markers
-- [ ] Mark file as resolved
-- [ ] Support different resolution strategies
+- [x] Detect conflict state
+- [x] List conflicted files
+- [x] Read conflict markers
+- [x] Mark file as resolved
+- [x] Support different resolution strategies
 
 ---
 

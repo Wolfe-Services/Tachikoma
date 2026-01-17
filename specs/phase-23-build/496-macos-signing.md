@@ -16,12 +16,12 @@ Configure macOS code signing using Apple Developer ID certificates to enable dis
 
 ## Acceptance Criteria
 
-- [ ] Developer ID Application certificate configured
-- [ ] All binaries and frameworks signed
-- [ ] Entitlements properly applied
-- [ ] Hardened runtime enabled
-- [ ] Signature verification passes
-- [ ] CI/CD signing automated
+- [x] Developer ID Application certificate configured
+- [x] All binaries and frameworks signed
+- [x] Entitlements properly applied
+- [x] Hardened runtime enabled
+- [x] Signature verification passes
+- [x] CI/CD signing automated
 
 ---
 

@@ -16,12 +16,12 @@ Implement automated changelog generation from git commit history following the K
 
 ## Acceptance Criteria
 
-- [ ] Changelog follows Keep a Changelog format
-- [ ] Conventional commits parsed automatically
-- [ ] Breaking changes highlighted
-- [ ] Links to PRs and issues included
-- [ ] Manual entries supported
-- [ ] CI validates changelog on release
+- [x] Changelog follows Keep a Changelog format
+- [x] Conventional commits parsed automatically
+- [x] Breaking changes highlighted
+- [x] Links to PRs and issues included
+- [x] Manual entries supported
+- [x] CI validates changelog on release
 
 ---
 

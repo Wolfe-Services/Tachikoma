@@ -16,11 +16,11 @@ Implement Git hooks management, enabling installation, execution, and management
 
 ## Acceptance Criteria
 
-- [ ] List available hooks
-- [ ] Install/uninstall hooks
-- [ ] Hook execution framework
-- [ ] Pre-commit hook support
-- [ ] Custom hook scripts
+- [x] List available hooks
+- [x] Install/uninstall hooks
+- [x] Hook execution framework
+- [x] Pre-commit hook support
+- [x] Custom hook scripts
 
 ---
 

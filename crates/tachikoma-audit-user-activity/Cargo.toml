@@ -1,0 +1,23 @@
+[package]
+name = "tachikoma-audit-user-activity"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "User activity tracking and analysis for Tachikoma audit system"
+
+[dependencies]
+tachikoma-audit-types.workspace = true
+tachikoma-common-core.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+thiserror.workspace = true
+uuid = { version = "1.6", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+rusqlite = { version = "0.30", features = ["bundled", "chrono"] }
+parking_lot = "0.12"
+
+[dev-dependencies]
+tachikoma-test-utils.workspace = true
+proptest.workspace = true
+tempfile = "3.8"
+test-case.workspace = true

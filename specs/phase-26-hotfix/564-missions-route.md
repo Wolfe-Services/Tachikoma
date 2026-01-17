@@ -11,10 +11,10 @@
 Create the /missions route that shows mission history and allows starting new missions.
 
 ## Acceptance Criteria
-- [ ] File `web/src/routes/missions/+page.svelte` exists
-- [ ] Page shows list of past missions (or empty state)
-- [ ] "New Mission" button opens mission creation flow
-- [ ] Uses existing mission components from `$lib/components/mission/`
+- [x] File `web/src/routes/missions/+page.svelte` exists
+- [x] Page shows list of past missions (or empty state)
+- [x] "New Mission" button opens mission creation flow
+- [x] Uses existing mission components from `$lib/components/mission/`
 
 ## Implementation
 

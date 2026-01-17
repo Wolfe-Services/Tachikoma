@@ -16,11 +16,11 @@ Implement Git remote management, enabling adding, removing, and configuring remo
 
 ## Acceptance Criteria
 
-- [ ] List remotes
-- [ ] Add/remove remotes
-- [ ] Get remote info
-- [ ] Update remote URLs
-- [ ] Remote branch tracking
+- [x] List remotes
+- [x] Add/remove remotes
+- [x] Get remote info
+- [x] Update remote URLs
+- [x] Remote branch tracking
 
 ---
 

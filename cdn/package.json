@@ -1,0 +1,19 @@
+{
+  "name": "tachikoma-cdn",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker for Tachikoma release distribution",
+  "main": "worker.js",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "test": "vitest"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20231218.0",
+    "vitest": "^1.0.0"
+  },
+  "keywords": ["cloudflare", "worker", "cdn", "tachikoma"],
+  "author": "Tachikoma Team",
+  "license": "MIT"
+}

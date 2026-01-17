@@ -16,12 +16,12 @@ Implement property-based testing using proptest for Rust and fast-check for Type
 
 ## Acceptance Criteria
 
-- [ ] proptest configured for all Rust crates
-- [ ] fast-check configured for TypeScript tests
-- [ ] Custom generators for domain types
-- [ ] Shrinking produces minimal failing cases
-- [ ] Property tests integrated with CI pipeline
-- [ ] Regression tests saved for previously failing cases
+- [x] proptest configured for all Rust crates
+- [x] fast-check configured for TypeScript tests
+- [x] Custom generators for domain types
+- [x] Shrinking produces minimal failing cases
+- [x] Property tests integrated with CI pipeline
+- [x] Regression tests saved for previously failing cases
 
 ---
 

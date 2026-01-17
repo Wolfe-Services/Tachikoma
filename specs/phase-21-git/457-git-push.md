@@ -16,11 +16,11 @@ Implement Git push operations, enabling pushing commits and branches to remote r
 
 ## Acceptance Criteria
 
-- [ ] Push current branch
-- [ ] Push specific branch
-- [ ] Push with force option
-- [ ] Push tags
-- [ ] Progress callbacks
+- [x] Push current branch
+- [x] Push specific branch
+- [x] Push with force option
+- [x] Push tags
+- [x] Progress callbacks
 
 ---
 

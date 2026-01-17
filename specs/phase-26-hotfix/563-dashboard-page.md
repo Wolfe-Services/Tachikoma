@@ -11,11 +11,11 @@
 Replace the test placeholder page with an actual dashboard showing project status, recent missions, and quick actions.
 
 ## Acceptance Criteria
-- [ ] `web/src/routes/+page.svelte` shows dashboard content (not test buttons)
-- [ ] Dashboard displays: Welcome message, Project stats, Recent activity
-- [ ] Stats cards show: Specs progress, Active missions, Success rate
-- [ ] Quick action buttons: New Mission, Browse Specs, Start Forge
-- [ ] Responsive grid layout for cards
+- [x] `web/src/routes/+page.svelte` shows dashboard content (not test buttons)
+- [x] Dashboard displays: Welcome message, Project stats, Recent activity
+- [x] Stats cards show: Specs progress, Active missions, Success rate
+- [x] Quick action buttons: New Mission, Browse Specs, Start Forge
+- [x] Responsive grid layout for cards
 
 ## Implementation
 

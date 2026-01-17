@@ -16,12 +16,12 @@ Create comprehensive mock implementations of LLM backends (Claude, Codex, Gemini
 
 ## Acceptance Criteria
 
-- [ ] Mock backend implements full Backend trait
-- [ ] Configurable responses for different scenarios
-- [ ] Streaming response simulation supported
-- [ ] Tool call mocking with configurable behavior
-- [ ] Error simulation (rate limits, timeouts, auth failures)
-- [ ] Request recording for verification
+- [x] Mock backend implements full Backend trait
+- [x] Configurable responses for different scenarios
+- [x] Streaming response simulation supported
+- [x] Tool call mocking with configurable behavior
+- [x] Error simulation (rate limits, timeouts, auth failures)
+- [x] Request recording for verification
 
 ---
 

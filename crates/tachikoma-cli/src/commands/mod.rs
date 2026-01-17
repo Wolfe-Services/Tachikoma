@@ -1,6 +1,7 @@
 //! Command module organization and shared traits.
 
 mod backends;
+mod chat;
 mod completions;
 mod config;
 mod doctor;
@@ -10,6 +11,7 @@ mod migrate;
 mod tools;
 
 pub use backends::BackendsCommand;
+pub use chat::ChatCommand;
 pub use completions::CompletionsCommand;
 pub use config::ConfigCommand;
 pub use doctor::DoctorCommand;

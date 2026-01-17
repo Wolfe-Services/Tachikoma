@@ -1,0 +1,58 @@
+{
+  "version": "1.0.0",
+  "date": "2024-01-15",
+  "type": "major",
+  "highlights": "Tachikoma 1.0 brings autonomous AI-powered development to your desktop with multi-model support and spec-driven workflows.",
+  "features": [
+    {
+      "title": "Multi-Model Backend Support",
+      "description": "Choose between Claude, GPT-4, Gemini, or local Ollama models for your development tasks. Switch models on the fly to leverage different strengths for different types of problems."
+    },
+    {
+      "title": "Spec Forge",
+      "description": "Collaborative specification creation using multiple AI models to brainstorm and refine your project specs. Get diverse perspectives and ensure comprehensive coverage of requirements."
+    },
+    {
+      "title": "Autonomous Loop Runner",
+      "description": "Let Tachikoma work unattended on your specifications with intelligent checkpoint management and progress tracking. Perfect for long-running development tasks."
+    }
+  ],
+  "improvements": [
+    "50% faster startup time",
+    "Reduced memory usage during long sessions",
+    "Better error handling and recovery",
+    "Improved progress visualization"
+  ],
+  "bugfixes": [
+    { "description": "Fixed crash when opening large files", "issue": "123" },
+    { "description": "Fixed memory leak in model switching", "issue": "124" },
+    { "description": "Resolved race condition in spec parsing" }
+  ],
+  "breakingChanges": [
+    {
+      "title": "Configuration File Format",
+      "what": "Changed configuration file structure to support multi-model settings",
+      "why": "The new format provides better organization and enables model-specific configuration",
+      "migration": "Run `tachikoma migrate-config` to automatically convert your existing config file",
+      "codeDiff": "- \"model\": \"claude\"\n+ \"models\": {\n+   \"primary\": \"claude\",\n+   \"secondary\": \"gpt-4\"\n+ }"
+    }
+  ],
+  "knownIssues": [
+    "Ollama models may have slower initial load times on some systems",
+    "Windows defender may flag the installer as unknown publisher (safe to ignore)"
+  ],
+  "upgradeSteps": [
+    "Download the new version for your platform",
+    "Run the installer (your settings will be automatically migrated)",
+    "If you have custom configurations, run `tachikoma migrate-config`"
+  ],
+  "configChanges": [
+    "Configuration files are now stored in `~/.tachikoma/config/` instead of `~/.tachikoma/`",
+    "Model settings moved to separate `models.json` file for better organization"
+  ],
+  "contributors": [
+    "tachikoma-dev",
+    "ai-assistant",
+    "community-contributor"
+  ]
+}

@@ -16,12 +16,12 @@ Set up the server-side infrastructure for distributing application updates, supp
 
 ## Acceptance Criteria
 
-- [ ] GitHub Releases configured as update source
-- [ ] Release assets properly named for auto-update
-- [ ] Update manifest (latest.yml) generated
-- [ ] Delta updates supported (where possible)
-- [ ] Staging/beta channel support
-- [ ] Self-hosted option documented
+- [x] GitHub Releases configured as update source
+- [x] Release assets properly named for auto-update
+- [x] Update manifest (latest.yml) generated
+- [x] Delta updates supported (where possible)
+- [x] Staging/beta channel support
+- [x] Self-hosted option documented
 
 ---
 

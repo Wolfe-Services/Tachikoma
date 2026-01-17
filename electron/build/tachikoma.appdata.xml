@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.tachikoma.app</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Tachikoma</name>
+  <summary>AI-powered autonomous development environment</summary>
+  <description>
+    <p>
+      Tachikoma is an AI-powered development environment that autonomously
+      executes development tasks using state-of-the-art language models.
+    </p>
+    <p>Features include:</p>
+    <ul>
+      <li>Multi-model support (Claude, GPT, Gemini, Ollama)</li>
+      <li>Spec-driven development workflow</li>
+      <li>Autonomous loop runner for unattended operation</li>
+      <li>Spec Forge for multi-model brainstorming</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">tachikoma.desktop</launchable>
+  <url type="homepage">https://github.com/tachikoma/tachikoma</url>
+  <url type="bugtracker">https://github.com/tachikoma/tachikoma/issues</url>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Mission Panel</caption>
+      <image>https://tachikoma.dev/screenshots/mission-panel.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Spec Browser</caption>
+      <image>https://tachikoma.dev/screenshots/spec-browser.png</image>
+    </screenshot>
+  </screenshots>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="0.1.0" date="2024-01-15">
+      <description>
+        <p>Initial release of Tachikoma.</p>
+      </description>
+    </release>
+  </releases>
+  <developer_name>Tachikoma Team</developer_name>
+  <keywords>
+    <keyword>ai</keyword>
+    <keyword>development</keyword>
+    <keyword>llm</keyword>
+    <keyword>coding</keyword>
+    <keyword>automation</keyword>
+  </keywords>
+</component>

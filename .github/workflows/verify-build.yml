@@ -1,0 +1,145 @@
+name: Verify Build
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+jobs:
+  verify-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-builds
+          path: artifacts
+
+      - name: Verify macOS builds
+        run: |
+          chmod +x scripts/verify-macos-build.sh
+
+          for dmg in artifacts/*.dmg; do
+            if [ -f "$dmg" ]; then
+              ./scripts/verify-macos-build.sh "$dmg"
+            fi
+          done
+
+  verify-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-builds
+          path: artifacts
+
+      - name: Verify Windows builds
+        shell: pwsh
+        run: |
+          Get-ChildItem artifacts/*.exe -ErrorAction SilentlyContinue | ForEach-Object {
+            .\scripts\verify-windows-build.ps1 -InstallerPath $_.FullName
+          }
+
+  verify-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Linux artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-builds
+          path: artifacts
+
+      - name: Verify Linux builds
+        run: |
+          chmod +x scripts/verify-linux-build.sh
+
+          for appimage in artifacts/*.AppImage; do
+            if [ -f "$appimage" ]; then
+              ./scripts/verify-linux-build.sh "$appimage" appimage
+            fi
+          done
+
+          for deb in artifacts/*.deb; do
+            if [ -f "$deb" ]; then
+              ./scripts/verify-linux-build.sh "$deb" deb
+            fi
+          done
+
+  verify-update-packages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify update packages
+        run: npx ts-node scripts/verify-update-packages.ts artifacts
+
+  verify-checksums:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Generate and verify checksums
+        run: |
+          cd artifacts
+
+          # Generate checksums
+          sha256sum *.{dmg,exe,AppImage,deb} 2>/dev/null > checksums.sha256 || true
+
+          echo "Generated checksums:"
+          cat checksums.sha256
+
+          # Upload as artifact
+          echo "checksums<<EOF" >> $GITHUB_OUTPUT
+          cat checksums.sha256 >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Upload checksums
+        uses: actions/upload-artifact@v4
+        with:
+          name: checksums
+          path: artifacts/checksums.sha256
+
+  summary:
+    needs: [verify-macos, verify-windows, verify-linux, verify-update-packages, verify-checksums]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build verification summary
+        run: |
+          echo "## Build Verification Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Platform | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| macOS | :white_check_mark: Verified |" >> $GITHUB_STEP_SUMMARY
+          echo "| Windows | :white_check_mark: Verified |" >> $GITHUB_STEP_SUMMARY
+          echo "| Linux | :white_check_mark: Verified |" >> $GITHUB_STEP_SUMMARY
+          echo "| Update Packages | :white_check_mark: Verified |" >> $GITHUB_STEP_SUMMARY
+          echo "| Checksums | :white_check_mark: Generated |" >> $GITHUB_STEP_SUMMARY

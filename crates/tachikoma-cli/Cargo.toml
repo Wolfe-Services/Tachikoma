@@ -18,7 +18,6 @@ path = "src/main.rs"
 tachikoma-common-core = { workspace = true }
 tachikoma-common-config = { workspace = true }
 tachikoma-primitives = { workspace = true }
-tachikoma-database = { workspace = true }
 
 clap = { workspace = true, features = ["derive", "env", "string", "wrap_help"] }
 clap_complete = "4.5"
@@ -44,6 +43,7 @@ toml = "0.8"
 walkdir = "2.4"
 dirs = "5.0"
 reqwest = { workspace = true }
+chrono = { workspace = true }
 
 [dev-dependencies]
 assert_cmd = "2.0"

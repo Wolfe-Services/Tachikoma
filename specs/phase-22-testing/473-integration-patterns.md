@@ -16,12 +16,12 @@ Establish standardized integration testing patterns that verify interactions bet
 
 ## Acceptance Criteria
 
-- [ ] Integration tests isolated in dedicated test directories
-- [ ] Database tests use transactions for isolation and rollback
-- [ ] External service tests use mock servers (wiremock)
-- [ ] Test fixtures provide consistent initial state
-- [ ] Tests can run in parallel without interference
-- [ ] Clear separation between unit and integration tests
+- [x] Integration tests isolated in dedicated test directories
+- [x] Database tests use transactions for isolation and rollback
+- [x] External service tests use mock servers (wiremock)
+- [x] Test fixtures provide consistent initial state
+- [x] Tests can run in parallel without interference
+- [x] Clear separation between unit and integration tests
 
 ---
 

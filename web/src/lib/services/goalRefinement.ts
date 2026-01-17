@@ -1,150 +1,283 @@
 /**
  * Goal Refinement Service
  * 
- * Provides AI-assisted goal refinement through interactive Q&A.
- * Currently uses mock responses - will be connected to real LLM APIs via Tauri IPC.
+ * Provides AI-assisted goal refinement through intelligent context-gap analysis.
+ * 
+ * Analyzes the user's ACTUAL prompt content to ask RELEVANT questions,
+ * not generic stakeholder/constraint garbage.
  */
 
 import { writable, get } from 'svelte/store';
 
 export interface RefinementMessage {
   id: string;
-  role: 'assistant' | 'user';
+  role: 'assistant' | 'user' | 'system';
   content: string;
   timestamp: Date;
   status: 'pending' | 'streaming' | 'complete';
 }
 
-export interface StructuredGoal {
-  objective: string;
-  context: string;
-  constraints: string;
-  successCriteria: string;
+export interface ContextGap {
+  category: string;
+  question: string;
+  priority: 'high' | 'medium' | 'low';
+  filled: boolean;
 }
 
 export interface RefinementState {
   isActive: boolean;
   isStreaming: boolean;
-  currentQuestionIndex: number;
-  structuredGoal: StructuredGoal;
+  initialGoal: string;
+  contextGaps: ContextGap[];
+  currentGapIndex: number;
+  refinedGoal: string;
   error: string | null;
 }
 
-// Clarifying questions to guide goal refinement
-const clarifyingQuestions = [
-  "What specific problem are you trying to solve with this deliberation session?",
-  "Who are the stakeholders involved, and what are their primary concerns?",
-  "What constraints should the Think Tank consider when deliberating?",
-  "What does success look like? How will you measure it?"
-];
-
-// Mock synthesis responses based on collected answers
-function generateMockSynthesis(answers: string[]): StructuredGoal {
-  // Extract key themes from answers
-  const hasStakeholders = answers.some(a => 
-    a.toLowerCase().includes('team') || 
-    a.toLowerCase().includes('user') || 
-    a.toLowerCase().includes('customer')
-  );
-  
-  const hasConstraints = answers.some(a => 
-    a.toLowerCase().includes('time') || 
-    a.toLowerCase().includes('budget') || 
-    a.toLowerCase().includes('resource')
-  );
-
-  return {
-    objective: answers[0] 
-      ? `Define a clear approach to: ${answers[0].slice(0, 150)}${answers[0].length > 150 ? '...' : ''}`
-      : 'Develop a comprehensive strategy for the stated problem.',
-    context: hasStakeholders && answers[1]
-      ? `Key stakeholders: ${answers[1].slice(0, 200)}${answers[1].length > 200 ? '...' : ''}`
-      : 'Multiple stakeholders with varying priorities will be considered.',
-    constraints: hasConstraints && answers[2]
-      ? `Operating within: ${answers[2].slice(0, 200)}${answers[2].length > 200 ? '...' : ''}`
-      : 'Standard resource and timeline constraints apply.',
-    successCriteria: answers[3]
-      ? `Success measured by: ${answers[3].slice(0, 200)}${answers[3].length > 200 ? '...' : ''}`
-      : 'Clear deliverables and actionable recommendations.'
-  };
+export interface ConversationContext {
+  initialGoal: string;
+  exchanges: { question: string; answer: string }[];
 }
 
-function structuredGoalToMarkdown(goal: StructuredGoal): string {
-  return `## Objective
-${goal.objective}
+/**
+ * Topic patterns to detect what the user is actually talking about.
+ */
+const topicPatterns: { pattern: RegExp; topic: string; questions: string[] }[] = [
+  // Code/Repo related
+  {
+    pattern: /\b(repo|repository|repositories|git|code\s*base|codebase)\b/i,
+    topic: 'repositories',
+    questions: [
+      'Which repository providers do you need to support? (GitHub, GitLab, Bitbucket, local file system, etc.)',
+      'Should this work with private repos that require authentication?',
+      'Do you need to track multiple branches, or just main/default?'
+    ]
+  },
+  // Indexing related
+  {
+    pattern: /\b(index|indexing|search|find|lookup)\b/i,
+    topic: 'indexing',
+    questions: [
+      'What do you want to index? (file contents, symbols/functions, dependencies, commit history?)',
+      'How should search work - full text, semantic/meaning-based, or symbol lookup?',
+      'Should the index update automatically when code changes, or on-demand?'
+    ]
+  },
+  // Connection related
+  {
+    pattern: /\b(connect|connection|sync|pull|fetch|clone)\b/i,
+    topic: 'connection',
+    questions: [
+      'For remote connections, what authentication methods should be supported? (SSH keys, tokens, OAuth?)',
+      'Should it handle large repos efficiently, or is size not a concern?',
+      'Do you need offline support when remote is unavailable?'
+    ]
+  },
+  // Local vs Remote
+  {
+    pattern: /\b(local|remote|both)\b/i,
+    topic: 'locality',
+    questions: [
+      'For local repos, should it scan for repos automatically or require manual paths?',
+      'Should local and remote repos be treated the same, or have different capabilities?'
+    ]
+  },
+  // API related
+  {
+    pattern: /\b(api|endpoint|service|backend)\b/i,
+    topic: 'api',
+    questions: [
+      'What kind of API - REST, GraphQL, or CLI commands?',
+      'Are there rate limits or quotas to consider?',
+      'Does it need to integrate with existing Tachikoma services?'
+    ]
+  },
+  // Database/Storage
+  {
+    pattern: /\b(database|storage|persist|save|store)\b/i,
+    topic: 'storage',
+    questions: [
+      'What storage backend - SQLite, PostgreSQL, file-based?',
+      'How much data are we talking about? Rough estimate of repo count/size?'
+    ]
+  },
+  // UI related
+  {
+    pattern: /\b(ui|interface|display|show|view|screen)\b/i,
+    topic: 'interface',
+    questions: [
+      'Where should this appear in the Tachikoma UI?',
+      'Any specific interactions or workflows you envision?'
+    ]
+  },
+  // Performance
+  {
+    pattern: /\b(fast|performance|speed|efficient|scale)\b/i,
+    topic: 'performance',
+    questions: [
+      'What scale are we dealing with? Number of repos, lines of code?',
+      'Are there specific performance targets to hit?'
+    ]
+  },
+  // Configuration
+  {
+    pattern: /\b(config|configure|settings|options)\b/i,
+    topic: 'configuration',
+    questions: [
+      'What should be configurable by the user vs hardcoded?',
+      'Should config be per-project, per-workspace, or global?'
+    ]
+  }
+];
 
-## Context
-${goal.context}
+/**
+ * Analyzes the user's actual prompt to extract relevant topics and generate
+ * questions that are SPECIFIC to what they're asking about.
+ */
+function analyzePromptForQuestions(initialGoal: string): ContextGap[] {
+  const text = initialGoal.toLowerCase();
+  const gaps: ContextGap[] = [];
+  const usedQuestions = new Set<string>();
+  const detectedTopics = new Set<string>();
 
-## Constraints
-${goal.constraints}
+  // Find all matching topics
+  for (const { pattern, topic, questions } of topicPatterns) {
+    if (pattern.test(text)) {
+      detectedTopics.add(topic);
+      
+      // Pick the most relevant question for this topic (first one not used)
+      for (const q of questions) {
+        if (!usedQuestions.has(q) && gaps.length < 4) {
+          usedQuestions.add(q);
+          gaps.push({
+            category: topic,
+            question: q,
+            priority: gaps.length === 0 ? 'high' : 'medium',
+            filled: false
+          });
+          break; // Only one question per topic initially
+        }
+      }
+    }
+  }
 
-## Success Criteria
-${goal.successCriteria}`;
+  // If prompt is very short, ask for elaboration first
+  if (initialGoal.trim().length < 50 && gaps.length === 0) {
+    gaps.unshift({
+      category: 'clarity',
+      question: `You mentioned: "${initialGoal.trim()}"\n\nCan you expand on this? What specifically are you trying to accomplish?`,
+      priority: 'high',
+      filled: false
+    });
+  }
+
+  // If we found topics but have room for more questions, add second-tier questions
+  if (gaps.length < 3 && detectedTopics.size > 0) {
+    for (const { pattern, topic, questions } of topicPatterns) {
+      if (pattern.test(text) && detectedTopics.has(topic)) {
+        for (const q of questions) {
+          if (!usedQuestions.has(q) && gaps.length < 4) {
+            usedQuestions.add(q);
+            gaps.push({
+              category: topic,
+              question: q,
+              priority: 'low',
+              filled: false
+            });
+          }
+        }
+      }
+    }
+  }
+
+  // Fallback if we couldn't detect any topics
+  if (gaps.length === 0) {
+    gaps.push({
+      category: 'scope',
+      question: `I want to make sure I understand correctly.\n\nWhat's the main outcome you're looking for from this session? What would success look like?`,
+      priority: 'high',
+      filled: false
+    });
+  }
+
+  return gaps.slice(0, 4);
+}
+
+/**
+ * Synthesizes the conversation into a refined goal.
+ */
+function synthesizeRefinedGoal(context: ConversationContext): string {
+  const { initialGoal, exchanges } = context;
+  
+  let markdown = `## Objective\n${initialGoal}`;
+  
+  if (exchanges.length > 0) {
+    markdown += `\n\n## Details\n`;
+    
+    for (const { question, answer } of exchanges) {
+      // Extract the essence of the question for a heading
+      const shortQ = question.split('\n')[0].replace(/[?:]+$/, '').trim();
+      markdown += `\n**${shortQ}**\n${answer}\n`;
+    }
+  }
+
+  return markdown;
 }
 
 function createGoalRefinementStore() {
   const state = writable<RefinementState>({
     isActive: false,
     isStreaming: false,
-    currentQuestionIndex: 0,
-    structuredGoal: {
-      objective: '',
-      context: '',
-      constraints: '',
-      successCriteria: ''
-    },
+    initialGoal: '',
+    contextGaps: [],
+    currentGapIndex: 0,
+    refinedGoal: '',
     error: null
   });
 
   const messages = writable<RefinementMessage[]>([]);
-  const userAnswers = writable<string[]>([]);
+  const conversationContext = writable<ConversationContext>({
+    initialGoal: '',
+    exchanges: []
+  });
 
-  function startRefinement() {
+  function startRefinement(initialGoal: string) {
+    // Analyze what the user ACTUALLY wrote
+    const gaps = analyzePromptForQuestions(initialGoal);
+    
     state.update(s => ({
       ...s,
       isActive: true,
-      currentQuestionIndex: 0,
+      initialGoal,
+      contextGaps: gaps,
+      currentGapIndex: 0,
       error: null
     }));
-    messages.set([]);
-    userAnswers.set([]);
     
-    // Ask first question
-    askNextQuestion(0);
+    messages.set([]);
+    conversationContext.set({
+      initialGoal,
+      exchanges: []
+    });
+
+    if (gaps.length > 0) {
+      askQuestion(gaps[0].question);
+    } else {
+      addAssistantMessage(`Your goal looks clear. Proceed when ready, or ask me to clarify anything.`);
+    }
   }
 
-  async function askNextQuestion(index: number) {
-    if (index >= clarifyingQuestions.length) {
-      // All questions answered, synthesize
-      await synthesizeGoal();
-      return;
-    }
-
-    const messageId = `msg-${Date.now()}`;
-    const question = clarifyingQuestions[index];
-
-    // Add thinking state
-    messages.update(msgs => [...msgs, {
-      id: messageId,
-      role: 'assistant',
-      content: '',
-      timestamp: new Date(),
-      status: 'pending'
-    }]);
-
-    // Simulate thinking delay
-    await delay(400 + Math.random() * 400);
-
-    // Stream the question
+  async function askQuestion(question: string) {
+    const messageId = addPendingMessage();
+    await delay(200 + Math.random() * 150);
     state.update(s => ({ ...s, isStreaming: true }));
     await streamMessage(messageId, question);
-    state.update(s => ({ ...s, isStreaming: false, currentQuestionIndex: index }));
+    state.update(s => ({ ...s, isStreaming: false }));
   }
 
   async function submitAnswer(answer: string) {
     const currentState = get(state);
-    const currentIndex = currentState.currentQuestionIndex;
+    const currentGap = currentState.contextGaps[currentState.currentGapIndex];
 
     // Add user message
     messages.update(msgs => [...msgs, {
@@ -155,23 +288,59 @@ function createGoalRefinementStore() {
       status: 'complete'
     }]);
 
-    // Store answer
-    userAnswers.update(answers => {
-      const newAnswers = [...answers];
-      newAnswers[currentIndex] = answer;
-      return newAnswers;
+    // Record the exchange
+    conversationContext.update(ctx => ({
+      ...ctx,
+      exchanges: [...ctx.exchanges, { 
+        question: currentGap?.question || '', 
+        answer 
+      }]
+    }));
+
+    // Mark current gap as filled
+    state.update(s => {
+      const gaps = [...s.contextGaps];
+      if (gaps[s.currentGapIndex]) {
+        gaps[s.currentGapIndex].filled = true;
+      }
+      return { ...s, contextGaps: gaps };
     });
 
-    // Move to next question
-    await delay(300);
-    await askNextQuestion(currentIndex + 1);
+    await delay(150);
+
+    // Check for more questions
+    const updatedState = get(state);
+    const nextGapIndex = updatedState.currentGapIndex + 1;
+
+    if (nextGapIndex < updatedState.contextGaps.length) {
+      state.update(s => ({ ...s, currentGapIndex: nextGapIndex }));
+      
+      const nextQuestion = updatedState.contextGaps[nextGapIndex].question;
+      await askQuestion(nextQuestion);
+    } else {
+      await synthesizeAndPresent();
+    }
   }
 
-  async function synthesizeGoal() {
-    const answers = get(userAnswers);
-    const messageId = `synthesis-${Date.now()}`;
+  async function synthesizeAndPresent() {
+    const context = get(conversationContext);
+    
+    const messageId = addPendingMessage();
+    await delay(300);
+    
+    state.update(s => ({ ...s, isStreaming: true }));
 
-    // Add synthesis message
+    const refinedGoal = synthesizeRefinedGoal(context);
+    state.update(s => ({ ...s, refinedGoal }));
+
+    const msg = `Here's your refined goal:\n\n---\n\n${refinedGoal}\n\n---\n\nClick **Apply to Goal** to use this, or keep chatting to refine further.`;
+
+    await streamMessage(messageId, msg);
+    state.update(s => ({ ...s, isStreaming: false }));
+  }
+
+  function addPendingMessage(): string {
+    const messageId = `msg-${Date.now()}`;
     messages.update(msgs => [...msgs, {
       id: messageId,
       role: 'assistant',
@@ -179,19 +348,14 @@ function createGoalRefinementStore() {
       timestamp: new Date(),
       status: 'pending'
     }]);
+    return messageId;
+  }
 
-    await delay(600);
-
-    // Generate structured goal
-    const structured = generateMockSynthesis(answers);
-    state.update(s => ({ ...s, structuredGoal: structured, isStreaming: true }));
-
-    // Stream synthesis message
-    const synthesisIntro = "Great! Based on your answers, I've structured your goal into a clear format:\n\n" + 
-      structuredGoalToMarkdown(structured) + 
-      "\n\n*Click \"Apply Suggestions\" to use this as your goal, or continue refining.*";
-
-    await streamMessage(messageId, synthesisIntro);
+  async function addAssistantMessage(content: string) {
+    const messageId = addPendingMessage();
+    await delay(150);
+    state.update(s => ({ ...s, isStreaming: true }));
+    await streamMessage(messageId, content);
     state.update(s => ({ ...s, isStreaming: false }));
   }
 
@@ -213,7 +377,7 @@ function createGoalRefinementStore() {
         msgs.map(m => m.id === messageId ? { ...m, content: current } : m)
       );
 
-      await delay(15 + Math.random() * 25);
+      await delay(10 + Math.random() * 15);
     }
 
     messages.update(msgs => 
@@ -221,9 +385,8 @@ function createGoalRefinementStore() {
     );
   }
 
-  function getStructuredGoalMarkdown(): string {
-    const currentState = get(state);
-    return structuredGoalToMarkdown(currentState.structuredGoal);
+  function getRefinedGoalMarkdown(): string {
+    return get(state).refinedGoal;
   }
 
   function stopRefinement() {
@@ -231,7 +394,6 @@ function createGoalRefinementStore() {
       ...s,
       isActive: false,
       isStreaming: false,
-      currentQuestionIndex: 0,
       error: null
     }));
   }
@@ -240,17 +402,17 @@ function createGoalRefinementStore() {
     state.set({
       isActive: false,
       isStreaming: false,
-      currentQuestionIndex: 0,
-      structuredGoal: {
-        objective: '',
-        context: '',
-        constraints: '',
-        successCriteria: ''
-      },
+      initialGoal: '',
+      contextGaps: [],
+      currentGapIndex: 0,
+      refinedGoal: '',
       error: null
     });
     messages.set([]);
-    userAnswers.set([]);
+    conversationContext.set({
+      initialGoal: '',
+      exchanges: []
+    });
   }
 
   return {
@@ -259,7 +421,7 @@ function createGoalRefinementStore() {
     startRefinement,
     submitAnswer,
     stopRefinement,
-    getStructuredGoalMarkdown,
+    getRefinedGoalMarkdown,
     reset
   };
 }

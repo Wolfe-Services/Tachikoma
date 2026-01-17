@@ -2,7 +2,8 @@
   import { onMount } from 'svelte';
   import { ipc } from '$lib/ipc';
   import Icon from '$lib/components/common/Icon.svelte';
-  import TachikomaLogo from '$lib/components/common/TachikomaLogo.svelte';
+  
+  let sacMode = false;
   
   // System status - reflects actual backend functionality
   let stats = {
@@ -52,6 +53,13 @@
   ];
   
   onMount(async () => {
+    const storedSac = localStorage.getItem('tachikoma:sacMode');
+    const legacy = localStorage.getItem('tachikoma:forgeLoreMode');
+    if (storedSac === null && legacy !== null) {
+      localStorage.setItem('tachikoma:sacMode', legacy);
+    }
+    sacMode = localStorage.getItem('tachikoma:sacMode') === 'true';
+    
     if (typeof window !== 'undefined' && window.tachikoma) {
       platform = window.tachikoma.platform;
     }
@@ -88,10 +96,23 @@
     <div class="hero-background">
       <div class="hex-grid"></div>
     </div>
+
+    <!-- Tachikoma video on the right side of Command Center -->
+    <div class="hero-tachikoma-panel" aria-hidden="true">
+      <video
+        class="tachikoma-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+      >
+        <source src="/Ghost-In-The-Shell-Ghost-in-the-Shell-BLUE-1920x1080-Ver.01.mp4" type="video/mp4" />
+      </video>
+      <div class="tachikoma-overlay"></div>
+    </div>
+
     <div class="hero-content">
-      <div class="hero-icon">
-        <TachikomaLogo size={72} animated={true} />
-      </div>
       <div class="hero-text">
         <div class="hero-tag">SECTION 9 // AI DIVISION</div>
         <h1 class="hero-title">TACHIKOMA</h1>
@@ -125,6 +146,7 @@
       <h2 class="section-title">
         <Icon name="activity" size={18} />
         <span>SYSTEM STATUS</span>
+        <span class="section-jp">システム状態</span>
       </h2>
       <span class="section-subtitle">Core components and AI backend status</span>
     </div>
@@ -134,7 +156,7 @@
       <div class="stat-card" class:active={systemStatus.loopRunner === 'running'}>
         <div class="stat-header">
           <Icon name="play-circle" size={18} glow />
-          <span class="stat-label">LOOP RUNNER</span>
+          <span class="stat-label">LOOP RUNNER <span class="label-jp">実行</span></span>
           <span class="status-pill" class:running={systemStatus.loopRunner === 'running'} class:idle={systemStatus.loopRunner === 'idle'}>
             {systemStatus.loopRunner.toUpperCase()}
           </span>
@@ -158,7 +180,7 @@
       <div class="stat-card primary">
         <div class="stat-header">
           <Icon name="file-text" size={18} glow />
-          <span class="stat-label">SPEC REGISTRY</span>
+          <span class="stat-label">SPEC REGISTRY <span class="label-jp">仕様書</span></span>
         </div>
         <div class="stat-body">
           <div class="stat-value">{stats.specsComplete}<span class="stat-unit">/{stats.specsTotal}</span></div>
@@ -178,7 +200,7 @@
       <div class="stat-card">
         <div class="stat-header">
           <Icon name="brain" size={18} glow />
-          <span class="stat-label">THINK TANK</span>
+          <span class="stat-label">THINK TANK <span class="label-jp">思考戦車</span></span>
           <span class="status-pill ready">{systemStatus.forge.toUpperCase()}</span>
         </div>
         <div class="stat-body">
@@ -223,8 +245,9 @@
           <h2 class="panel-title">
             <Icon name="zap" size={18} />
             <span>OPERATIONS</span>
+            <span class="title-jp">作戦</span>
           </h2>
-          <span class="panel-badge">COMMAND</span>
+          <span class="panel-badge">COMMAND 司令</span>
         </div>
         <div class="action-grid">
           <a href="/missions/new" class="action-card">
@@ -284,8 +307,9 @@
           <h2 class="panel-title">
             <Icon name="terminal" size={18} />
             <span>ACTIVITY LOG</span>
+            <span class="title-jp">記録</span>
           </h2>
-          <span class="panel-badge live">LIVE</span>
+          <span class="panel-badge live">LIVE 生放送</span>
         </div>
         <div class="activity-list">
           {#each recentActivity as activity}
@@ -345,6 +369,42 @@
     position: relative;
     overflow: hidden;
   }
+
+  .hero-tachikoma-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 45%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .tachikoma-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0.35;
+    filter: saturate(1.2) contrast(1.05);
+  }
+
+  .tachikoma-overlay {
+    position: absolute;
+    inset: -1px;
+    background: linear-gradient(
+      to right,
+      var(--bg-primary, #0d1117) 0%,
+      rgba(13, 17, 23, 0.95) 5%,
+      rgba(13, 17, 23, 0.7) 15%,
+      rgba(13, 17, 23, 0.3) 35%,
+      transparent 60%
+    );
+    pointer-events: none;
+  }
   
   .hero-background {
     position: absolute;
@@ -368,10 +428,11 @@
     position: relative;
     z-index: 1;
   }
-  
-  .hero-icon {
-    flex-shrink: 0;
-    padding-top: 0.5rem;
+
+  @media (max-width: 900px) {
+    .hero-tachikoma-panel {
+      display: none;
+    }
   }
   
   .hero-text {
@@ -508,6 +569,30 @@
   .section-subtitle {
     font-size: 0.8rem;
     color: var(--text-muted, rgba(230, 237, 243, 0.4));
+  }
+
+  .section-jp {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.7rem;
+    color: var(--tachi-cyan, #4ecdc4);
+    opacity: 0.6;
+    margin-left: 0.5rem;
+  }
+
+  .label-jp {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.6rem;
+    color: var(--tachi-cyan, #4ecdc4);
+    opacity: 0.5;
+    margin-left: 0.35rem;
+  }
+
+  .title-jp {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.65rem;
+    color: var(--tachi-cyan, #4ecdc4);
+    opacity: 0.6;
+    margin-left: 0.5rem;
   }
   
   .stats-grid {

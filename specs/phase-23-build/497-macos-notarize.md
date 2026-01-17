@@ -16,12 +16,12 @@ Configure Apple notarization for the macOS application to satisfy Gatekeeper req
 
 ## Acceptance Criteria
 
-- [ ] App submitted to Apple notarization service
-- [ ] Notarization ticket stapled to app
-- [ ] DMG notarization configured
-- [ ] Notarization status monitoring
-- [ ] CI/CD notarization automated
-- [ ] Error handling for notarization failures
+- [x] App submitted to Apple notarization service
+- [x] Notarization ticket stapled to app
+- [x] DMG notarization configured
+- [x] Notarization status monitoring
+- [x] CI/CD notarization automated
+- [x] Error handling for notarization failures
 
 ---
 

@@ -16,12 +16,12 @@ Establish a comprehensive test harness that unifies Rust, TypeScript, and end-to
 
 ## Acceptance Criteria
 
-- [ ] Unified test configuration across all crates and packages
-- [ ] Shared test utilities accessible from all test modules
-- [ ] Consistent test naming and organization conventions
-- [ ] Test isolation mechanisms prevent cross-test contamination
-- [ ] Parallel test execution with proper resource management
-- [ ] Test categorization (unit, integration, e2e) with selective execution
+- [x] Unified test configuration across all crates and packages
+- [x] Shared test utilities accessible from all test modules
+- [x] Consistent test naming and organization conventions
+- [x] Test isolation mechanisms prevent cross-test contamination
+- [x] Parallel test execution with proper resource management
+- [x] Test categorization (unit, integration, e2e) with selective execution
 
 ---
 

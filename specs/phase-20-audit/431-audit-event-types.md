@@ -16,12 +16,12 @@ Define the core event types for Tachikoma's audit logging system, providing stro
 
 ## Acceptance Criteria
 
-- [ ] `tachikoma-audit-types` crate created
-- [ ] Core event type enum with all audit categories
-- [ ] Event metadata types (actor, target, context)
-- [ ] Event severity levels
-- [ ] Serialization support for all types
-- [ ] Event builder pattern for construction
+- [x] `tachikoma-audit-types` crate created
+- [x] Core event type enum with all audit categories
+- [x] Event metadata types (actor, target, context)
+- [x] Event severity levels
+- [x] Serialization support for all types
+- [x] Event builder pattern for construction
 
 ---
 

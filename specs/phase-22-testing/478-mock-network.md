@@ -16,12 +16,12 @@ Create HTTP mocking infrastructure using wiremock for Rust and MSW for TypeScrip
 
 ## Acceptance Criteria
 
-- [ ] HTTP request interception for all methods (GET, POST, PUT, DELETE, etc.)
-- [ ] Response stubbing with custom status codes, headers, and bodies
-- [ ] Request verification (assertions on received requests)
-- [ ] Latency simulation for timeout testing
-- [ ] Sequence matching for multi-request scenarios
-- [ ] GraphQL request matching support
+- [x] HTTP request interception for all methods (GET, POST, PUT, DELETE, etc.)
+- [x] Response stubbing with custom status codes, headers, and bodies
+- [x] Request verification (assertions on received requests)
+- [x] Latency simulation for timeout testing
+- [x] Sequence matching for multi-request scenarios
+- [x] GraphQL request matching support
 
 ---
 

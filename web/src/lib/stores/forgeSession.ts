@@ -1,5 +1,7 @@
-import { writable, derived } from 'svelte/store';
+import { derived, get } from 'svelte/store';
+import { createPersistedStore } from '$lib/stores/persistedStore';
 import type { ForgeSession, ForgeSessionState, SessionPhase, SessionDraft } from '$lib/types/forge';
+import { forgeService } from '$lib/services/forgeService';
 
 function createForgeSessionStore() {
   const initialState: ForgeSessionState = {
@@ -9,16 +11,87 @@ function createForgeSessionStore() {
     error: null
   };
 
-  const { subscribe, set, update } = writable<ForgeSessionState>(initialState);
+  type StoredForgeSession = Omit<ForgeSession, 'createdAt' | 'updatedAt'> & {
+    createdAt: string;
+    updatedAt: string;
+  };
+
+  type StoredForgeSessionState = Omit<ForgeSessionState, 'sessions' | 'activeSession' | 'loading' | 'error'> & {
+    sessions: StoredForgeSession[];
+    activeSession: StoredForgeSession | null;
+    loading?: boolean;
+    error?: string | null;
+  };
+
+  function toStoredSession(session: ForgeSession): StoredForgeSession {
+    return {
+      ...session,
+      createdAt: session.createdAt.toISOString(),
+      updatedAt: session.updatedAt.toISOString()
+    };
+  }
+
+  function fromStoredSession(session: StoredForgeSession): ForgeSession {
+    return {
+      ...session,
+      createdAt: new Date(session.createdAt),
+      updatedAt: new Date(session.updatedAt)
+    };
+  }
+
+  const store = createPersistedStore<ForgeSessionState>(initialState, {
+    key: 'forgeSessionState',
+    version: 1,
+    serialize: (value) => {
+      const stored: StoredForgeSessionState = {
+        activeSession: value.activeSession ? toStoredSession(value.activeSession) : null,
+        sessions: value.sessions.map(toStoredSession),
+        // Don't persist transient UI state
+        loading: false,
+        error: null
+      };
+      return JSON.stringify(stored);
+    },
+    deserialize: (raw) => {
+      const parsed = JSON.parse(raw) as StoredForgeSessionState;
+      return {
+        activeSession: parsed.activeSession ? fromStoredSession(parsed.activeSession) : null,
+        sessions: Array.isArray(parsed.sessions) ? parsed.sessions.map(fromStoredSession) : [],
+        loading: false,
+        error: null
+      };
+    }
+  });
+
+  const { subscribe, set, update } = store;
 
   return {
     subscribe,
 
     async loadSessions(): Promise<void> {
+      // If we already have persisted sessions, don't clobber them with mock data.
+      const existing = get(store).sessions;
+      if (existing.length > 0) {
+        update(state => ({ ...state, loading: false, error: null }));
+        return;
+      }
+
       update(state => ({ ...state, loading: true, error: null }));
       
       try {
-        // TODO: Replace with actual API call
+        // Try to load from backend first
+        const backendSessions = await forgeService.listSessions();
+        
+        if (backendSessions.length > 0) {
+          update(state => ({
+            ...state,
+            sessions: backendSessions,
+            loading: false
+          }));
+          return;
+        }
+        
+        // Fallback to mock data for demo purposes
         const mockSessions: ForgeSession[] = [
           {
             id: 'session-1',
@@ -85,6 +158,10 @@ function createForgeSessionStore() {
       });
     },
 
+    clearActiveSession(): void {
+      update(state => ({ ...state, activeSession: null }));
+    },
+
     updateSessionPhase(sessionId: string, phase: SessionPhase): void {
       update(state => {
         const sessions = state.sessions.map(session =>
@@ -127,21 +204,14 @@ function createForgeSessionStore() {
       update(state => ({ ...state, loading: true, error: null }));
       
       try {
-        // TODO: Replace with actual API call
-        const sessionId = `session-${Date.now()}`;
-        
-        const newSession: ForgeSession = {
-          id: sessionId,
+        // Use forgeService to create session (handles IPC vs mock)
+        const newSession = await forgeService.createSession({
           name: draft.name,
           goal: draft.goal,
-          phase: 'configuring',
           participants: draft.participants,
           oracle: draft.oracle,
-          rounds: [],
-          hasResults: false,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        };
+          config: draft.config
+        });
 
         update(state => ({
           ...state,
@@ -149,12 +219,54 @@ function createForgeSessionStore() {
           loading: false
         }));
 
-        return sessionId;
+        return newSession.id;
       } catch (error) {
         update(state => ({
           ...state,
           loading: false,
           error: error instanceof Error ? error.message : 'Failed to create session'
+        }));
+        throw error;
+      }
+    },
+
+    async updateSession(sessionId: string, draft: SessionDraft): Promise<string> {
+      update(state => ({ ...state, loading: true, error: null }));
+      
+      try {
+        update(state => {
+          const sessions = state.sessions.map(session =>
+            session.id === sessionId
+              ? {
+                  ...session,
+                  name: draft.name,
+                  goal: draft.goal,
+                  participants: draft.participants,
+                  oracle: draft.oracle,
+                  config: draft.config,
+                  updatedAt: new Date()
+                }
+              : session
+          );
+          
+          const activeSession = state.activeSession?.id === sessionId
+            ? sessions.find(s => s.id === sessionId) || null
+            : state.activeSession;
+
+          return {
+            ...state,
+            sessions,
+            activeSession,
+            loading: false
+          };
+        });
+
+        return sessionId;
+      } catch (error) {
+        update(state => ({
+          ...state,
+          loading: false,
+          error: error instanceof Error ? error.message : 'Failed to update session'
         }));
         throw error;
       }

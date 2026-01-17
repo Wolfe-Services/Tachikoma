@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  import Icon from '$lib/components/common/Icon.svelte';
   import type { Oracle, Participant } from '$lib/types/forge';
 
   export let selected: Oracle | null = null;
@@ -21,14 +22,14 @@
     },
     {
       id: 'gpt4-oracle-1',
-      name: 'GPT-4 Oracle',
+      name: 'LLM Oracle (Analyst)',
       type: 'llm',
       config: { model: 'gpt-4', temperature: 0.3 },
       estimatedCostPerRound: 0.02
     },
     {
       id: 'claude-oracle-1',
-      name: 'Claude Oracle',
+      name: 'LLM Oracle (Architect)',
       type: 'llm',
       config: { model: 'claude-3-sonnet', temperature: 0.2 },
       estimatedCostPerRound: 0.015
@@ -131,7 +132,19 @@
         }}
       >
         <div class="oracle-header">
-          <h3 class="oracle-name">{oracle.name}</h3>
+          <div class="oracle-title">
+            <div
+              class="oracle-icon"
+              style="--oracle-accent: {oracle.type === 'llm' ? 'rgba(88, 166, 255, 0.9)' : oracle.type === 'consensus' ? 'rgba(63, 185, 80, 0.9)' : 'rgba(78, 205, 196, 0.9)'}"
+            >
+              <Icon
+                name={oracle.type === 'llm' ? 'brain' : oracle.type === 'consensus' ? 'check-circle' : 'refresh-cw'}
+                size={18}
+                glow
+              />
+            </div>
+            <h3 class="oracle-name">{oracle.name}</h3>
+          </div>
           <div class="oracle-type">{oracle.type}</div>
         </div>
 
@@ -173,13 +186,15 @@
 
         {#if isParticipantOracle(oracle)}
           <div class="warning-badge">
-            ⚠️ Also a participant
+            <Icon name="alert-triangle" size={14} />
+            <span>Also a participant</span>
           </div>
         {/if}
 
         {#if selected?.id === oracle.id}
           <div class="selected-indicator" aria-hidden="true">
-            ✓ Selected
+            <Icon name="check-circle" size={16} glow />
+            <span>Selected</span>
           </div>
         {/if}
       </div>
@@ -188,26 +203,38 @@
 
   {#if selected}
     <div class="selection-summary">
-      <h3>Selected Oracle: {selected.name}</h3>
-      <p>This oracle will cost approximately <strong>${selected.estimatedCostPerRound.toFixed(4)} per round</strong> and is rated as <strong>{getRecommendation(selected).toLowerCase()}</strong> for your participant configuration.</p>
+      <div class="summary-header">
+        <div class="summary-title">
+          <Icon name="brain" size={16} glow />
+          <h3>Selected Oracle</h3>
+        </div>
+        <div class="summary-pill">{selected.name}</div>
+      </div>
+      <p class="summary-text">
+        Estimated <strong>${selected.estimatedCostPerRound.toFixed(4)} / round</strong> •
+        Fit: <strong>{getRecommendation(selected).toLowerCase()}</strong>
+      </p>
     </div>
   {/if}
 </div>
 
 <style>
   .oracle-select {
-    max-width: 800px;
+    max-width: 960px;
+    margin: 0 auto;
   }
 
   .step-header h2 {
     font-size: 1.5rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
-    color: var(--text-primary);
+    color: var(--text-primary, #e6edf3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
   }
 
   .step-description {
-    color: var(--text-secondary);
+    color: var(--text-secondary, rgba(230, 237, 243, 0.7));
     margin-bottom: 2rem;
     line-height: 1.5;
   }
@@ -215,13 +242,13 @@
   .error-messages {
     margin-bottom: 1.5rem;
     padding: 1rem;
-    background: var(--error-bg, #fef2f2);
-    border: 1px solid var(--error-border, #fecaca);
-    border-radius: 6px;
+    background: rgba(255, 107, 107, 0.08);
+    border: 1px solid rgba(255, 107, 107, 0.25);
+    border-radius: 12px;
   }
 
   .error-message {
-    color: var(--error-color, #dc2626);
+    color: rgba(230, 237, 243, 0.85);
     font-size: 0.875rem;
     margin: 0;
   }
@@ -235,28 +262,40 @@
 
   .oracle-card {
     padding: 1.5rem;
-    border: 2px solid var(--border-color, #e5e7eb);
+    border: 1px solid rgba(78, 205, 196, 0.14);
     border-radius: 12px;
-    background: var(--card-bg, #ffffff);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01)),
+      rgba(13, 17, 23, 0.35);
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.25) inset,
+      0 12px 35px rgba(0, 0, 0, 0.25);
+    -webkit-backdrop-filter: blur(12px) saturate(1.1);
+    backdrop-filter: blur(12px) saturate(1.1);
   }
 
   .oracle-card:hover {
-    border-color: var(--primary-color, #3b82f6);
+    border-color: rgba(78, 205, 196, 0.5);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.25) inset,
+      0 18px 50px rgba(0, 0, 0, 0.3),
+      0 0 22px rgba(78, 205, 196, 0.12);
   }
 
   .oracle-card.selected {
-    border-color: var(--primary-color, #3b82f6);
-    background: var(--primary-bg-light, #f0f7ff);
+    border-color: rgba(78, 205, 196, 0.75);
+    box-shadow:
+      0 0 0 3px rgba(78, 205, 196, 0.14),
+      0 18px 55px rgba(0, 0, 0, 0.35);
   }
 
   .oracle-card.incompatible {
     opacity: 0.7;
-    border-color: var(--warning-color, #f59e0b);
+    border-color: rgba(255, 217, 61, 0.5);
   }
 
   .oracle-header {
@@ -266,21 +305,47 @@
     margin-bottom: 1rem;
   }
 
+  .oracle-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .oracle-icon {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(78, 205, 196, 0.18), rgba(78, 205, 196, 0.05));
+    border: 1px solid rgba(78, 205, 196, 0.22);
+    color: var(--oracle-accent, rgba(78, 205, 196, 0.9));
+    flex-shrink: 0;
+  }
+
   .oracle-name {
     font-size: 1.125rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-primary, #e6edf3);
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .oracle-type {
-    background: var(--secondary-bg, #f3f4f6);
-    color: var(--text-secondary);
+    background: rgba(13, 17, 23, 0.35);
+    color: rgba(230, 237, 243, 0.65);
     padding: 0.25rem 0.75rem;
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 500;
     text-transform: uppercase;
+    border: 1px solid rgba(78, 205, 196, 0.14);
+    letter-spacing: 1px;
+    font-family: var(--font-display, 'Orbitron', sans-serif);
   }
 
   .oracle-details {
@@ -296,13 +361,14 @@
   }
 
   .cost-label {
-    color: var(--text-secondary);
+    color: rgba(230, 237, 243, 0.65);
     font-size: 0.875rem;
   }
 
   .cost-value {
     font-weight: 600;
-    color: var(--text-primary);
+    color: rgba(230, 237, 243, 0.9);
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 
   .compatibility-info {
@@ -319,57 +385,83 @@
 
   .score-bar {
     flex: 1;
-    height: 6px;
-    background: var(--border-color, #e5e7eb);
-    border-radius: 3px;
+    height: 10px;
+    background: rgba(78, 205, 196, 0.1);
+    border: 1px solid rgba(78, 205, 196, 0.12);
+    border-radius: 999px;
     overflow: hidden;
   }
 
   .score-fill {
     height: 100%;
-    background: var(--success-color, #10b981);
+    background: linear-gradient(90deg, rgba(45, 122, 122, 0.9), rgba(78, 205, 196, 0.95));
     transition: width 0.3s ease;
+    box-shadow: 0 0 18px rgba(78, 205, 196, 0.25);
   }
 
   .score-text {
     font-size: 0.875rem;
     font-weight: 500;
-    color: var(--text-secondary);
+    color: rgba(230, 237, 243, 0.7);
     min-width: 3rem;
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    letter-spacing: 1px;
   }
 
   .recommendation {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.9px;
+    border: 1px solid rgba(78, 205, 196, 0.14);
+    background: rgba(13, 17, 23, 0.25);
+    color: rgba(230, 237, 243, 0.7);
+    border-radius: 999px;
+    padding: 0.25rem 0.65rem;
+    font-family: var(--font-display, 'Orbitron', sans-serif);
   }
 
   .recommendation-high {
-    color: var(--success-color, #10b981);
+    border-color: rgba(63, 185, 80, 0.35);
+    color: rgba(63, 185, 80, 0.95);
+    background: rgba(63, 185, 80, 0.08);
   }
 
   .recommendation-good {
-    color: var(--primary-color, #3b82f6);
+    border-color: rgba(78, 205, 196, 0.35);
+    color: rgba(78, 205, 196, 0.95);
+    background: rgba(78, 205, 196, 0.08);
   }
 
   .recommendation-fair {
-    color: var(--warning-color, #f59e0b);
+    border-color: rgba(255, 217, 61, 0.35);
+    color: rgba(255, 217, 61, 0.95);
+    background: rgba(255, 217, 61, 0.08);
   }
 
   .recommendation-low {
-    color: var(--error-color, #ef4444);
+    border-color: rgba(255, 107, 107, 0.35);
+    color: rgba(255, 107, 107, 0.95);
+    background: rgba(255, 107, 107, 0.08);
   }
 
   .oracle-config details {
     margin-top: 0.5rem;
+    border: 1px solid rgba(78, 205, 196, 0.12);
+    border-radius: 12px;
+    background: rgba(13, 17, 23, 0.18);
+    padding: 0.65rem 0.75rem;
   }
 
   .oracle-config summary {
     font-size: 0.875rem;
-    color: var(--text-secondary);
+    color: rgba(230, 237, 243, 0.75);
     cursor: pointer;
     user-select: none;
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    font-size: 0.75rem;
   }
 
   .config-list {
@@ -386,44 +478,101 @@
   }
 
   .config-key {
-    color: var(--text-secondary);
+    color: rgba(230, 237, 243, 0.65);
     text-transform: capitalize;
   }
 
   .config-value {
-    color: var(--text-primary);
+    color: rgba(230, 237, 243, 0.9);
     font-weight: 500;
   }
 
   .warning-badge {
     position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    background: var(--warning-color, #f59e0b);
-    color: white;
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-weight: 500;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255, 217, 61, 0.08);
+    border: 1px solid rgba(255, 217, 61, 0.22);
+    color: rgba(255, 217, 61, 0.95);
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    letter-spacing: 0.7px;
+    font-size: 0.65rem;
+    padding: 0.3rem 0.55rem;
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
   }
 
   .selected-indicator {
     position: absolute;
     bottom: 0.75rem;
     right: 0.75rem;
-    background: var(--success-color, #10b981);
-    color: white;
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(78, 205, 196, 0.12);
+    border: 1px solid rgba(78, 205, 196, 0.22);
+    color: rgba(78, 205, 196, 0.95);
+    font-size: 0.65rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
   }
 
   .selection-summary {
-    padding: 1.5rem;
-    background: var(--info-bg, #f0f9ff);
-    border: 1px solid var(--info-border, #bae6fd);
-    border-radius: 8px;
+    padding: 1rem 1.1rem;
+    background: rgba(13, 17, 23, 0.25);
+    border: 1px solid rgba(78, 205, 196, 0.14);
+    border-radius: 14px;
+  }
+
+  .summary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .summary-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(78, 205, 196, 0.95);
+  }
+
+  .summary-title h3 {
+    margin: 0;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+  }
+
+  .summary-pill {
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(78, 205, 196, 0.18);
+    background: rgba(78, 205, 196, 0.08);
+    color: rgba(230, 237, 243, 0.85);
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .summary-text {
+    margin: 0;
+    color: rgba(230, 237, 243, 0.7);
+  }
+
+  .oracle-card:focus-visible {
+    outline: 2px solid rgba(78, 205, 196, 0.85);
+    outline-offset: 2px;
   }
 
   .selection-summary h3 {

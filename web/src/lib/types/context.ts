@@ -5,6 +5,25 @@ export interface ContextUsage {
   maxTokens: number;
   usagePercent: number;
   zone: ContextZone;
+  // Extended breakdown for spec 304
+  system: number;
+  user: number;
+  assistant: number;
+  tools: number;
+  estimatedCost?: number;
+}
+
+export interface ContextHistory {
+  timestamp: string;
+  usage: ContextUsage;
+  total: number;
+}
+
+export interface ContextConfig {
+  maxTokens: number;
+  redlineThreshold: number;
+  warningThreshold: number;
+  autoReboot: boolean;
 }
 
 export type ContextZone = 'safe' | 'warning' | 'danger' | 'critical';

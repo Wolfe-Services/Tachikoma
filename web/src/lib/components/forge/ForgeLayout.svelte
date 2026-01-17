@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
   import { onMount, onDestroy } from 'svelte';
   import { writable, derived } from 'svelte/store';
   import SessionSidebar from './SessionSidebar.svelte';
@@ -11,6 +12,11 @@
   import type { ForgeLayoutConfig, PanelState } from '$lib/types/forge';
 
   export let sessionId: string | null = null;
+
+  const dispatch = createEventDispatcher<{
+    newSession: void;
+    editSession: { sessionId: string };
+  }>();
 
   const defaultConfig: ForgeLayoutConfig = {
     leftSidebarWidth: 280,
@@ -131,6 +137,7 @@
   <ForgeToolbar
     {sessionId}
     on:togglePanel={(e) => togglePanel(e.detail)}
+    on:newSession={() => dispatch('newSession')}
     layoutConfig={$layoutConfig}
   />
 
@@ -163,6 +170,7 @@
       <MainContentArea
         {sessionId}
         phase={$panelStates.sessionPhase}
+        on:editSession={(e) => dispatch('editSession', e.detail)}
       />
 
       {#if $layoutConfig.bottomPanelVisible}
@@ -214,8 +222,8 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background: var(--forge-bg, #1a1a2e);
-    color: var(--forge-text, #eaeaea);
+    background: var(--bg-primary, #0d1117);
+    color: var(--text-primary, #e6edf3);
   }
 
   .forge-layout.resizing {
@@ -232,8 +240,8 @@
   .left-sidebar {
     display: flex;
     flex-direction: column;
-    background: var(--sidebar-bg, #16213e);
-    border-right: 1px solid var(--border-color, #2a2a4a);
+    background: rgba(13, 17, 23, 0.35);
+    border-right: 1px solid rgba(78, 205, 196, 0.12);
     position: relative;
     overflow: hidden;
     transition: transform 0.3s ease;
@@ -250,8 +258,8 @@
   .right-panel {
     display: flex;
     flex-direction: column;
-    background: var(--panel-bg, #16213e);
-    border-left: 1px solid var(--border-color, #2a2a4a);
+    background: rgba(13, 17, 23, 0.35);
+    border-left: 1px solid rgba(78, 205, 196, 0.12);
     position: relative;
     overflow: hidden;
     transition: transform 0.3s ease;

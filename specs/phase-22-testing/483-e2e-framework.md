@@ -16,12 +16,12 @@ Set up end-to-end testing infrastructure using Playwright for testing the comple
 
 ## Acceptance Criteria
 
-- [ ] Playwright configured for Electron testing
-- [ ] Test utilities for common E2E operations
-- [ ] Page object models for main UI areas
-- [ ] Screenshot and video capture on failures
-- [ ] Parallel test execution support
-- [ ] CI integration with artifacts
+- [x] Playwright configured for Electron testing
+- [x] Test utilities for common E2E operations
+- [x] Page object models for main UI areas
+- [x] Screenshot and video capture on failures
+- [x] Parallel test execution support
+- [x] CI integration with artifacts
 
 ---
 

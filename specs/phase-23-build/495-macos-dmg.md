@@ -16,12 +16,12 @@ Configure macOS DMG disk image creation with custom background, icon positioning
 
 ## Acceptance Criteria
 
-- [ ] DMG created with custom background image
-- [ ] App icon and Applications folder properly positioned
-- [ ] Both x64 and arm64 architectures supported
-- [ ] Universal binary option available
-- [ ] DMG is code signed
-- [ ] Volume icon customized
+- [x] DMG created with custom background image
+- [x] App icon and Applications folder properly positioned
+- [x] Both x64 and arm64 architectures supported
+- [x] Universal binary option available
+- [x] DMG is code signed
+- [x] Volume icon customized
 
 ---
 

@@ -2,7 +2,17 @@
 // This will be implemented when the Rust native module is ready
 
 import { randomUUID } from 'crypto';
-import type { MissionStatus, SpecFile, SpecMetadata, TachikomaConfig } from '../shared/ipc';
+import type { 
+  MissionStatus, 
+  SpecFile, 
+  SpecMetadata, 
+  TachikomaConfig,
+  ForgeSessionRequest,
+  ForgeSessionResponse,
+  ForgePhase,
+  ForgeOutputRequest,
+  ForgeOutputResponse
+} from '../shared/ipc';
 
 // Native interface that will be implemented via NAPI-RS
 export interface NativeInterface {
@@ -21,6 +31,16 @@ export interface NativeInterface {
 
   // Log operations
   getLogHistory(missionId?: string): Promise<Array<{ level: string; message: string; timestamp: string }>>;
+
+  // Forge operations
+  createForgeSession(request: ForgeSessionRequest): Promise<ForgeSessionResponse>;
+  getForgeSession(sessionId: string): Promise<ForgeSessionResponse | null>;
+  listForgeSessions(): Promise<ForgeSessionResponse[]>;
+  deleteForgeSession(sessionId: string): Promise<boolean>;
+  startDeliberation(sessionId: string, phase: ForgePhase): Promise<boolean>;
+  stopDeliberation(sessionId: string): Promise<boolean>;
+  submitForgeMessage(sessionId: string, content: string, participantId: string): Promise<string>;
+  generateForgeOutput(request: ForgeOutputRequest): Promise<ForgeOutputResponse>;
 }
 
 // Placeholder implementation that will be replaced with actual Rust bindings
@@ -87,5 +107,82 @@ export const native: NativeInterface = {
   async getLogHistory(missionId?: string): Promise<Array<{ level: string; message: string; timestamp: string }>> {
     console.log(`[NATIVE PLACEHOLDER] Getting log history for: ${missionId || 'all'}`);
     return [];
+  },
+
+  // Forge placeholder implementations
+  async createForgeSession(request: ForgeSessionRequest): Promise<ForgeSessionResponse> {
+    console.log(`[NATIVE PLACEHOLDER] Creating forge session: ${request.name}`);
+    const now = new Date().toISOString();
+    return {
+      id: randomUUID(),
+      name: request.name,
+      goal: request.goal,
+      phase: 'configuring',
+      participants: request.participants,
+      oracle: request.oracle,
+      config: request.config,
+      roundCount: 0,
+      totalCostUsd: 0,
+      totalTokens: { input: 0, output: 0 },
+      createdAt: now,
+      updatedAt: now
+    };
+  },
+
+  async getForgeSession(sessionId: string): Promise<ForgeSessionResponse | null> {
+    console.log(`[NATIVE PLACEHOLDER] Getting forge session: ${sessionId}`);
+    return null;
+  },
+
+  async listForgeSessions(): Promise<ForgeSessionResponse[]> {
+    console.log(`[NATIVE PLACEHOLDER] Listing forge sessions`);
+    return [];
+  },
+
+  async deleteForgeSession(sessionId: string): Promise<boolean> {
+    console.log(`[NATIVE PLACEHOLDER] Deleting forge session: ${sessionId}`);
+    return true;
+  },
+
+  async startDeliberation(sessionId: string, phase: ForgePhase): Promise<boolean> {
+    console.log(`[NATIVE PLACEHOLDER] Starting deliberation for session ${sessionId} in phase ${phase}`);
+    return true;
+  },
+
+  async stopDeliberation(sessionId: string): Promise<boolean> {
+    console.log(`[NATIVE PLACEHOLDER] Stopping deliberation for session: ${sessionId}`);
+    return true;
+  },
+
+  async submitForgeMessage(sessionId: string, _content: string, participantId: string): Promise<string> {
+    console.log(`[NATIVE PLACEHOLDER] Submitting message to session ${sessionId} from ${participantId}`);
+    return randomUUID();
+  },
+
+  async generateForgeOutput(request: ForgeOutputRequest): Promise<ForgeOutputResponse> {
+    console.log(`[NATIVE PLACEHOLDER] Generating ${request.format} output for session ${request.sessionId}`);
+    
+    // Return placeholder content based on format
+    const formatExtensions: Record<string, string> = {
+      markdown: 'md',
+      json: 'json',
+      yaml: 'yaml',
+      html: 'html',
+      plain: 'txt',
+      beads: 'yaml'
+    };
+
+    const placeholderContent = request.format === 'json' 
+      ? JSON.stringify({ sessionId: request.sessionId, placeholder: true }, null, 2)
+      : request.format === 'yaml' || request.format === 'beads'
+      ? `session_id: ${request.sessionId}\nplaceholder: true\n`
+      : `# Forge Session Output\n\nSession: ${request.sessionId}\n\nNo content generated yet.`;
+
+    return {
+      sessionId: request.sessionId,
+      format: request.format,
+      content: placeholderContent,
+      filename: `forge-output-${request.sessionId.slice(0, 8)}.${formatExtensions[request.format]}`
+    };
   }
 };

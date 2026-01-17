@@ -16,11 +16,11 @@ Implement Git merge operations, enabling merging branches and handling merge con
 
 ## Acceptance Criteria
 
-- [ ] Merge branches
-- [ ] Fast-forward merges
-- [ ] Merge with custom message
-- [ ] Conflict detection
-- [ ] Merge abort
+- [x] Merge branches
+- [x] Fast-forward merges
+- [x] Merge with custom message
+- [x] Conflict detection
+- [x] Merge abort
 
 ---
 

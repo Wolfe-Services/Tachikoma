@@ -16,12 +16,12 @@ Implement performance benchmarking infrastructure using Criterion for Rust and V
 
 ## Acceptance Criteria
 
-- [ ] Criterion benchmarks for Rust hot paths
-- [ ] Vitest benchmarks for TypeScript utilities
-- [ ] Baseline tracking for regression detection
-- [ ] CI integration with threshold alerts
-- [ ] Historical performance trend visualization
-- [ ] Memory usage benchmarks included
+- [x] Criterion benchmarks for Rust hot paths
+- [x] Vitest benchmarks for TypeScript utilities
+- [x] Baseline tracking for regression detection
+- [x] CI integration with threshold alerts
+- [x] Historical performance trend visualization
+- [x] Memory usage benchmarks included
 
 ---
 

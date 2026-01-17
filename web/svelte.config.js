@@ -25,7 +25,8 @@ const config = {
 
     // Disable SSR for Tauri
     prerender: {
-      entries: []
+      entries: [],
+      handleUnseenRoutes: 'ignore'
     }
   }
 };

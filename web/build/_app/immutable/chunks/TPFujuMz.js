@@ -1,0 +1,1 @@
+const c=typeof window<"u"&&window.tachikoma!==void 0,e={async invoke(n,...a){switch(n){case"config:get":return{backend:{brain:"claude",thinkTank:"o3"},loop:{maxIterations:100}};case"spec:list":return[];case"mission:status":return{state:"idle",progress:0};default:return null}},on(n,a){},off(n,a){}},o=c?window.tachikoma:e;export{o as i};

@@ -1,13 +1,104 @@
 <script lang="ts">
   import type { ForgeSession } from '$lib/types/forge';
+  import { forgeService, type ForgeOutputFormat } from '$lib/services/forgeService';
+  import Icon from '$lib/components/common/Icon.svelte';
+  import Spinner from '$lib/components/ui/Spinner/Spinner.svelte';
 
   export let session: ForgeSession | null = null;
   export let visible: boolean = false;
+
+  let isExporting = false;
+  let exportError: string | null = null;
+  let previewContent: string | null = null;
+  let previewFormat: ForgeOutputFormat | null = null;
 
   $: hasResults = session?.hasResults ?? false;
   $: completedRounds = session?.rounds.filter(r => r.status === 'completed') ?? [];
   $: totalContributions = completedRounds.reduce((sum, round) => sum + round.contributions.length, 0);
   $: totalCritiques = completedRounds.reduce((sum, round) => sum + round.critiques.length, 0);
+
+  const outputFormats: { value: ForgeOutputFormat; label: string; icon: string }[] = [
+    { value: 'markdown', label: 'Markdown', icon: 'file-text' },
+    { value: 'json', label: 'JSON', icon: 'code' },
+    { value: 'yaml', label: 'YAML', icon: 'file' },
+    { value: 'html', label: 'HTML', icon: 'globe' },
+    { value: 'beads', label: 'Beads Issue', icon: 'circle' }
+  ];
+
+  async function handleExport(format: ForgeOutputFormat) {
+    if (!session) return;
+    
+    isExporting = true;
+    exportError = null;
+    
+    try {
+      const result = await forgeService.generateOutput({
+        sessionId: session.id,
+        format,
+        includeMetadata: true,
+        includeHistory: true,
+        includeMetrics: true
+      });
+      
+      // Download the file
+      downloadFile(result.content, result.filename, getMimeType(format));
+    } catch (error) {
+      exportError = error instanceof Error ? error.message : 'Export failed';
+    } finally {
+      isExporting = false;
+    }
+  }
+
+  async function handlePreview(format: ForgeOutputFormat) {
+    if (!session) return;
+    
+    isExporting = true;
+    exportError = null;
+    
+    try {
+      const result = await forgeService.generateOutput({
+        sessionId: session.id,
+        format,
+        includeMetadata: true
+      });
+      
+      previewContent = result.content;
+      previewFormat = format;
+    } catch (error) {
+      exportError = error instanceof Error ? error.message : 'Preview failed';
+    } finally {
+      isExporting = false;
+    }
+  }
+
+  function closePreview() {
+    previewContent = null;
+    previewFormat = null;
+  }
+
+  function downloadFile(content: string, filename: string, mimeType: string) {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function getMimeType(format: ForgeOutputFormat): string {
+    const mimeTypes: Record<ForgeOutputFormat, string> = {
+      markdown: 'text/markdown',
+      json: 'application/json',
+      yaml: 'text/yaml',
+      html: 'text/html',
+      plain: 'text/plain',
+      beads: 'text/yaml'
+    };
+    return mimeTypes[format] || 'text/plain';
+  }
 
   function formatTimestamp(date: Date): string {
     return new Intl.DateTimeFormat('en-US', {
@@ -140,9 +231,74 @@
             <p>Insights will be generated automatically as the session progresses.</p>
           </div>
         </section>
+
+        <!-- Export Section -->
+        <section class="export-section">
+          <h3>Export Results</h3>
+          {#if exportError}
+            <div class="export-error">
+              <Icon name="alert-triangle" size={14} />
+              <span>{exportError}</span>
+            </div>
+          {/if}
+          
+          <div class="export-buttons">
+            {#each outputFormats as format}
+              <div class="export-button-group">
+                <button
+                  class="export-btn"
+                  on:click={() => handleExport(format.value)}
+                  disabled={isExporting}
+                  title="Download as {format.label}"
+                >
+                  {#if isExporting}
+                    <Spinner size={14} />
+                  {:else}
+                    <Icon name={format.icon} size={16} />
+                  {/if}
+                  <span>{format.label}</span>
+                </button>
+                <button
+                  class="preview-btn"
+                  on:click={() => handlePreview(format.value)}
+                  disabled={isExporting}
+                  title="Preview {format.label}"
+                >
+                  <Icon name="eye" size={14} />
+                </button>
+              </div>
+            {/each}
+          </div>
+        </section>
       </div>
     {/if}
   </div>
+
+  <!-- Preview Modal -->
+  {#if previewContent && previewFormat}
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="preview-overlay" on:click={closePreview}>
+      <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+      <div class="preview-modal" on:click|stopPropagation={() => {}} role="dialog" aria-modal="true">
+        <div class="preview-header">
+          <h3>Preview: {previewFormat.toUpperCase()}</h3>
+          <button class="close-btn" on:click={closePreview} aria-label="Close preview">
+            <Icon name="x" size={18} />
+          </button>
+        </div>
+        <div class="preview-content">
+          <pre><code>{previewContent}</code></pre>
+        </div>
+        <div class="preview-actions">
+          <button class="btn-secondary" on:click={closePreview}>Close</button>
+          <button class="btn-primary" on:click={() => previewFormat && handleExport(previewFormat)}>
+            <Icon name="download" size={16} />
+            Download
+          </button>
+        </div>
+      </div>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -342,6 +498,219 @@
     color: var(--text-muted, #6b7280);
   }
 
+  /* Export Section */
+  .export-section h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--forge-text, #eaeaea);
+    margin: 0 0 1rem 0;
+  }
+
+  .export-error {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: rgba(220, 38, 38, 0.15);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    border-radius: 8px;
+    color: #fca5a5;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+
+  .export-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .export-button-group {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .export-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(78, 205, 196, 0.1);
+    border: 1px solid rgba(78, 205, 196, 0.25);
+    border-radius: 8px 0 0 8px;
+    color: var(--tachi-cyan, #4ecdc4);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .export-btn:hover:not(:disabled) {
+    background: rgba(78, 205, 196, 0.2);
+    border-color: rgba(78, 205, 196, 0.4);
+  }
+
+  .export-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .preview-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    background: rgba(78, 205, 196, 0.1);
+    border: 1px solid rgba(78, 205, 196, 0.25);
+    border-left: none;
+    border-radius: 0 8px 8px 0;
+    color: var(--tachi-cyan, #4ecdc4);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .preview-btn:hover:not(:disabled) {
+    background: rgba(78, 205, 196, 0.2);
+  }
+
+  .preview-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Preview Modal */
+  .preview-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 2rem;
+  }
+
+  .preview-modal {
+    width: 100%;
+    max-width: 800px;
+    max-height: 80vh;
+    background: var(--bg-secondary, #161b22);
+    border: 1px solid rgba(78, 205, 196, 0.25);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  .preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: rgba(78, 205, 196, 0.06);
+    border-bottom: 1px solid rgba(78, 205, 196, 0.15);
+  }
+
+  .preview-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--tachi-cyan, #4ecdc4);
+    letter-spacing: 0.5px;
+  }
+
+  .close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: rgba(230, 237, 243, 0.6);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(230, 237, 243, 0.9);
+  }
+
+  .preview-content {
+    flex: 1;
+    overflow: auto;
+    padding: 1rem;
+  }
+
+  .preview-content pre {
+    margin: 0;
+    padding: 1rem;
+    background: rgba(13, 17, 23, 0.6);
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+
+  .preview-content code {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: rgba(230, 237, 243, 0.9);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .preview-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid rgba(78, 205, 196, 0.15);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background: rgba(13, 17, 23, 0.35);
+    border: 1px solid rgba(78, 205, 196, 0.18);
+    border-radius: 8px;
+    color: rgba(230, 237, 243, 0.85);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(78, 205, 196, 0.1);
+    border-color: rgba(78, 205, 196, 0.35);
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background: linear-gradient(135deg, var(--tachi-cyan-dark, #2d7a7a), var(--tachi-cyan, #4ecdc4));
+    border: 1px solid rgba(78, 205, 196, 0.5);
+    border-radius: 8px;
+    color: var(--bg-primary, #0d1117);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+  }
+
   @media (max-width: 768px) {
     .results-summary {
       flex-direction: column;
@@ -354,6 +723,10 @@
 
     .stat-value {
       font-size: 1.25rem;
+    }
+
+    .preview-modal {
+      max-height: 90vh;
     }
   }
 </style>

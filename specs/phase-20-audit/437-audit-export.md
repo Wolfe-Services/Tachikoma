@@ -16,11 +16,11 @@ Implement audit event export functionality supporting multiple formats (JSON, CS
 
 ## Acceptance Criteria
 
-- [ ] JSON export with streaming support
-- [ ] CSV export for spreadsheet analysis
-- [ ] SIEM format export (CEF, LEEF)
-- [ ] Configurable field selection
-- [ ] Progress tracking for large exports
+- [x] JSON export with streaming support
+- [x] CSV export for spreadsheet analysis
+- [x] SIEM format export (CEF, LEEF)
+- [x] Configurable field selection
+- [x] Progress tracking for large exports
 
 ---
 

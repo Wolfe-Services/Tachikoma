@@ -16,13 +16,13 @@ Configure NSIS installer for Windows distribution with custom branding, installa
 
 ## Acceptance Criteria
 
-- [ ] NSIS installer with custom UI
-- [ ] Installation directory selection
-- [ ] Desktop and Start Menu shortcuts
-- [ ] File associations registered
-- [ ] Protocol handler registered
-- [ ] Uninstaller included
-- [ ] Silent installation supported
+- [x] NSIS installer with custom UI
+- [x] Installation directory selection
+- [x] Desktop and Start Menu shortcuts
+- [x] File associations registered
+- [x] Protocol handler registered
+- [x] Uninstaller included
+- [x] Silent installation supported
 
 ---
 

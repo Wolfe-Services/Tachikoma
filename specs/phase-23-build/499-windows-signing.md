@@ -16,12 +16,12 @@ Configure Windows code signing using EV (Extended Validation) or standard code s
 
 ## Acceptance Criteria
 
-- [ ] Executable files signed with Authenticode
-- [ ] Installer signed
-- [ ] Timestamp server used for longevity
-- [ ] SmartScreen reputation established
-- [ ] CI/CD signing automated
-- [ ] Signature verification passes
+- [x] Executable files signed with Authenticode
+- [x] Installer signed
+- [x] Timestamp server used for longevity
+- [x] SmartScreen reputation established
+- [x] CI/CD signing automated
+- [x] Signature verification passes
 
 ---
 

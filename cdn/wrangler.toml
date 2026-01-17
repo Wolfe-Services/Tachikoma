@@ -1,0 +1,27 @@
+name = "tachikoma-cdn"
+main = "worker.js"
+compatibility_date = "2024-01-15"
+
+# R2 bucket binding
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "tachikoma-releases"
+
+# KV namespace for analytics (optional)
+[[kv_namespaces]]
+binding = "ANALYTICS"
+id = "your-kv-namespace-id"
+preview_id = "your-kv-namespace-preview-id"
+
+# Environment variables
+[vars]
+ENVIRONMENT = "production"
+
+# Custom domain
+[[routes]]
+pattern = "releases.tachikoma.dev/*"
+zone_name = "tachikoma.dev"
+
+# Rate limiting
+[limits]
+cpu_ms = 10000

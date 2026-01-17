@@ -1,5 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  import Icon from '$lib/components/common/Icon.svelte';
+  import { activeSession } from '$lib/stores/forgeSession';
   import type { ForgeLayoutConfig } from '$lib/types/forge';
 
   export let sessionId: string | null = null;
@@ -7,10 +9,15 @@
 
   const dispatch = createEventDispatcher<{
     togglePanel: 'left' | 'right' | 'bottom';
+    newSession: void;
   }>();
 
   function togglePanel(panel: 'left' | 'right' | 'bottom') {
     dispatch('togglePanel', panel);
+  }
+
+  function requestNewSession() {
+    dispatch('newSession');
   }
 
   function handleKeydown(event: KeyboardEvent) {
@@ -27,9 +34,9 @@
 <header class="forge-toolbar" role="banner">
   <div class="toolbar-section left">
     <h1 class="forge-title">
-      Forge
+      Think Tank
       {#if sessionId}
-        <span class="session-indicator">Session Active</span>
+        <span class="session-indicator">{$activeSession?.name ?? 'Session Active'}</span>
       {/if}
     </h1>
   </div>
@@ -96,6 +103,11 @@
         <span class="status-text">Idle</span>
       {/if}
     </div>
+
+    <button type="button" class="new-session" on:click={requestNewSession} title="Start a new Think Tank session">
+      <Icon name="zap" size={16} />
+      <span>New</span>
+    </button>
   </div>
 </header>
 
@@ -105,9 +117,11 @@
     align-items: center;
     height: 48px;
     padding: 0 16px;
-    background: var(--toolbar-bg, #0f1419);
-    border-bottom: 1px solid var(--border-color, #2a2a4a);
-    color: var(--forge-text, #eaeaea);
+    background: rgba(13, 17, 23, 0.7);
+    border-bottom: 1px solid rgba(78, 205, 196, 0.14);
+    color: var(--text-primary, #e6edf3);
+    -webkit-backdrop-filter: blur(14px) saturate(1.25);
+    backdrop-filter: blur(14px) saturate(1.25);
     user-select: none;
   }
 
@@ -127,20 +141,27 @@
 
   .toolbar-section.right {
     flex: 0 0 auto;
+    gap: 0.75rem;
   }
 
   .forge-title {
     font-size: 18px;
     font-weight: 600;
     margin: 0;
-    color: var(--accent-color, #4a9eff);
+    color: var(--tachi-cyan, #4ecdc4);
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
   }
 
   .session-indicator {
     font-size: 12px;
-    font-weight: 400;
-    color: var(--success-color, #00d084);
+    font-weight: 500;
+    color: rgba(230, 237, 243, 0.65);
     margin-left: 8px;
+    font-family: var(--font-body, 'Rajdhani', sans-serif);
+    letter-spacing: 0.2px;
+    text-transform: none;
   }
 
   .panel-controls {
@@ -165,19 +186,19 @@
   }
 
   .panel-toggle:hover {
-    background: var(--hover-bg, rgba(255, 255, 255, 0.1));
-    border-color: var(--border-color, #2a2a4a);
+    background: var(--hover-bg, rgba(78, 205, 196, 0.08));
+    border-color: rgba(78, 205, 196, 0.18);
   }
 
   .panel-toggle:focus {
-    outline: 2px solid var(--accent-color, #4a9eff);
+    outline: 2px solid var(--tachi-cyan, #4ecdc4);
     outline-offset: 2px;
   }
 
   .panel-toggle.active {
-    background: var(--accent-color, #4a9eff);
-    color: var(--bg-color, #1a1a2e);
-    border-color: var(--accent-color, #4a9eff);
+    background: rgba(78, 205, 196, 0.15);
+    color: var(--tachi-cyan, #4ecdc4);
+    border-color: rgba(78, 205, 196, 0.55);
   }
 
   .panel-toggle svg {
@@ -200,8 +221,8 @@
   }
 
   .status-dot.active {
-    background: var(--success-color, #00d084);
-    box-shadow: 0 0 4px var(--success-color, #00d084);
+    background: var(--success-color, #3fb950);
+    box-shadow: 0 0 6px rgba(63, 185, 80, 0.6);
   }
 
   .status-dot.inactive {
@@ -210,6 +231,29 @@
 
   .status-text {
     color: var(--muted-color, #6b7280);
+  }
+
+  .new-session {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.65rem;
+    border-radius: 10px;
+    background: rgba(78, 205, 196, 0.12);
+    border: 1px solid rgba(78, 205, 196, 0.22);
+    color: var(--tachi-cyan, #4ecdc4);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+  }
+
+  .new-session:hover {
+    border-color: rgba(78, 205, 196, 0.5);
+    background: rgba(78, 205, 196, 0.16);
+    box-shadow: 0 0 18px rgba(78, 205, 196, 0.22);
   }
 
   @media (max-width: 768px) {
@@ -236,6 +280,10 @@
     }
 
     .session-indicator {
+      display: none;
+    }
+
+    .new-session span {
       display: none;
     }
   }

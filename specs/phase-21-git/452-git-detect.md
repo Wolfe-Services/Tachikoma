@@ -16,11 +16,11 @@ Implement Git repository detection, enabling automatic discovery of Git reposito
 
 ## Acceptance Criteria
 
-- [ ] Repository detection from any path
-- [ ] Worktree detection
-- [ ] Bare repository detection
-- [ ] Repository metadata extraction
-- [ ] Safe initialization
+- [x] Repository detection from any path
+- [x] Worktree detection
+- [x] Bare repository detection
+- [x] Repository metadata extraction
+- [x] Safe initialization
 
 ---
 

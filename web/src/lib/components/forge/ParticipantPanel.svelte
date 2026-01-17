@@ -4,6 +4,25 @@
   export let session: ForgeSession | null = null;
 
   $: participants = session?.participants || [];
+
+  const brokenAvatarIds = new Set<string>();
+
+  function parseAvatar(avatar?: string): { src?: string; emoji?: string } {
+    if (!avatar) return {};
+    if (avatar.startsWith('asset:')) {
+      const raw = avatar.slice('asset:'.length);
+      const [src, emoji] = raw.split('|');
+      return { src, emoji };
+    }
+    if (avatar.startsWith('/') || avatar.startsWith('http')) {
+      return { src: avatar };
+    }
+    return { emoji: avatar };
+  }
+
+  function markAvatarBroken(id: string) {
+    brokenAvatarIds.add(id);
+  }
 </script>
 
 <div class="participant-panel" data-testid="participant-panel">
@@ -12,6 +31,7 @@
   {#if participants.length > 0}
     <div class="participant-list">
       {#each participants as participant}
+        {@const a = parseAvatar(participant.avatar)}
         <div
           class="participant-item"
           class:active={participant.status === 'active'}
@@ -20,8 +40,14 @@
           data-testid="participant-{participant.id}"
         >
           <div class="participant-avatar">
-            {#if participant.avatar}
-              <img src={participant.avatar} alt="{participant.name} avatar" />
+            {#if a.src && !brokenAvatarIds.has(participant.id)}
+              <img
+                src={a.src}
+                alt="{participant.name} avatar"
+                on:error={() => markAvatarBroken(participant.id)}
+              />
+            {:else if a.emoji}
+              <div class="avatar-placeholder emoji" aria-hidden="true">{a.emoji}</div>
             {:else}
               <div class="avatar-placeholder">
                 {participant.name.charAt(0).toUpperCase()}
@@ -127,6 +153,13 @@
     font-weight: bold;
     color: white;
     font-size: 1.2rem;
+  }
+
+  .avatar-placeholder.emoji {
+    background: rgba(13, 17, 23, 0.55);
+    border: 1px solid rgba(78, 205, 196, 0.14);
+    color: var(--text-primary, #e6edf3);
+    font-weight: 600;
   }
 
   .status-indicator {

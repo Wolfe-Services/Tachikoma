@@ -109,9 +109,9 @@
           class:active={showRefinement}
           on:click={toggleRefinement}
           data-testid="refine-toggle"
-          title="Refine your goal with AI assistance"
+          title="Guided Q&A to refine your goal"
         >
-          ✨ Refine with AI
+          💬 Q&A Mode
         </button>
         <span class="char-count" class:warning={value.length > 4500}>
           {value.length}/5000
@@ -199,8 +199,8 @@ Provide relevant context...
 
 <style>
   .goal-input-step {
-    max-width: 700px;
-    margin: 0 auto;
+    max-width: 100%;
+    margin: 0;
   }
 
   .step-header {
@@ -273,26 +273,29 @@ Provide relevant context...
   }
 
   .refine-toggle {
-    padding: 0.375rem 0.875rem;
-    border: 1px solid rgba(78, 205, 196, 0.35);
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--border-color, rgba(78, 205, 196, 0.15));
     border-radius: 6px;
-    background: linear-gradient(135deg, rgba(78, 205, 196, 0.12), rgba(78, 205, 196, 0.04));
-    color: var(--tachi-cyan, #4ecdc4);
-    font-size: 0.8rem;
-    font-weight: 500;
+    background: var(--bg-tertiary, #1c2128);
+    color: var(--text-secondary, rgba(230, 237, 243, 0.7));
+    font-family: var(--font-display, 'Orbitron', sans-serif);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
   }
 
   .refine-toggle:hover {
-    background: linear-gradient(135deg, rgba(78, 205, 196, 0.2), rgba(78, 205, 196, 0.08));
-    box-shadow: 0 0 12px rgba(78, 205, 196, 0.15);
+    background: rgba(78, 205, 196, 0.08);
+    border-color: var(--tachi-cyan, #4ecdc4);
+    color: var(--text-primary, #e6edf3);
   }
 
   .refine-toggle.active {
-    background: linear-gradient(135deg, rgba(78, 205, 196, 0.35), rgba(78, 205, 196, 0.15));
-    border-color: rgba(78, 205, 196, 0.5);
-    box-shadow: 0 0 15px rgba(78, 205, 196, 0.2);
+    background: rgba(78, 205, 196, 0.12);
+    border-color: var(--tachi-cyan, #4ecdc4);
+    color: var(--tachi-cyan, #4ecdc4);
   }
 
   .char-count {
