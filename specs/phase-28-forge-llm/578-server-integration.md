@@ -19,13 +19,13 @@ Wire the ForgeOrchestrator to the HTTP/WebSocket server so the frontend can star
 
 ## Acceptance Criteria
 
-- [ ] Add `tachikoma-forge` as a dependency in `crates/tachikoma-server/Cargo.toml`
-- [ ] Update `forge_create_session` handler to create real ForgeSession
-- [ ] Update `forge_start_round` handler to instantiate orchestrator and run a round
-- [ ] Add WebSocket endpoint for streaming ForgeEvents to clients
-- [ ] Store active orchestrators in shared state (Arc<RwLock<HashMap<SessionId, ForgeOrchestrator>>>)
-- [ ] Handle errors gracefully and return proper HTTP status codes
-- [ ] Verify `cargo check -p tachikoma-server` passes
+- [x] Add `tachikoma-forge` as a dependency in `crates/tachikoma-server/Cargo.toml`
+- [x] Update `forge_create_session` handler to create real ForgeSession
+- [x] Update `forge_start_round` handler to instantiate orchestrator and run a round
+- [x] Add WebSocket endpoint for streaming ForgeEvents to clients
+- [x] Store active orchestrators in shared state (Arc<RwLock<HashMap<SessionId, ForgeOrchestrator>>>)
+- [x] Handle errors gracefully and return proper HTTP status codes
+- [x] Verify `cargo check -p tachikoma-server` passes
 
 ---
 
