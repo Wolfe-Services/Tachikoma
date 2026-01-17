@@ -19,10 +19,10 @@ Create the ForgeOrchestrator that coordinates LLM participants through deliberat
 
 ## Acceptance Criteria
 
-- [ ] Create `crates/tachikoma-forge/src/orchestrator.rs`
-- [ ] Define `ForgeOrchestrator` struct with session, participants list, event sender
-- [ ] Define `ForgeEvent` enum: RoundStarted, ParticipantThinking, ContentDelta, ParticipantComplete, RoundComplete, Error
-- [ ] Define `RoundType` enum: Draft, Critique, Synthesis, Convergence
+- [x] Create `crates/tachikoma-forge/src/orchestrator.rs`
+- [x] Define `ForgeOrchestrator` struct with session, participants list, event sender
+- [x] Define `ForgeEvent` enum: RoundStarted, ParticipantThinking, ContentDelta, ParticipantComplete, RoundComplete, Error
+- [x] Define `RoundType` enum: Draft, Critique, Synthesis, Convergence
 - [ ] Implement `ForgeOrchestrator::new()` that takes session and participant configs
 - [ ] Implement `run_round(&mut self, round_type: RoundType)` that calls each participant
 - [ ] Stream content deltas through the event channel as they arrive
