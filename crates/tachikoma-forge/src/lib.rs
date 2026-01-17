@@ -2,7 +2,9 @@
 
 pub mod error;
 pub mod llm;
+pub mod orchestrator;
 pub mod output;
+pub mod prompts;
 pub mod session;
 pub mod round;
 pub mod quality;
@@ -10,6 +12,8 @@ pub mod templates;
 
 // Re-export common types
 pub use error::{ForgeError, ForgeResult};
+pub use orchestrator::{ForgeOrchestrator, ForgeEvent, RoundType};
+pub use prompts::build_prompt;
 pub use session::{ForgeSession, ForgeSessionStatus, ForgeSessionConfig, ForgeTopic, TokenUsage};
 pub use round::{ForgeRound, DraftRound, CritiqueRound, SynthesisRound, RefinementRound, ConvergenceRound};
 pub use quality::{QualityTracker, QualitySnapshot, QualityDimension, QualityTrend, QualityReport, CritiqueSummary};

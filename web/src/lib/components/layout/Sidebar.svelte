@@ -112,16 +112,41 @@
     overflow: hidden;
   }
   
-  /* Subtle gradient overlay */
+  /* Ghost in the Shell manga background */
+  .sidebar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('/gints.jpeg');
+    background-size: 180% auto;
+    background-position: center 20%;
+    background-repeat: no-repeat;
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 0;
+    filter: grayscale(30%) contrast(1.1);
+  }
+  
+  /* Subtle gradient overlay on top of image */
   .sidebar::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 200px;
-    background: linear-gradient(180deg, rgba(78, 205, 196, 0.05) 0%, transparent 100%);
+    bottom: 0;
+    background: linear-gradient(
+      180deg, 
+      rgba(13, 17, 23, 0.85) 0%, 
+      rgba(13, 17, 23, 0.6) 30%,
+      rgba(13, 17, 23, 0.4) 60%,
+      rgba(13, 17, 23, 0.7) 100%
+    );
     pointer-events: none;
+    z-index: 1;
   }
   
   .sidebar.collapsed {
@@ -136,7 +161,9 @@
     border-bottom: 1px solid var(--border-color, rgba(78, 205, 196, 0.15));
     min-height: 80px;
     position: relative;
-    z-index: 1;
+    z-index: 2;
+    background: rgba(13, 17, 23, 0.6);
+    backdrop-filter: blur(4px);
   }
   
   .logo-container {
@@ -174,6 +201,9 @@
   .status-section {
     padding: 0.75rem 1.25rem;
     border-bottom: 1px solid var(--border-color, rgba(78, 205, 196, 0.1));
+    position: relative;
+    z-index: 2;
+    background: rgba(13, 17, 23, 0.4);
   }
   
   .status-badge {
@@ -226,6 +256,8 @@
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    position: relative;
+    z-index: 2;
   }
   
   .nav-item {
@@ -251,8 +283,9 @@
   }
   
   .nav-item:hover {
-    background: var(--hover-bg, rgba(78, 205, 196, 0.08));
+    background: var(--hover-bg, rgba(78, 205, 196, 0.15));
     color: var(--text-primary, #e6edf3);
+    backdrop-filter: blur(4px);
   }
   
   .nav-item:hover::before {
@@ -260,8 +293,9 @@
   }
   
   .nav-item.active {
-    background: var(--active-bg, rgba(78, 205, 196, 0.15));
+    background: var(--active-bg, rgba(78, 205, 196, 0.2));
     color: var(--tachi-cyan, #4ecdc4);
+    backdrop-filter: blur(6px);
   }
   
   .nav-item.active::before {
@@ -330,6 +364,10 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
+    position: relative;
+    z-index: 2;
+    background: rgba(13, 17, 23, 0.6);
+    backdrop-filter: blur(4px);
   }
   
   .collapse-btn {
