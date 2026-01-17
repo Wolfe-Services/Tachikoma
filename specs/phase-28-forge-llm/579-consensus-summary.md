@@ -20,14 +20,14 @@ After deliberation converges, generate a human-readable consensus summary. This 
 
 ## Acceptance Criteria
 
-- [ ] Create `crates/tachikoma-forge/src/output/summary.rs`
-- [ ] Define `ConsensusSummary` struct with: title, goal, decision, rationale, dissenting_views, next_steps
-- [ ] Implement `generate_summary(session: &ForgeSession) -> ConsensusSummary`
-- [ ] Add `to_markdown(&self) -> String` method that produces ~500 words max
-- [ ] Include participant attribution: "The Architect proposed...", "The Critic noted..."
-- [ ] Highlight any unresolved concerns in a "Dissent" section
-- [ ] Export from `output/mod.rs`
-- [ ] Verify `cargo check -p tachikoma-forge` passes
+- [x] Create `crates/tachikoma-forge/src/output/summary.rs`
+- [x] Define `ConsensusSummary` struct with: title, goal, decision, rationale, dissenting_views, next_steps
+- [x] Implement `generate_summary(session: &ForgeSession) -> ConsensusSummary`
+- [x] Add `to_markdown(&self) -> String` method that produces ~500 words max
+- [x] Include participant attribution: "The Architect proposed...", "The Critic noted..."
+- [x] Highlight any unresolved concerns in a "Dissent" section
+- [x] Export from `output/mod.rs`
+- [x] Verify `cargo check -p tachikoma-forge` passes
 
 ---
 

@@ -121,8 +121,8 @@
     right: 0;
     bottom: 0;
     background-image: url('/gints.jpeg');
-    background-size: 180% auto;
-    background-position: center center;
+    background-size: 150% auto;
+    background-position: center 65%;
     background-repeat: no-repeat;
     opacity: 0.12;
     pointer-events: none;
