@@ -7,6 +7,7 @@ Cargo.lock
 node_modules/
 .npm
 *.log
+**/.svelte-kit/
 
 # Electron
 dist/
@@ -32,6 +33,9 @@ Thumbs.db
 # Env
 .env
 .env.local
+.env.*
+!.env.example
+!.env.template
 *.pem
 
 # Tachikoma
