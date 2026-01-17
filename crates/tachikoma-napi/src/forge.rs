@@ -2,15 +2,11 @@ use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use tachikoma_forge::{
     ForgeSession, ForgeSessionConfig, ForgeTopic, ForgeSessionStatus,
-    ForgeOrchestrator, ForgeEvent, RoundType, Participant,
-    TokenUsage as ForgeTokenUsage,
+    ForgeEvent, TokenUsage as ForgeTokenUsage,
 };
-use tachikoma_common_core::ForgeSessionId;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use tokio::sync::broadcast;
-use uuid::Uuid;
-use chrono::{DateTime, Utc};
 
 // Global session storage
 type SessionStorage = Arc<Mutex<HashMap<String, ForgeSession>>>;
