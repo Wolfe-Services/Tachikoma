@@ -27,8 +27,8 @@ Implement a deliberation engine that encourages divergent opinions, tracks disag
 - [x] Implement refinement rounds where dissenters respond to synthesis
 - [x] Add convergence scoring: count agreements, weight by participant role
 - [x] Cap refinement at `max_rounds` to prevent infinite loops
-- [ ] Export from lib.rs
-- [ ] Verify `cargo check -p tachikoma-forge` passes
+- [x] Export from lib.rs
+- [x] Verify `cargo check -p tachikoma-forge` passes
 
 ---
 

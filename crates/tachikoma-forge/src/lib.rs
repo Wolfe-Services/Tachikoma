@@ -25,8 +25,8 @@ pub use quality::{QualityTracker, QualitySnapshot, QualityDimension, QualityTren
 pub use templates::{TemplateEngine, Template, TemplateContext, OutputType};
 pub use deliberation::{
     DeliberationEngine, DeliberationRound, Contribution, Opinion, Stance, Divergence, 
-    DivergentPosition, RoundStatus, DeliberationRoundType, DivergenceDetector, ConvergenceScore, calculate_convergence, 
-    calculate_convergence_weighted
+    DivergentPosition, RoundStatus, DeliberationRoundType, DivergenceDetector, ConvergenceScore, 
+    calculate_convergence, calculate_convergence_weighted
 };
 
 // Re-export from tachikoma-common-core
