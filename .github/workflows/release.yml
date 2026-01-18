@@ -178,7 +178,7 @@ jobs:
           find ./artifacts -name "*.rpm" -exec cp {} release-assets/ \; || true
 
       - name: Create release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: release-assets/*
           generate_release_notes: true
