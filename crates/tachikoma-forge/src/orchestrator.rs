@@ -1,7 +1,11 @@
-use crate::{ForgeSession, Participant};
+use crate::{
+    Critique, ForgeRound, ForgeSession, Participant, TokenUsage,
+    round::{CritiqueRound, DraftRound, SynthesisRound},
+};
 use crate::llm::{LlmProvider, LlmRequest, LlmMessage, MessageRole, LlmError, ProviderFactory};
 use tokio::sync::broadcast;
 use futures::StreamExt;
+use chrono::Utc;
 
 pub struct ForgeOrchestrator {
     pub session: ForgeSession,
@@ -78,15 +82,72 @@ impl ForgeOrchestrator {
     pub fn subscribe(&self) -> broadcast::Receiver<ForgeEvent> {
         self.event_tx.subscribe()
     }
+
+    fn render_transcript(&self, max_chars: usize) -> String {
+        let mut out = String::new();
+
+        for round in &self.session.rounds {
+            match round {
+                ForgeRound::Draft(d) => {
+                    out.push_str(&format!("## Draft — {}\n\n{}\n\n", d.drafter.name, d.content));
+                }
+                ForgeRound::Critique(c) => {
+                    for crit in &c.critiques {
+                        out.push_str(&format!(
+                            "## Critique — {}\n\n{}\n\n",
+                            crit.critic.name, crit.raw_content
+                        ));
+                    }
+                }
+                ForgeRound::Synthesis(s) => {
+                    out.push_str(&format!(
+                        "## Synthesis — {}\n\n{}\n\n",
+                        s.synthesizer.name, s.content
+                    ));
+                }
+                ForgeRound::Refinement(r) => {
+                    out.push_str(&format!(
+                        "## Refinement — {}\n\n{}\n\n",
+                        r.refiner.name, r.content
+                    ));
+                }
+                ForgeRound::Convergence(_) => {}
+            }
+
+            if out.len() >= max_chars {
+                break;
+            }
+        }
+
+        if out.len() > max_chars {
+            out.truncate(max_chars);
+            out.push_str("\n\n…(truncated)\n");
+        }
+
+        out.trim().to_string()
+    }
+
+    fn should_run_participant(round_type: RoundType, participant: &Participant, idx: usize) -> bool {
+        if participant.is_human {
+            return false;
+        }
+        match round_type {
+            // These rounds should be a single "driver" response, not N parallel syntheses/votes.
+            RoundType::Synthesis | RoundType::Convergence => idx == 0,
+            RoundType::Draft | RoundType::Critique => true,
+        }
+    }
     
     pub async fn run_round(&mut self, round_type: RoundType) -> Result<(), LlmError> {
         let round = self.session.rounds.len() as u32 + 1;
         
         let _ = self.event_tx.send(ForgeEvent::RoundStarted { round, round_type });
+
+        // Collect structured outputs for round aggregation (where applicable).
+        let mut critiques: Vec<Critique> = Vec::new();
         
-        for pwp in &self.participants {
-            if pwp.participant.is_human {
-                // Skip human participants for now
+        for (idx, pwp) in self.participants.iter().enumerate() {
+            if !Self::should_run_participant(round_type, &pwp.participant, idx) {
                 continue;
             }
             
@@ -97,6 +158,11 @@ impl ForgeOrchestrator {
                 participant_id: participant_id.to_string(),
                 participant_name: participant_name.clone(),
             });
+
+            // Build a live transcript so each subsequent participant can respond to prior outputs.
+            // This is the key change that makes "agents talk to each other" instead of
+            // emitting isolated answers.
+            let transcript = self.render_transcript(24_000);
             
             let prompt = crate::prompts::build_prompt(
                 round_type,
@@ -127,12 +193,36 @@ impl ForgeOrchestrator {
                 
                 let request = LlmRequest {
                     model: provider.model().to_string(),
-                    messages: vec![
-                        LlmMessage {
+                    messages: {
+                        let mut msgs: Vec<LlmMessage> = Vec::new();
+                        msgs.push(LlmMessage {
+                            role: MessageRole::User,
+                            content: format!(
+                                "Session: {}\n\nGoal:\n{}\n{}",
+                                self.session.topic.title,
+                                self.session.topic.description,
+                                if self.session.topic.constraints.is_empty() {
+                                    "".to_string()
+                                } else {
+                                    format!(
+                                        "\nConstraints:\n- {}",
+                                        self.session.topic.constraints.join("\n- ")
+                                    )
+                                }
+                            ),
+                        });
+                        if !transcript.is_empty() {
+                            msgs.push(LlmMessage {
+                                role: MessageRole::User,
+                                content: format!("Transcript so far:\n\n{}", transcript),
+                            });
+                        }
+                        msgs.push(LlmMessage {
                             role: MessageRole::User,
                             content: prompt.clone(),
-                        },
-                    ],
+                        });
+                        msgs
+                    },
                     temperature: Some(pwp.participant.model_config.temperature),
                     max_tokens: Some(pwp.participant.model_config.max_tokens),
                     system_prompt: if !pwp.participant.system_prompt.is_empty() {
@@ -171,9 +261,52 @@ impl ForgeOrchestrator {
                         if !stream_error {
                             let _ = self.event_tx.send(ForgeEvent::ParticipantComplete {
                                 participant_id: participant_id.to_string(),
-                                content: full_content,
+                                content: full_content.clone(),
                                 tokens: crate::session::TokenUsage::default(),
                             });
+
+                            // Persist the output into the session so subsequent participants
+                            // (and subsequent rounds) can build on it.
+                            match round_type {
+                                RoundType::Draft => {
+                                    self.session.add_round(ForgeRound::Draft(DraftRound {
+                                        drafter: pwp.participant.clone(),
+                                        content: full_content.clone(),
+                                        reasoning: String::new(),
+                                        tokens: TokenUsage::default(),
+                                        duration_ms: 0,
+                                        timestamp: Utc::now(),
+                                    }));
+                                }
+                                RoundType::Critique => {
+                                    critiques.push(Critique {
+                                        critic: pwp.participant.clone(),
+                                        score: 0,
+                                        strengths: Vec::new(),
+                                        weaknesses: Vec::new(),
+                                        suggestions: Vec::new(),
+                                        raw_content: full_content.clone(),
+                                        tokens: TokenUsage::default(),
+                                        duration_ms: 0,
+                                    });
+                                }
+                                RoundType::Synthesis => {
+                                    self.session.add_round(ForgeRound::Synthesis(SynthesisRound {
+                                        synthesizer: pwp.participant.clone(),
+                                        content: full_content.clone(),
+                                        reasoning: String::new(),
+                                        resolved_conflicts: Vec::new(),
+                                        changes: Vec::new(),
+                                        tokens: TokenUsage::default(),
+                                        duration_ms: 0,
+                                        timestamp: Utc::now(),
+                                    }));
+                                }
+                                RoundType::Convergence => {
+                                    // TODO: record votes into a ConvergenceRound
+                                }
+                            }
+
                             successful = true;
                             break;
                         }
@@ -191,6 +324,14 @@ impl ForgeOrchestrator {
                 });
                 return Err(LlmError::ParseError(error_msg));
             }
+        }
+
+        // Round-level aggregation
+        if round_type == RoundType::Critique {
+            self.session.add_round(ForgeRound::Critique(CritiqueRound {
+                critiques,
+                timestamp: Utc::now(),
+            }));
         }
         
         let _ = self.event_tx.send(ForgeEvent::RoundComplete { round });

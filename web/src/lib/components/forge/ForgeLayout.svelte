@@ -9,6 +9,7 @@
   import ForgeToolbar from './ForgeToolbar.svelte';
   import LogPanel from './LogPanel.svelte';
   import { forgeSessionStore } from '$lib/stores/forgeSession';
+  import { forgeService } from '$lib/services/forgeService';
   import { layoutPreferencesStore } from '$lib/stores/layoutPreferences';
   import type { ForgeLayoutConfig, PanelState } from '$lib/types/forge';
 
@@ -34,14 +35,18 @@
   let didAutoOpenRunPanels = false;
 
   const panelStates = derived(
-    [layoutConfig, forgeSessionStore],
-    ([$config, $session]) => ({
+    [layoutConfig, forgeSessionStore, forgeService.state],
+    ([$config, $session, $forge]) => {
+      const persistedPhase = $session?.activeSession?.phase ?? 'idle';
+      const livePhase = $forge.isDeliberating ? $forge.currentPhase : persistedPhase;
+      return ({
       hasActiveSession: !!$session?.activeSession,
       showParticipants: $config.leftSidebarVisible && !!$session?.activeSession,
       // Always allow the Results panel to render; it has a useful empty-state during runs.
       showResults: $config.rightPanelVisible && !!$session?.activeSession,
-      sessionPhase: $session?.activeSession?.phase ?? 'idle'
-    })
+      sessionPhase: livePhase
+    });
+    }
   );
 
   function handleResizeStart(panel: string) {

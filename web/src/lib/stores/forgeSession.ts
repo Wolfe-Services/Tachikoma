@@ -39,6 +39,37 @@ function createForgeSessionStore() {
     };
   }
 
+  function defaultAvatarForParticipant(p: { id: string; name: string; type: 'human' | 'ai' }): string | undefined {
+    const id = (p.id || '').toLowerCase();
+    const name = (p.name || '').toLowerCase();
+    const icon = (filename: string, emoji?: string) => `asset:/icons/${filename}${emoji ? `|${emoji}` : ''}`;
+
+    if (id.includes('fuchikoma-blue') || name.includes('fuchikoma blue')) return icon('Iconfactory-Ghost-In-The-Shell-Fuchikoma-Blue.32.png', '🕷️');
+    if (id.includes('fuchikoma-red') || name.includes('fuchikoma red')) return icon('Iconfactory-Ghost-In-The-Shell-Fuchikoma-Red.32.png', '🔴');
+    if (id.includes('fuchikoma-purple') || name.includes('fuchikoma purple')) return icon('Iconfactory-Ghost-In-The-Shell-Fuchikoma-Purple.32.png', '🟣');
+    if (id.includes('arakone') || name.includes('arakone')) return icon('Iconfactory-Ghost-In-The-Shell-Arakone-Unit.32.png', '🦂');
+    if (name.includes('laughing man')) return '🌀';
+    if (name.includes('puppet master')) return '🧬';
+
+    if (name.includes('kusanagi') || name.includes('motoko')) return icon('Iconfactory-Ghost-In-The-Shell-Motoko-Kusanagi.32.png', '🕶️');
+    if (name.includes('batou') || name.includes('bateau')) return icon('Iconfactory-Ghost-In-The-Shell-Bateau.32.png', '🦾');
+    if (name.includes('togusa')) return icon('Iconfactory-Ghost-In-The-Shell-Togusa.32.png', '🕵️');
+    if (name.includes('ishikawa')) return icon('Iconfactory-Ghost-In-The-Shell-Ishikawa.32.png', '📡');
+
+    if (p.type === 'ai') return icon('Iconfactory-Ghost-In-The-Shell-Fuchikoma-Gray.32.png', '🤖');
+    return undefined;
+  }
+
+  function normalizeSession(session: ForgeSession): ForgeSession {
+    return {
+      ...session,
+      participants: (session.participants || []).map(p => ({
+        ...p,
+        avatar: p.avatar || defaultAvatarForParticipant({ id: p.id, name: p.name, type: p.type }),
+      })),
+    };
+  }
+
   const store = createPersistedStore<ForgeSessionState>(initialState, {
     key: 'forgeSessionState',
     version: 1,
@@ -55,8 +86,8 @@ function createForgeSessionStore() {
     deserialize: (raw) => {
       const parsed = JSON.parse(raw) as StoredForgeSessionState;
       return {
-        activeSession: parsed.activeSession ? fromStoredSession(parsed.activeSession) : null,
-        sessions: Array.isArray(parsed.sessions) ? parsed.sessions.map(fromStoredSession) : [],
+        activeSession: parsed.activeSession ? normalizeSession(fromStoredSession(parsed.activeSession)) : null,
+        sessions: Array.isArray(parsed.sessions) ? parsed.sessions.map(fromStoredSession).map(normalizeSession) : [],
         loading: false,
         error: null
       };

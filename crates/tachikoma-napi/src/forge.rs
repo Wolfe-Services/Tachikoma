@@ -327,7 +327,7 @@ pub fn start_deliberation(session_id: String) -> Result<DeliberationStream> {
         }
     }
 
-    // Spawn orchestrator: initial implementation runs a single Draft round.
+    // Spawn orchestrator: run a simple multi-round pipeline so models can respond to each other.
     let sessions_for_task: SessionStorage = get_sessions().clone();
     let session_id_for_task = session_id.clone();
     let handle = tokio::spawn(async move {
@@ -341,9 +341,20 @@ pub fn start_deliberation(session_id: String) -> Result<DeliberationStream> {
             }
         }
 
-        match orchestrator.run_round(RoundType::Draft).await {
+        let result = async {
+            orchestrator.run_round(RoundType::Draft).await?;
+            orchestrator.run_round(RoundType::Critique).await?;
+            orchestrator.run_round(RoundType::Synthesis).await?;
+            Ok::<(), tachikoma_forge::llm::LlmError>(())
+        }
+        .await;
+
+        match result {
             Ok(_) => {
-                // Leave session "Active" for now; future work will progress through phases.
+                if let Some(s) = sessions_for_task.lock().unwrap().get_mut(&session_id_for_task) {
+                    *s = orchestrator.session.clone();
+                    s.set_status(ForgeSessionStatus::Converged);
+                }
             }
             Err(e) => {
                 let _ = event_tx.send(ForgeEvent::Error {
@@ -353,7 +364,7 @@ pub fn start_deliberation(session_id: String) -> Result<DeliberationStream> {
                     s.set_status(ForgeSessionStatus::Failed(e.to_string()));
                 }
             }
-        }
+        };
     });
 
     {
