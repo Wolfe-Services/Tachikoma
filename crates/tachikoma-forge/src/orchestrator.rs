@@ -15,7 +15,7 @@ struct ParticipantWithProvider {
     fallback_providers: Vec<Box<dyn LlmProvider>>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub enum ForgeEvent {
     RoundStarted { round: u32, round_type: RoundType },
     ParticipantThinking { participant_id: String, participant_name: String },
@@ -26,7 +26,7 @@ pub enum ForgeEvent {
     Error { message: String },
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize)]
 pub enum RoundType {
     Draft,
     Critique,

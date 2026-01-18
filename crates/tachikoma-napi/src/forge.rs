@@ -49,7 +49,7 @@ pub struct JsForgeOracle {
     pub id: String,
     pub name: String,
     pub model_id: String,
-    pub config: serde_json::Value,
+    pub config: String,  // JSON string instead of Value
 }
 
 #[napi(object)]
@@ -184,16 +184,17 @@ pub struct DeliberationStream {
 #[napi]
 impl DeliberationStream {
     #[napi]
-    pub async fn next(&mut self) -> Result<Option<String>> {
+    pub async unsafe fn next(&mut self) -> Result<Option<String>> {
         if let Some(ref mut receiver) = self.receiver {
             match receiver.recv().await {
                 Ok(event) => {
                     let event_json = serde_json::to_string(&serde_json::json!({
-                        "type": match event {
+                        "type": match &event {
                             ForgeEvent::RoundStarted { .. } => "round_started",
                             ForgeEvent::ParticipantThinking { .. } => "participant_thinking",
                             ForgeEvent::ContentDelta { .. } => "content_delta",
                             ForgeEvent::ParticipantComplete { .. } => "participant_complete",
+                            ForgeEvent::ParticipantError { .. } => "participant_error",
                             ForgeEvent::RoundComplete { .. } => "round_complete",
                             ForgeEvent::Error { .. } => "error",
                         },

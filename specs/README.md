@@ -775,3 +775,19 @@ Execute specs in numerical order. Each phase must complete before the next.
 | 584 | [Divergent Deliberation](phase-28-forge-llm/584-divergent-deliberation.md) | diverge, disagree, refine, converge |
 | 585 | [Multi-Provider Orchestrator](phase-28-forge-llm/585-multi-provider-orchestrator.md) | openai, ollama, multi, factory |
 | 586 | [Frontend-Backend Wire](phase-28-forge-llm/586-frontend-backend-wire.md) | frontend, ipc, stream, wire |
+## Phase 29: Forge UI Redesign (587-596)
+
+**PRIORITY: P0 - Fix clipped chat output and reimagine Think Tank UI**
+
+| Spec | File | Keywords |
+|------|------|----------|
+| 587 | [Chat-First Layout](phase-29-forge-ui/587-chat-first-layout.md) | layout, chat, hero, flex |
+| 588 | [Deliberation Flex Fix](phase-29-forge-ui/588-deliberation-flex-fix.md) | flex, height, scroll, clip |
+| 589 | [Session List Tooltips](phase-29-forge-ui/589-session-list-tooltips.md) | tooltip, truncate, hover |
+| 590 | [Compact Session Cards](phase-29-forge-ui/590-compact-session-cards.md) | card, compact, sidebar |
+| 591 | [Message Bubbles](phase-29-forge-ui/591-message-bubbles.md) | message, bubble, chat, color |
+| 592 | [Sticky Phase Header](phase-29-forge-ui/592-sticky-phase-header.md) | sticky, header, scroll, blur |
+| 593 | [Results Panel Content](phase-29-forge-ui/593-results-panel-content.md) | results, export, summary |
+| 594 | [Human Input Bar](phase-29-forge-ui/594-human-input-bar.md) | input, human, textarea, send |
+| 595 | [Dark Chat Background](phase-29-forge-ui/595-dark-chat-background.md) | dark, background, depth |
+| 596 | [Participant Avatars](phase-29-forge-ui/596-participant-avatars.md) | avatar, row, indicator |
