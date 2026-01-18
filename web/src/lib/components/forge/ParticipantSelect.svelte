@@ -31,6 +31,13 @@
   // Mock available participants - in real implementation would come from API
   // Theme: Ghost in the Shell / Public Security Section 9
   // Icons from web/static/icons/ (Iconfactory GitS set)
+  const modelOptions: Array<{ id: string; label: string }> = [
+    { id: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4' },
+    { id: 'claude-3-5-sonnet-20241022', label: 'Claude 3.5 Sonnet' },
+    { id: 'gpt-4-turbo', label: 'GPT-4 Turbo' },
+    { id: 'ollama/llama3:latest', label: 'Ollama Llama 3' },
+  ];
+
   const availableParticipants: Participant[] = [
     {
       id: 'human-kusanagi',
@@ -94,6 +101,7 @@
       type: 'ai',
       role: 'Implementation Agent',
       status: 'active',
+      modelId: 'claude-sonnet-4-20250514',
       avatar: 'asset:/icons/Iconfactory-Ghost-In-The-Shell-Fuchikoma-Blue.32.png|🕷️',
       estimatedCostPerRound: 0.03
     },
@@ -103,6 +111,7 @@
       type: 'ai',
       role: 'Testing & Validation Agent',
       status: 'active',
+      modelId: 'gpt-4-turbo',
       avatar: 'asset:/icons/Iconfactory-Ghost-In-The-Shell-Fuchikoma-Red.32.png|🔴',
       estimatedCostPerRound: 0.03
     },
@@ -112,6 +121,7 @@
       type: 'ai',
       role: 'Research & Analysis Agent',
       status: 'active',
+      modelId: 'ollama/llama3:latest',
       avatar: 'asset:/icons/Iconfactory-Ghost-In-The-Shell-Fuchikoma-Purple.32.png|🟣',
       estimatedCostPerRound: 0.03
     },
@@ -121,6 +131,7 @@
       type: 'ai',
       role: 'Heavy Processing / Synthesis',
       status: 'active',
+      modelId: 'claude-3-5-sonnet-20241022',
       avatar: 'asset:/icons/Iconfactory-Ghost-In-The-Shell-Arakone-Unit.32.png|🦂',
       estimatedCostPerRound: 0.06
     },
@@ -130,6 +141,7 @@
       type: 'ai',
       role: 'Adversarial Reviewer',
       status: 'active',
+      modelId: 'gpt-4-turbo',
       avatar: '🌀',
       estimatedCostPerRound: 0.06
     },
@@ -139,6 +151,7 @@
       type: 'ai',
       role: 'Orchestration & Arbitration',
       status: 'active',
+      modelId: 'claude-sonnet-4-20250514',
       avatar: '🧬',
       estimatedCostPerRound: 0.08
     }
@@ -170,6 +183,11 @@
 
   function removeParticipant(participantId: string) {
     const newSelected = selected.filter(p => p.id !== participantId);
+    dispatch('change', newSelected);
+  }
+
+  function setParticipantModel(participantId: string, modelId: string) {
+    const newSelected = selected.map(p => (p.id === participantId ? { ...p, modelId } : p));
     dispatch('change', newSelected);
   }
 
@@ -214,6 +232,18 @@
               <span class="participant-type" class:human={participant.type === 'human'} class:ai={participant.type === 'ai'}>
                 {participant.type.toUpperCase()}
               </span>
+              {#if participant.type === 'ai'}
+                <select
+                  class="model-select"
+                  value={participant.modelId || 'claude-sonnet-4-20250514'}
+                  on:change={(e) => setParticipantModel(participant.id, e.currentTarget.value)}
+                  aria-label="Model for {participant.name}"
+                >
+                  {#each modelOptions as opt}
+                    <option value={opt.id}>{opt.label}</option>
+                  {/each}
+                </select>
+              {/if}
               {#if participant.estimatedCostPerRound}
                 <span class="participant-cost">${participant.estimatedCostPerRound.toFixed(3)}/round</span>
               {/if}
@@ -467,6 +497,24 @@
     flex-direction: column;
     align-items: end;
     gap: 0.25rem;
+  }
+
+  .model-select {
+    width: 100%;
+    max-width: 200px;
+    padding: 0.35rem 0.5rem;
+    border-radius: 10px;
+    border: 1px solid rgba(78, 205, 196, 0.18);
+    background: rgba(13, 17, 23, 0.45);
+    color: rgba(230, 237, 243, 0.85);
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+
+  .model-select:focus {
+    outline: none;
+    border-color: rgba(78, 205, 196, 0.5);
+    box-shadow: 0 0 0 2px rgba(78, 205, 196, 0.1);
   }
 
   .participant-type {

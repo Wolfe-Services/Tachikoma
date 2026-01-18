@@ -2,6 +2,9 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { IPC_CHANNELS } from '../shared/ipc/channels';
 import type { ElectronAPI } from './types';
 
+// Tracks wrapper fns so legacy `tachikoma.off()` can correctly unregister listeners.
+const legacyListenerMap = new Map<string, Map<Function, Function>>();
+
 // Helper function to create event listeners with cleanup
 function createEventListener<T>(
   channel: string,
@@ -215,7 +218,17 @@ const electronAPI: ElectronAPI = {
         'spec:list',
         'spec:read',
         'config:get',
-        'config:set'
+        'config:set',
+
+        // Forge (Think Tank)
+        'forge:createSession',
+        'forge:getSession',
+        'forge:listSessions',
+        'forge:deleteSession',
+        'forge:startDeliberation',
+        'forge:stopDeliberation',
+        'forge:submitMessage',
+        'forge:generateOutput',
       ];
       if (validChannels.includes(channel)) {
         return safeInvoke(channel, ...args);
@@ -227,14 +240,33 @@ const electronAPI: ElectronAPI = {
         'mission:progress',
         'mission:log',
         'mission:complete',
-        'mission:error'
+        'mission:error',
+
+        // Forge (Think Tank) events (streaming deliberation)
+        'forge:message',
+        'forge:phaseChange',
+        'forge:roundComplete',
+        'forge:convergence',
+        'forge:error',
       ];
       if (validChannels.includes(channel)) {
-        ipcRenderer.on(channel, (_event, ...args) => callback(...args));
+        const handler = (_event: IpcRendererEvent, ...args: unknown[]) =>
+          callback(...args);
+
+        if (!legacyListenerMap.has(channel)) {
+          legacyListenerMap.set(channel, new Map());
+        }
+        legacyListenerMap.get(channel)!.set(callback, handler);
+        ipcRenderer.on(channel, handler);
       }
     },
     off: (channel: string, callback: (...args: unknown[]) => void) => {
-      ipcRenderer.removeListener(channel, callback);
+      const channelMap = legacyListenerMap.get(channel);
+      const handler = channelMap?.get(callback);
+      if (handler) {
+        ipcRenderer.removeListener(channel, handler as any);
+        channelMap?.delete(callback);
+      }
     }
   }
 };

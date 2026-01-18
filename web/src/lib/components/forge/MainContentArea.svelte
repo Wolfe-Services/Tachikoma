@@ -3,6 +3,7 @@
   import type { SessionPhase, ForgeSession } from '$lib/types/forge';
   import { marked } from 'marked';
   import { forgeSessionStore } from '$lib/stores/forgeSession';
+  import { deliberationStore } from '$lib/services/deliberation';
   import Icon from '$lib/components/common/Icon.svelte';
   import GlassPanel from '$lib/components/ui/GlassPanel.svelte';
   import DeliberationView from './DeliberationView.svelte';
@@ -41,8 +42,13 @@
 
   function handleStartDeliberation() {
     if (!sessionId) return;
-    // Update session phase to 'drafting' to begin the deliberation process
+    // Single-action flow: move to drafting AND immediately start the run.
     forgeSessionStore.updateSessionPhase(sessionId, 'drafting');
+    if (session) {
+      deliberationStore.clearMessages();
+      // Ensure the session object we pass reflects the new phase
+      deliberationStore.startDeliberation({ ...session, phase: 'drafting' });
+    }
   }
 
   function handleEditSession() {
@@ -101,12 +107,12 @@
             </button>
             <button type="button" class="btn btn-primary" on:click={handleStartDeliberation}>
               <Icon name="zap" size={16} />
-              Start Deliberation
+              Run Initial Drafts
             </button>
           {:else if phase === 'paused'}
             <button type="button" class="btn btn-primary" on:click={handleStartDeliberation}>
               <Icon name="play" size={16} />
-              Resume Session
+              Resume (Drafts)
             </button>
           {/if}
         </div>

@@ -40,10 +40,22 @@ function createDeliberationStore() {
   });
 
   const messages = writable<DeliberationMessage[]>([]);
+  // Used to safely cancel in-flight mock runs when the user hits Stop or starts a new run.
+  let runToken = 0;
 
   // Subscribe to forge service state to detect connection mode
   forgeService.state.subscribe(forgeState => {
-    state.update(s => ({ ...s, useMockMode: forgeState.useMockMode }));
+    state.update(s => ({
+      ...s,
+      useMockMode: forgeState.useMockMode,
+      // When connected to IPC, reflect backend state for a predictable UX
+      ...(forgeState.useMockMode
+        ? {}
+        : {
+            isRunning: forgeState.isDeliberating,
+            error: forgeState.error,
+          }),
+    }));
   });
 
   // Subscribe to forge service messages for real-time updates
@@ -63,6 +75,13 @@ function createDeliberationStore() {
     // Only update if we have real messages from IPC
     if (converted.length > 0 && !get(state).useMockMode) {
       messages.set(converted);
+
+      // Best-effort "who is active" indicator from streaming/pending messages
+      const active =
+        [...converted]
+          .reverse()
+          .find(m => m.status === 'streaming' || m.status === 'pending')?.participantId ?? null;
+      state.update(s => ({ ...s, activeParticipantId: active }));
     }
   });
 
@@ -87,8 +106,40 @@ function createDeliberationStore() {
     ]
   };
 
+  function isCancelled(token: number) {
+    return token !== runToken || !get(state).isRunning;
+  }
+
+  function planPhases(startPhase: string): Array<'drafting' | 'critiquing' | 'synthesis'> {
+    // Keep the UI simple: when you hit Start, models run through a coherent mini-pipeline.
+    // (Backend mode emits real rounds; mock mode mirrors the intent.)
+    if (startPhase === 'critiquing') return ['critiquing', 'synthesis'];
+    if (startPhase === 'converging') return ['synthesis'];
+    // default: drafting
+    return ['drafting', 'critiquing', 'synthesis'];
+  }
+
+  function messageTypeForPhase(phase: string): DeliberationMessage['type'] {
+    if (phase === 'critiquing') return 'critique';
+    if (phase === 'synthesis') return 'synthesis';
+    return 'proposal';
+  }
+
+  function latestCompleteOfType(type: DeliberationMessage['type']): DeliberationMessage | null {
+    const current = get(messages);
+    return (
+      [...current]
+        .reverse()
+        .find(m => m.status === 'complete' && m.type === type) ?? null
+    );
+  }
+
   async function startDeliberation(session: ForgeSession) {
-    state.update(s => ({ ...s, isRunning: true, error: null, currentRound: 1 }));
+    // Cancel any in-flight mock run, then start a fresh run.
+    runToken += 1;
+    const token = runToken;
+
+    state.update(s => ({ ...s, isRunning: true, error: null, currentRound: 1, activeParticipantId: null }));
     
     const currentState = get(state);
     
@@ -113,47 +164,80 @@ function createDeliberationStore() {
     messages.set([]);
     
     const aiParticipants = session.participants.filter(p => p.type === 'ai');
-    const phase = session.phase;
-    const phaseResponses = mockResponses[phase] || mockResponses['drafting'];
+    const startPhase = String(session.phase || 'drafting');
+    const phases = planPhases(startPhase);
 
-    // Simulate each AI participant contributing
-    for (let i = 0; i < aiParticipants.length; i++) {
-      const participant = aiParticipants[i];
-      
-      // Set active participant
-      state.update(s => ({ ...s, activeParticipantId: participant.id }));
+    // Simulate a structured multi-phase run so models "talk" without extra user clicks.
+    for (let phaseIdx = 0; phaseIdx < phases.length; phaseIdx++) {
+      const phase = phases[phaseIdx];
+      state.update(s => ({ ...s, currentRound: phaseIdx + 1 }));
 
-      // Add "thinking" message
-      const thinkingMsg: DeliberationMessage = {
-        id: `msg-${Date.now()}-${i}`,
-        participantId: participant.id,
-        participantName: participant.name,
-        participantType: participant.type,
-        content: '',
-        timestamp: new Date(),
-        type: 'thinking',
-        status: 'pending'
-      };
-      messages.update(msgs => [...msgs, thinkingMsg]);
+      const phaseResponses = mockResponses[phase] || mockResponses['drafting'];
 
-      // Simulate thinking delay
-      await delay(800 + Math.random() * 1200);
+      for (let i = 0; i < aiParticipants.length; i++) {
+        if (isCancelled(token)) return;
+        const participant = aiParticipants[i];
 
-      // Stream the response
-      const response = phaseResponses[i % phaseResponses.length];
-      await streamResponse(thinkingMsg.id, response, participant);
+        // Set active participant
+        state.update(s => ({ ...s, activeParticipantId: participant.id }));
+
+        // Add "thinking" message
+        const thinkingMsg: DeliberationMessage = {
+          id: `msg-${Date.now()}-${phaseIdx}-${i}`,
+          participantId: participant.id,
+          participantName: participant.name,
+          participantType: participant.type,
+          content: '',
+          timestamp: new Date(),
+          type: 'thinking',
+          status: 'pending'
+        };
+        messages.update(msgs => [...msgs, thinkingMsg]);
+
+        // Simulate thinking delay
+        await delay(650 + Math.random() * 900);
+        if (isCancelled(token)) return;
+
+        // Stream the response (best-effort: reference prior content to feel "interactive")
+        let response = phaseResponses[i % phaseResponses.length];
+        if (phase === 'critiquing') {
+          const lastProposal = latestCompleteOfType('proposal');
+          if (lastProposal?.content) {
+            response =
+              `**Critiquing (context: ${lastProposal.participantName})**\n\n` +
+              response +
+              `\n\n---\n\n**Snippet I’m responding to:**\n> ${lastProposal.content.slice(0, 220).replace(/\n/g, '\n> ')}`;
+          }
+        } else if (phase === 'synthesis') {
+          const lastCritique = latestCompleteOfType('critique');
+          if (lastCritique?.content) {
+            response =
+              response +
+              `\n\n---\n\n**Incorporating critique from ${lastCritique.participantName}:**\n> ${lastCritique.content.slice(0, 220).replace(/\n/g, '\n> ')}`;
+          }
+        }
+
+        await streamResponse(thinkingMsg.id, response, participant, messageTypeForPhase(phase));
+      }
     }
 
-    state.update(s => ({ ...s, isRunning: false, activeParticipantId: null }));
+    if (!isCancelled(token)) {
+      state.update(s => ({ ...s, isRunning: false, activeParticipantId: null }));
+    }
   }
 
-  async function streamResponse(messageId: string, fullResponse: string, _participant: Participant) {
+  async function streamResponse(
+    messageId: string,
+    fullResponse: string,
+    _participant: Participant,
+    finalType: DeliberationMessage['type']
+  ) {
     const words = fullResponse.split(' ');
     let current = '';
 
     messages.update(msgs => 
       msgs.map(m => m.id === messageId 
-        ? { ...m, type: 'proposal' as const, status: 'streaming' as const } 
+        ? { ...m, type: finalType, status: 'streaming' as const } 
         : m
       )
     );
@@ -186,6 +270,8 @@ function createDeliberationStore() {
       }
     }
     
+    // Cancel any in-flight mock work.
+    runToken += 1;
     state.update(s => ({ ...s, isRunning: false, activeParticipantId: null }));
   }
 

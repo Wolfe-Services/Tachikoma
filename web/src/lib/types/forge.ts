@@ -30,6 +30,7 @@ export interface Participant {
   name: string;
   type: 'human' | 'ai';
   role: string;
+  modelId?: string;
   status: 'active' | 'inactive' | 'thinking' | 'contributing';
   avatar?: string;
   estimatedCostPerRound?: number;

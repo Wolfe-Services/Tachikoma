@@ -7,6 +7,7 @@
   import MainContentArea from './MainContentArea.svelte';
   import ResultPanel from './ResultPanel.svelte';
   import ForgeToolbar from './ForgeToolbar.svelte';
+  import LogPanel from './LogPanel.svelte';
   import { forgeSessionStore } from '$lib/stores/forgeSession';
   import { layoutPreferencesStore } from '$lib/stores/layoutPreferences';
   import type { ForgeLayoutConfig, PanelState } from '$lib/types/forge';
@@ -30,13 +31,15 @@
   let layoutConfig = writable<ForgeLayoutConfig>(defaultConfig);
   let isResizing = writable<string | null>(null);
   let containerRef: HTMLElement;
+  let didAutoOpenRunPanels = false;
 
   const panelStates = derived(
     [layoutConfig, forgeSessionStore],
     ([$config, $session]) => ({
       hasActiveSession: !!$session?.activeSession,
       showParticipants: $config.leftSidebarVisible && !!$session?.activeSession,
-      showResults: $config.rightPanelVisible && !!$session?.activeSession?.hasResults,
+      // Always allow the Results panel to render; it has a useful empty-state during runs.
+      showResults: $config.rightPanelVisible && !!$session?.activeSession,
       sessionPhase: $session?.activeSession?.phase ?? 'idle'
     })
   );
@@ -126,6 +129,16 @@
   onDestroy(() => {
     window.removeEventListener('keydown', handleKeydown);
   });
+
+  // Auto-open Logs (and ensure Results is visible) on the first run so output is never "invisible".
+  $: if (!didAutoOpenRunPanels && $panelStates.sessionPhase === 'drafting') {
+    didAutoOpenRunPanels = true;
+    layoutConfig.update((c) => ({
+      ...c,
+      rightPanelVisible: true,
+      bottomPanelVisible: true,
+    }));
+  }
 </script>
 
 <div
@@ -187,7 +200,9 @@
           style="height: {$layoutConfig.bottomPanelHeight}px"
           aria-label="Session logs"
         >
-          <slot name="bottom-panel" />
+          <slot name="bottom-panel">
+            <LogPanel session={$forgeSessionStore.activeSession} />
+          </slot>
         </div>
       {/if}
     </main>
@@ -208,10 +223,7 @@
           tabindex="0"
         />
 
-        <ResultPanel
-          session={$forgeSessionStore.activeSession}
-          visible={$panelStates.showResults}
-        />
+        <ResultPanel session={$forgeSessionStore.activeSession} visible={$panelStates.showResults} />
       </aside>
     {/if}
   </div>

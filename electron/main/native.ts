@@ -2,7 +2,7 @@
 // Uses the compiled Rust module for forge operations
 
 import { randomUUID } from 'crypto';
-import path from 'path';
+import { BrowserWindow } from 'electron';
 import type { 
   MissionStatus, 
   SpecFile, 
@@ -12,7 +12,8 @@ import type {
   ForgeSessionResponse,
   ForgePhase,
   ForgeOutputRequest,
-  ForgeOutputResponse
+  ForgeOutputResponse,
+  ForgeMessageEvent
 } from '../shared/ipc';
 
 // Import types from NAPI bindings
@@ -26,6 +27,68 @@ import type {
 let napiModule: typeof import('./native-bindings/index') | null = null;
 let deliberationStreams: Map<string, DeliberationStream> = new Map();
 
+type ForgeStreamEnvelope = { type: string; data: any };
+type RoundType = 'Draft' | 'Critique' | 'Synthesis' | 'Convergence' | string;
+
+const activeMessageByParticipant: Map<string, string> = new Map();
+const contentByMessageId: Map<string, string> = new Map();
+const participantNameById: Map<string, string> = new Map();
+const roundTypeBySession: Map<string, RoundType> = new Map();
+const roundNumberBySession: Map<string, number> = new Map();
+
+function broadcast(channel: string, data: unknown) {
+  for (const win of BrowserWindow.getAllWindows()) {
+    if (!win.isDestroyed()) {
+      win.webContents.send(channel, data);
+    }
+  }
+}
+
+function extractVariantData(data: any): any {
+  // NAPI currently wraps `ForgeEvent` as a serde enum like { VariantName: { ...fields } }
+  if (!data || typeof data !== 'object') return data;
+  const keys = Object.keys(data);
+  if (keys.length === 1) return data[keys[0]];
+  return data;
+}
+
+function phaseFromRoundType(roundType: RoundType): ForgePhase {
+  switch (roundType) {
+    case 'Draft':
+      return 'drafting';
+    case 'Critique':
+      return 'critiquing';
+    case 'Synthesis':
+    case 'Convergence':
+      return 'converging';
+    default:
+      return 'deliberating';
+  }
+}
+
+function messageTypeFromRoundType(roundType: RoundType): ForgeMessageEvent['type'] {
+  switch (roundType) {
+    case 'Draft':
+      return 'proposal';
+    case 'Critique':
+      return 'critique';
+    case 'Synthesis':
+    case 'Convergence':
+      return 'synthesis';
+    default:
+      return 'proposal';
+  }
+}
+
+function nextMessageId(sessionId: string, participantId: string) {
+  const round = roundNumberBySession.get(sessionId) ?? 0;
+  return `${sessionId}:${participantId}:${round}:${Date.now()}`;
+}
+
+function upsertStreamMessage(evt: ForgeMessageEvent) {
+  broadcast('forge:message', evt);
+}
+
 try {
   // Dynamic import for native module
   napiModule = require('./native-bindings/index');
@@ -35,6 +98,26 @@ try {
 }
 
 // Convert between IPC types and NAPI types
+function normalizeParticipantType(value: unknown): 'human' | 'ai' {
+  return value === 'human' ? 'human' : 'ai';
+}
+
+function normalizeParticipantStatus(
+  value: unknown
+): 'active' | 'inactive' | 'thinking' | 'contributing' {
+  switch (value) {
+    case 'inactive':
+      return 'inactive';
+    case 'thinking':
+      return 'thinking';
+    case 'contributing':
+      return 'contributing';
+    case 'active':
+    default:
+      return 'active';
+  }
+}
+
 function toNapiRequest(request: ForgeSessionRequest): JsForgeSessionRequest {
   return {
     name: request.name,
@@ -71,10 +154,10 @@ function fromNapiResponse(response: JsForgeSessionResponse): ForgeSessionRespons
     participants: response.participants.map(p => ({
       id: p.id,
       name: p.name,
-      type: p.type,
+      type: normalizeParticipantType(p.type),
       role: p.role,
       modelId: p.modelId,
-      status: p.status
+      status: normalizeParticipantStatus(p.status)
     })),
     oracle: response.oracle ? {
       id: response.oracle.id,
@@ -269,20 +352,157 @@ export const native: NativeInterface = {
     if (napiModule) {
       try {
         console.log(`[NATIVE] Starting deliberation for session ${sessionId} in phase ${phase}`);
+
+        // If this session wasn't created via the backend (e.g. persisted/mock UI session),
+        // return false so the renderer can fall back to mock-mode deliberation.
+        try {
+          const existing = napiModule.getSession(sessionId);
+          if (!existing) {
+            console.warn('[NATIVE] startDeliberation: session not found in backend, falling back to mock', { sessionId });
+            return false;
+          }
+        } catch (e) {
+          console.warn('[NATIVE] startDeliberation: getSession check failed, falling back to mock', e);
+          return false;
+        }
+
         const stream = napiModule.startDeliberation(sessionId);
         deliberationStreams.set(sessionId, stream);
+
+        // Reset per-session ephemeral state
+        activeMessageByParticipant.clear();
+        contentByMessageId.clear();
+        participantNameById.clear();
+        roundTypeBySession.set(sessionId, phase === 'critiquing' ? 'Critique' : phase === 'converging' ? 'Synthesis' : 'Draft');
+        roundNumberBySession.set(sessionId, 0);
         
         // Start streaming events (async)
         (async () => {
           try {
             let event = await stream.next();
             while (event !== null) {
-              console.log('[NATIVE] Deliberation event:', event);
-              // TODO: Emit event to renderer via IPC
+              try {
+                const parsed = JSON.parse(event) as ForgeStreamEnvelope;
+                const kind = parsed.type;
+                const data = extractVariantData(parsed.data);
+
+                if (kind === 'round_started') {
+                  const round = data.round ?? 0;
+                  const roundType = (data.round_type ?? data.roundType) as RoundType;
+                  roundNumberBySession.set(sessionId, round);
+                  roundTypeBySession.set(sessionId, roundType);
+
+                  const nextPhase = phaseFromRoundType(roundType);
+                  broadcast('forge:phaseChange', {
+                    sessionId,
+                    phase: nextPhase,
+                    previousPhase: phase,
+                  });
+                }
+
+                if (kind === 'participant_thinking') {
+                  const participantId = String(data.participant_id ?? data.participantId ?? 'unknown');
+                  const participantName = String(data.participant_name ?? data.participantName ?? participantId);
+                  participantNameById.set(participantId, participantName);
+
+                  const messageId = nextMessageId(sessionId, participantId);
+                  activeMessageByParticipant.set(participantId, messageId);
+                  contentByMessageId.set(messageId, '');
+
+                  upsertStreamMessage({
+                    sessionId,
+                    messageId,
+                    participantId,
+                    participantName,
+                    participantType: 'ai',
+                    content: '',
+                    timestamp: new Date().toISOString(),
+                    type: 'thinking',
+                    status: 'pending',
+                  });
+                }
+
+                if (kind === 'content_delta') {
+                  const participantId = String(data.participant_id ?? data.participantId ?? 'unknown');
+                  const delta = String(data.delta ?? '');
+                  const messageId =
+                    activeMessageByParticipant.get(participantId) ??
+                    (() => {
+                      const id = nextMessageId(sessionId, participantId);
+                      activeMessageByParticipant.set(participantId, id);
+                      contentByMessageId.set(id, '');
+                      return id;
+                    })();
+
+                  const prev = contentByMessageId.get(messageId) ?? '';
+                  const next = prev + delta;
+                  contentByMessageId.set(messageId, next);
+
+                  upsertStreamMessage({
+                    sessionId,
+                    messageId,
+                    participantId,
+                    participantName: participantNameById.get(participantId) ?? participantId,
+                    participantType: 'ai',
+                    content: next,
+                    contentDelta: delta,
+                    timestamp: new Date().toISOString(),
+                    type: messageTypeFromRoundType(roundTypeBySession.get(sessionId) ?? 'Draft'),
+                    status: 'streaming',
+                  });
+                }
+
+                if (kind === 'participant_complete') {
+                  const participantId = String(data.participant_id ?? data.participantId ?? 'unknown');
+                  const content = String(data.content ?? '');
+                  const messageId =
+                    activeMessageByParticipant.get(participantId) ?? nextMessageId(sessionId, participantId);
+
+                  contentByMessageId.set(messageId, content);
+
+                  upsertStreamMessage({
+                    sessionId,
+                    messageId,
+                    participantId,
+                    participantName: participantNameById.get(participantId) ?? participantId,
+                    participantType: 'ai',
+                    content,
+                    timestamp: new Date().toISOString(),
+                    type: messageTypeFromRoundType(roundTypeBySession.get(sessionId) ?? 'Draft'),
+                    status: 'complete',
+                  });
+                }
+
+                if (kind === 'round_complete') {
+                  const roundNumber = Number(data.round ?? roundNumberBySession.get(sessionId) ?? 0);
+                  broadcast('forge:roundComplete', {
+                    sessionId,
+                    roundNumber,
+                    summary: '',
+                  });
+                }
+
+                if (kind === 'participant_error') {
+                  const error = String(data.error ?? 'Participant error');
+                  broadcast('forge:error', { sessionId, error });
+                }
+
+                if (kind === 'error') {
+                  const error = String(data.message ?? data.error ?? 'Deliberation error');
+                  broadcast('forge:error', { sessionId, error });
+                }
+              } catch (e) {
+                console.warn('[NATIVE] Failed to parse deliberation event:', e);
+              }
+
               event = await stream.next();
             }
           } catch (error) {
             console.error('[NATIVE] Deliberation stream error:', error);
+            broadcast('forge:error', {
+              sessionId,
+              error: error instanceof Error ? error.message : String(error),
+            });
           } finally {
             deliberationStreams.delete(sessionId);
           }

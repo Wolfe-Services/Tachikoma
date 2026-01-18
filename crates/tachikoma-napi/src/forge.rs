@@ -2,19 +2,39 @@ use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use tachikoma_forge::{
     ForgeSession, ForgeSessionConfig, ForgeTopic, ForgeSessionStatus,
-    ForgeEvent, TokenUsage as ForgeTokenUsage,
+    ForgeEvent, TokenUsage as ForgeTokenUsage, ForgeOrchestrator, RoundType,
+    Participant, ParticipantRole,
 };
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use tokio::sync::broadcast;
+use tokio::task::JoinHandle;
 
 // Global session storage
 type SessionStorage = Arc<Mutex<HashMap<String, ForgeSession>>>;
 static mut SESSIONS: Option<SessionStorage> = None;
 
+type ParticipantStorage = Arc<Mutex<HashMap<String, Vec<Participant>>>>;
+static mut SESSION_PARTICIPANTS: Option<ParticipantStorage> = None;
+
+type ActiveDeliberationStorage = Arc<Mutex<HashMap<String, JoinHandle<()>>>>;
+static mut ACTIVE_DELIBERATIONS: Option<ActiveDeliberationStorage> = None;
+
 fn get_sessions() -> &'static SessionStorage {
     unsafe {
         SESSIONS.get_or_insert_with(|| Arc::new(Mutex::new(HashMap::new())))
+    }
+}
+
+fn get_participants() -> &'static ParticipantStorage {
+    unsafe {
+        SESSION_PARTICIPANTS.get_or_insert_with(|| Arc::new(Mutex::new(HashMap::new())))
+    }
+}
+
+fn get_active_deliberations() -> &'static ActiveDeliberationStorage {
+    unsafe {
+        ACTIVE_DELIBERATIONS.get_or_insert_with(|| Arc::new(Mutex::new(HashMap::new())))
     }
 }
 
@@ -35,6 +55,7 @@ impl From<ForgeTokenUsage> for JsTokenUsage {
 }
 
 #[napi(object)]
+#[derive(Clone)]
 pub struct JsForgeParticipant {
     pub id: String,
     pub name: String,
@@ -45,6 +66,7 @@ pub struct JsForgeParticipant {
 }
 
 #[napi(object)]
+#[derive(Clone)]
 pub struct JsForgeOracle {
     pub id: String,
     pub name: String,
@@ -98,10 +120,47 @@ pub struct JsForgeSessionResponse {
 fn forge_session_status_to_phase(status: &ForgeSessionStatus) -> String {
     match status {
         ForgeSessionStatus::Creating => "configuring".to_string(),
-        ForgeSessionStatus::Active => "deliberating".to_string(),
+        // Initial integration runs a Draft round first; treat "active" as "drafting" for UI.
+        ForgeSessionStatus::Active => "drafting".to_string(),
         ForgeSessionStatus::Converged => "completed".to_string(),
         ForgeSessionStatus::Stopped => "paused".to_string(),
         ForgeSessionStatus::Failed(_) => "error".to_string(),
+    }
+}
+
+fn parse_role(role: &str) -> ParticipantRole {
+    match role.to_ascii_lowercase().as_str() {
+        "architect" => ParticipantRole::Architect,
+        "critic" => ParticipantRole::Critic,
+        "advocate" => ParticipantRole::Advocate,
+        "synthesizer" => ParticipantRole::Synthesizer,
+        "specialist" => ParticipantRole::Specialist,
+        other => ParticipantRole::Custom(other.to_string()),
+    }
+}
+
+fn to_participant(p: &JsForgeParticipant) -> Participant {
+    let role = parse_role(&p.role);
+    if p.r#type.to_ascii_lowercase() == "human" {
+        Participant::human(p.name.clone(), role)
+    } else {
+        let model_id = p
+            .model_id
+            .clone()
+            .unwrap_or_else(|| "claude-sonnet-4-20250514".to_string());
+
+        let mut builder = Participant::builder(p.name.clone()).role(role);
+        let model_id_lc = model_id.to_ascii_lowercase();
+
+        if model_id_lc.starts_with("ollama/") || model_id_lc.contains("ollama") {
+            builder = builder.ollama(&model_id);
+        } else if model_id_lc.contains("gpt") || model_id_lc.contains("openai") {
+            builder = builder.openai(&model_id);
+        } else {
+            builder = builder.anthropic(&model_id);
+        }
+
+        builder.build()
     }
 }
 
@@ -112,8 +171,8 @@ impl From<ForgeSession> for JsForgeSessionResponse {
             name: session.topic.title.clone(),
             goal: session.topic.description.clone(),
             phase: forge_session_status_to_phase(&session.status),
-            participants: vec![], // TODO: Implement participant conversion
-            oracle: None, // TODO: Implement oracle conversion
+            participants: vec![], // Filled during create_forge_session for now
+            oracle: None, // Filled during create_forge_session for now
             config: JsForgeSessionConfig {
                 max_rounds: session.config.max_rounds as u32,
                 convergence_threshold: session.config.convergence_threshold,
@@ -140,11 +199,21 @@ pub fn create_forge_session(request: JsForgeSessionRequest) -> Result<JsForgeSes
     let config = request.config.into();
     let session = ForgeSession::new(config, topic);
     let session_id = session.id.to_string();
-    let response = JsForgeSessionResponse::from(session.clone());
+    let mut response = JsForgeSessionResponse::from(session.clone());
+    response.participants = request.participants.clone();
+    response.oracle = request.oracle.clone();
     
     // Store session
     let sessions = get_sessions();
     sessions.lock().unwrap().insert(session_id, session);
+
+    // Store participants for deliberation
+    let participants = response.participants.iter().map(to_participant).collect::<Vec<_>>();
+    let participant_store = get_participants();
+    participant_store
+        .lock()
+        .unwrap()
+        .insert(response.id.clone(), participants);
     
     Ok(response)
 }
@@ -218,9 +287,79 @@ impl DeliberationStream {
 
 #[napi]
 pub fn start_deliberation(session_id: String) -> Result<DeliberationStream> {
-    // For now, return a mock stream
-    // TODO: Implement actual orchestrator integration
-    let (tx, rx) = broadcast::channel(100);
+    // Stop any prior deliberation for this session (best-effort)
+    {
+        let active = get_active_deliberations();
+        if let Some(handle) = active.lock().unwrap().remove(&session_id) {
+            handle.abort();
+        }
+    }
+
+    let (event_tx, rx) = broadcast::channel(256);
+
+    // Fetch session + participants snapshot
+    let session_opt = {
+        let sessions = get_sessions();
+        sessions.lock().unwrap().get(&session_id).cloned()
+    };
+    let Some(session) = session_opt else {
+        return Ok(DeliberationStream {
+            session_id,
+            receiver: Some(rx),
+        });
+    };
+
+    let participants = {
+        let store = get_participants();
+        store
+            .lock()
+            .unwrap()
+            .get(&session_id)
+            .cloned()
+            .unwrap_or_default()
+    };
+
+    // Mark session active
+    {
+        let sessions = get_sessions();
+        if let Some(s) = sessions.lock().unwrap().get_mut(&session_id) {
+            s.set_status(ForgeSessionStatus::Active);
+        }
+    }
+
+    // Spawn orchestrator: initial implementation runs a single Draft round.
+    let sessions_for_task: SessionStorage = get_sessions().clone();
+    let session_id_for_task = session_id.clone();
+    let handle = tokio::spawn(async move {
+        let mut orchestrator = ForgeOrchestrator::new(session, event_tx.clone());
+
+        for p in participants {
+            if let Err(e) = orchestrator.add_participant(p) {
+                let _ = event_tx.send(ForgeEvent::Error {
+                    message: format!("Failed to add participant: {}", e),
+                });
+            }
+        }
+
+        match orchestrator.run_round(RoundType::Draft).await {
+            Ok(_) => {
+                // Leave session "Active" for now; future work will progress through phases.
+            }
+            Err(e) => {
+                let _ = event_tx.send(ForgeEvent::Error {
+                    message: format!("Deliberation failed: {}", e),
+                });
+                if let Some(s) = sessions_for_task.lock().unwrap().get_mut(&session_id_for_task) {
+                    s.set_status(ForgeSessionStatus::Failed(e.to_string()));
+                }
+            }
+        }
+    });
+
+    {
+        let active = get_active_deliberations();
+        active.lock().unwrap().insert(session_id.clone(), handle);
+    }
     
     Ok(DeliberationStream {
         session_id,
@@ -230,6 +369,14 @@ pub fn start_deliberation(session_id: String) -> Result<DeliberationStream> {
 
 #[napi]
 pub fn stop_deliberation(session_id: String) -> Result<bool> {
+    // Abort running task (if any)
+    {
+        let active = get_active_deliberations();
+        if let Some(handle) = active.lock().unwrap().remove(&session_id) {
+            handle.abort();
+        }
+    }
+
     // Update session status to stopped
     let sessions = get_sessions();
     let mut session_map = sessions.lock().unwrap();

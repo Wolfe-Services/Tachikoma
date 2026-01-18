@@ -74,6 +74,16 @@ function createForgeService() {
       state.update(s => ({ ...s, currentPhase: event.phase }));
     });
 
+    ipc.on('forge:roundComplete', (_event) => {
+      // For now, a round completion means the active stream has finished.
+      // (When we support multi-round runs, we can keep isDeliberating true.)
+      state.update(s => ({ ...s, isDeliberating: false }));
+    });
+
+    ipc.on('forge:convergence', (_event) => {
+      state.update(s => ({ ...s, isDeliberating: false }));
+    });
+
     ipc.on('forge:error', (event) => {
       state.update(s => ({ ...s, error: event.error, isDeliberating: false }));
     });
@@ -89,7 +99,7 @@ function createForgeService() {
         name: p.name,
         type: p.type,
         role: p.role,
-        modelId: p.type === 'ai' ? getModelId(p) : undefined,
+        modelId: p.type === 'ai' ? (p.modelId || getModelId(p)) : undefined,
         status: p.status
       })),
       oracle: session.oracle ? {
@@ -107,17 +117,66 @@ function createForgeService() {
     };
   }
 
+  function defaultAvatarForParticipant(p: {
+    id: string;
+    name: string;
+    type: 'human' | 'ai';
+  }): string | undefined {
+    const id = (p.id || '').toLowerCase();
+    const name = (p.name || '').toLowerCase();
+
+    const icon = (filename: string, emoji?: string) =>
+      `asset:/icons/${filename}${emoji ? `|${emoji}` : ''}`;
+
+    // Prefer explicit ids/names when available (mock + UI sessions)
+    if (id.includes('fuchikoma-blue') || name.includes('fuchikoma blue')) {
+      return icon('Iconfactory-Ghost-In-The-Shell-Fuchikoma-Blue.32.png', '🕷️');
+    }
+    if (id.includes('fuchikoma-red') || name.includes('fuchikoma red')) {
+      return icon('Iconfactory-Ghost-In-The-Shell-Fuchikoma-Red.32.png', '🔴');
+    }
+    if (id.includes('fuchikoma-purple') || name.includes('fuchikoma purple')) {
+      return icon('Iconfactory-Ghost-In-The-Shell-Fuchikoma-Purple.32.png', '🟣');
+    }
+    if (id.includes('arakone') || name.includes('arakone')) {
+      return icon('Iconfactory-Ghost-In-The-Shell-Arakone-Unit.32.png', '🦂');
+    }
+    if (name.includes('laughing man')) return '🌀';
+    if (name.includes('puppet master')) return '🧬';
+
+    // Humans (best-effort for the built-in Ghost in the Shell set)
+    if (name.includes('kusanagi') || name.includes('motoko')) {
+      return icon('Iconfactory-Ghost-In-The-Shell-Motoko-Kusanagi.32.png', '🕶️');
+    }
+    if (name.includes('batou') || name.includes('bateau')) {
+      return icon('Iconfactory-Ghost-In-The-Shell-Bateau.32.png', '🦾');
+    }
+    if (name.includes('togusa')) {
+      return icon('Iconfactory-Ghost-In-The-Shell-Togusa.32.png', '🕵️');
+    }
+    if (name.includes('ishikawa')) {
+      return icon('Iconfactory-Ghost-In-The-Shell-Ishikawa.32.png', '📡');
+    }
+
+    // Default AI fallback icon
+    if (p.type === 'ai') {
+      return icon('Iconfactory-Ghost-In-The-Shell-Fuchikoma-Gray.32.png', '🤖');
+    }
+
+    return undefined;
+  }
+
   function getModelId(participant: Participant): string {
     // Map participant names/types to model IDs
     const modelMap: Record<string, string> = {
       'claude': 'claude-3-5-sonnet-20241022',
       'gpt4': 'gpt-4-turbo',
       'gpt-4': 'gpt-4-turbo',
-      'gemini': 'gemini-pro',
-      'ollama': 'ollama/llama2'
+      'ollama': 'ollama/llama3:latest'
     };
     const key = participant.name.toLowerCase();
-    return modelMap[key] || 'claude-3-5-sonnet-20241022';
+    // Prefer the backend default used when model_id is omitted.
+    return modelMap[key] || 'claude-sonnet-4-20250514';
   }
 
   // Convert IPC response to frontend session format
@@ -132,6 +191,8 @@ function createForgeService() {
         name: p.name,
         type: p.type,
         role: p.role,
+        modelId: p.modelId,
+        avatar: defaultAvatarForParticipant({ id: p.id, name: p.name, type: p.type }),
         status: p.status
       })),
       oracle: response.oracle ? {
@@ -264,6 +325,23 @@ function createForgeService() {
             content, 
             participantId 
           });
+
+          // Optimistically add the message to the local stream so the UI can render Q&A.
+          // (Backend echo is not guaranteed yet.)
+          const messageId = result.messageId;
+          const humanMessage: ForgeMessageEvent = {
+            sessionId,
+            messageId,
+            participantId,
+            participantName: 'You',
+            participantType: 'human',
+            content,
+            timestamp: new Date().toISOString(),
+            type: 'proposal',
+            status: 'complete',
+          };
+          messages.update(msgs => [...msgs, humanMessage]);
+
           return result.messageId;
         } catch (error) {
           console.warn('IPC submitMessage failed:', error);

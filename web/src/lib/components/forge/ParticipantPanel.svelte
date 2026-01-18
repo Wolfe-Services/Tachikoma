@@ -1,9 +1,18 @@
 <script lang="ts">
   import type { ForgeSession, Participant } from '$lib/types/forge';
+  import { forgeSessionStore } from '$lib/stores/forgeSession';
 
   export let session: ForgeSession | null = null;
 
   $: participants = session?.participants || [];
+  $: canEditModels = session?.phase === 'configuring' || session?.phase === 'paused';
+
+  const modelOptions: Array<{ id: string; label: string }> = [
+    { id: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4 (Anthropic)' },
+    { id: 'claude-3-5-sonnet-20241022', label: 'Claude 3.5 Sonnet (Anthropic)' },
+    { id: 'gpt-4-turbo', label: 'GPT-4 Turbo (OpenAI)' },
+    { id: 'ollama/llama3:latest', label: 'Llama 3 (Ollama)' },
+  ];
 
   const brokenAvatarIds = new Set<string>();
 
@@ -22,6 +31,11 @@
 
   function markAvatarBroken(id: string) {
     brokenAvatarIds.add(id);
+  }
+
+  function setParticipantModel(participant: Participant, modelId: string) {
+    if (!session) return;
+    forgeSessionStore.updateParticipantModel(session.id, participant.id, modelId || undefined);
   }
 </script>
 
@@ -60,6 +74,23 @@
             <div class="participant-name">{participant.name}</div>
             <div class="participant-role">{participant.role}</div>
             <div class="participant-status">{participant.status}</div>
+            {#if participant.type === 'ai'}
+              <div class="participant-model">
+                <label class="model-label" for={"model-" + participant.id}>Model</label>
+                <select
+                  id={"model-" + participant.id}
+                  class="model-select"
+                  value={participant.modelId || 'claude-sonnet-4-20250514'}
+                  disabled={!canEditModels}
+                  title={!canEditModels ? 'Models can be edited before starting (Configuring) or when paused.' : ''}
+                  on:change={(e) => setParticipantModel(participant, e.currentTarget.value)}
+                >
+                  {#each modelOptions as opt}
+                    <option value={opt.id}>{opt.label}</option>
+                  {/each}
+                </select>
+              </div>
+            {/if}
           </div>
         </div>
       {/each}
@@ -200,6 +231,38 @@
     font-size: 0.75rem;
     text-transform: capitalize;
     opacity: 0.7;
+  }
+
+  .participant-model {
+    margin-top: 0.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .model-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+
+  .model-select {
+    width: 100%;
+    max-width: 260px;
+    padding: 0.35rem 0.5rem;
+    border-radius: 8px;
+    background: rgba(13, 17, 23, 0.45);
+    border: 1px solid rgba(78, 205, 196, 0.18);
+    color: rgba(230, 237, 243, 0.9);
+    font-size: 0.8rem;
+  }
+
+  .model-select:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
   }
 
   .oracle-section {

@@ -104,21 +104,25 @@ function createForgeSessionStore() {
                 name: 'Alice Product',
                 type: 'human',
                 role: 'Product Manager',
-                status: 'active'
+                status: 'active',
+                avatar: 'asset:/icons/Iconfactory-Ghost-In-The-Shell-Motoko-Kusanagi.32.png|🕶️',
               },
               {
                 id: 'p2',
                 name: 'Bob Engineer',
                 type: 'human',
                 role: 'Tech Lead',
-                status: 'active'
+                status: 'active',
+                avatar: 'asset:/icons/Iconfactory-Ghost-In-The-Shell-Bateau.32.png|🦾',
               },
               {
                 id: 'p3',
                 name: 'Claude Analyst',
                 type: 'ai',
                 role: 'Business Analyst',
-                status: 'active'
+                status: 'active',
+                modelId: 'claude-sonnet-4-20250514',
+                avatar: 'asset:/icons/Iconfactory-Ghost-In-The-Shell-Fuchikoma-Blue.32.png|🕷️',
               }
             ],
             oracle: {
@@ -178,6 +182,30 @@ function createForgeSessionStore() {
           ...state,
           sessions,
           activeSession
+        };
+      });
+    },
+
+    updateParticipantModel(sessionId: string, participantId: string, modelId: string | undefined): void {
+      update(state => {
+        const patchSession = (session: ForgeSession): ForgeSession => {
+          if (session.id !== sessionId) return session;
+          return {
+            ...session,
+            participants: session.participants.map(p =>
+              p.id === participantId ? { ...p, modelId } : p
+            ),
+            updatedAt: new Date(),
+          };
+        };
+
+        const sessions = state.sessions.map(patchSession);
+        const activeSession = state.activeSession ? patchSession(state.activeSession) : null;
+
+        return {
+          ...state,
+          sessions,
+          activeSession,
         };
       });
     },
