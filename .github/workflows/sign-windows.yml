@@ -103,7 +103,7 @@ jobs:
           }
 
       - name: Upload signed artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ inputs.artifact-name }}-signed
           path: ./unsigned
@@ -141,7 +141,7 @@ jobs:
           Write-Host "Signing report saved to: $ReportPath"
 
       - name: Upload signing report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: windows-signing-report
           path: signing-report.txt
