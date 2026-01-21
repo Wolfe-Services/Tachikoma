@@ -347,6 +347,28 @@ async fn run_single(
     // Determine task result based on stop reason
     let task_result = match result.stop_reason {
         StopReason::Completed => {
+            // Record progress for future iterations
+            let modified_files = progress::extract_modified_files(&result.tool_outputs);
+            if !modified_files.is_empty() {
+                let summary = format!(
+                    "Completed task: {}\n\nCriteria: {}",
+                    parsed.task.title,
+                    parsed.acceptance_criteria
+                        .iter()
+                        .map(|ac| format!("- {}", ac.text))
+                        .collect::<Vec<_>>()
+                        .join("\n")
+                );
+                if let Err(e) = progress::append_progress(
+                    project_root,
+                    &parsed.task.id,
+                    &summary,
+                    &modified_files,
+                ) {
+                    tracing::warn!("Failed to record progress: {}", e);
+                }
+            }
+            
             // Auto-sync if enabled
             if auto_sync {
                 task_parser::sync_beads(project_root)?;
@@ -358,6 +380,23 @@ async fn run_single(
         }
         StopReason::Redline => {
             println!("⚠️  REDLINE: Token limit exceeded. Will retry with fresh context.");
+            
+            // Record partial progress for next iteration
+            let modified_files = progress::extract_modified_files(&result.tool_outputs);
+            if !modified_files.is_empty() {
+                let summary = format!(
+                    "Partial progress on: {} (hit redline, will continue)\n\nModified {} file(s)",
+                    parsed.task.title,
+                    modified_files.len()
+                );
+                let _ = progress::append_progress(
+                    project_root,
+                    &parsed.task.id,
+                    &summary,
+                    &modified_files,
+                );
+            }
+            
             // Still sync any progress made
             let had_changes = if auto_sync {
                 task_parser::sync_beads(project_root)?;
@@ -369,12 +408,29 @@ async fn run_single(
                     false
                 }
             } else {
-                false
+                !modified_files.is_empty()
             };
             TaskResult::NeedsReboot { had_changes }
         }
         StopReason::MaxIterations => {
             println!("⚠️  Max iterations reached without completing.");
+            
+            // Record partial progress
+            let modified_files = progress::extract_modified_files(&result.tool_outputs);
+            if !modified_files.is_empty() {
+                let summary = format!(
+                    "Partial progress on: {} (max iterations, needs review)\n\nModified {} file(s)",
+                    parsed.task.title,
+                    modified_files.len()
+                );
+                let _ = progress::append_progress(
+                    project_root,
+                    &parsed.task.id,
+                    &summary,
+                    &modified_files,
+                );
+            }
+            
             if auto_sync {
                 task_parser::sync_beads(project_root)?;
                 if let Some(hash) = git::auto_commit_task(project_root, &parsed.task.id, &parsed.task.title)? {
@@ -1215,8 +1271,30 @@ async fn run_single_internal(
         .run_agentic_loop(&system_prompt, &task_prompt, max_iterations, redline_threshold, Some(output_tx.clone()))
         .await?;
 
+    // Track modified files for progress recording
+    let modified_files = progress::extract_modified_files(&result.tool_outputs);
+    
     let task_result = match result.stop_reason {
         StopReason::Completed => {
+            // Record progress
+            if !modified_files.is_empty() {
+                let summary = format!(
+                    "Completed task: {}\n\nCriteria: {}",
+                    parsed.task.title,
+                    parsed.acceptance_criteria
+                        .iter()
+                        .map(|ac| format!("- {}", ac.text))
+                        .collect::<Vec<_>>()
+                        .join("\n")
+                );
+                let _ = progress::append_progress(
+                    project_root,
+                    &parsed.task.id,
+                    &summary,
+                    &modified_files,
+                );
+            }
+            
             if auto_sync {
                 task_parser::sync_beads(project_root)?;
                 if let Some(hash) = git::auto_commit_task(project_root, &parsed.task.id, &parsed.task.title)? {
@@ -1226,6 +1304,21 @@ async fn run_single_internal(
             TaskResult::Completed
         }
         StopReason::Redline => {
+            // Record partial progress
+            if !modified_files.is_empty() {
+                let summary = format!(
+                    "Partial progress on: {} (hit redline)\n\nModified {} file(s)",
+                    parsed.task.title,
+                    modified_files.len()
+                );
+                let _ = progress::append_progress(
+                    project_root,
+                    &parsed.task.id,
+                    &summary,
+                    &modified_files,
+                );
+            }
+            
             let had_changes = if auto_sync {
                 task_parser::sync_beads(project_root)?;
                 if let Some(hash) = git::auto_commit_task(project_root, &parsed.task.id, &parsed.task.title)? {
@@ -1235,11 +1328,26 @@ async fn run_single_internal(
                     false
                 }
             } else {
-                false
+                !modified_files.is_empty()
             };
             TaskResult::NeedsReboot { had_changes }
         }
         StopReason::MaxIterations => {
+            // Record partial progress
+            if !modified_files.is_empty() {
+                let summary = format!(
+                    "Partial progress on: {} (max iterations)\n\nModified {} file(s)",
+                    parsed.task.title,
+                    modified_files.len()
+                );
+                let _ = progress::append_progress(
+                    project_root,
+                    &parsed.task.id,
+                    &summary,
+                    &modified_files,
+                );
+            }
+            
             if auto_sync {
                 task_parser::sync_beads(project_root)?;
                 if let Some(hash) = git::auto_commit_task(project_root, &parsed.task.id, &parsed.task.title)? {

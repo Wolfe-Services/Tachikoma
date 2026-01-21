@@ -261,6 +261,9 @@ impl ClaudeClient {
         // Track tool usage to detect exploration spirals
         let mut session_metrics = IterationMetrics::default();
         let mut intervention_sent = false;
+        
+        // Track tool outputs for progress recording
+        let mut tool_outputs: Vec<String> = Vec::new();
 
         loop {
             iterations += 1;
@@ -274,6 +277,7 @@ impl ClaudeClient {
                     final_text: String::new(),
                     messages,
                     stop_reason: StopReason::MaxIterations,
+                    tool_outputs,
                 });
             }
 
@@ -344,6 +348,7 @@ impl ClaudeClient {
                     final_text: String::new(),
                     messages,
                     stop_reason: StopReason::Redline,
+                    tool_outputs,
                 });
             }
 
@@ -392,6 +397,7 @@ impl ClaudeClient {
                         final_text,
                         messages,
                         stop_reason: StopReason::Completed,
+                        tool_outputs,
                     });
                 }
             } else {
@@ -428,6 +434,11 @@ impl ClaudeClient {
                             result.output.clone()
                         };
                         let _ = tx.send(format!("{}\n", preview)).await;
+                    }
+
+                    // Track edit_file outputs for progress recording
+                    if name == "edit_file" && result.success {
+                        tool_outputs.push(result.output.clone());
                     }
 
                     tool_results.push(ContentBlock::ToolResult {
@@ -636,6 +647,8 @@ pub struct LoopResult {
     pub final_text: String,
     pub messages: Vec<Message>,
     pub stop_reason: StopReason,
+    /// Tool outputs from edit_file calls (for progress tracking)
+    pub tool_outputs: Vec<String>,
 }
 
 impl LoopResult {
@@ -666,6 +679,7 @@ mod tests {
             final_text: String::new(),
             messages: vec![],
             stop_reason: StopReason::Completed,
+            tool_outputs: vec![],
         };
 
         // Input: 100k * $3/1M = $0.30

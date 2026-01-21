@@ -148,22 +148,24 @@ pub fn load_codebase_summary(project_root: &Path) -> String {
 /// Extract files that were modified from tool result output
 ///
 /// Parses edit_file success messages to extract file paths.
+/// Handles formats:
+/// - "Successfully edited path/to/file.rs. Replaced X bytes with Y bytes."
+/// - "Created new file: path/to/file.rs"
 pub fn extract_modified_files(tool_outputs: &[String]) -> Vec<String> {
     let mut files = Vec::new();
     
     for output in tool_outputs {
-        // Pattern: "Successfully edited path/to/file" or "Created new file: path/to/file"
-        if output.contains("Successfully edited ") {
-            if let Some(path) = output
-                .strip_prefix("Successfully edited ")
-                .and_then(|s| s.split('.').next())
-            {
+        // Pattern: "Successfully edited path/to/file.ext. Replaced X bytes..."
+        if output.starts_with("Successfully edited ") {
+            // Find ". Replaced" to extract the path portion
+            if let Some(end_idx) = output.find(". Replaced") {
+                let path = &output["Successfully edited ".len()..end_idx];
                 files.push(path.trim().to_string());
             }
-        } else if output.contains("Created new file: ") {
-            if let Some(path) = output.strip_prefix("Created new file: ") {
-                files.push(path.trim().to_string());
-            }
+        } else if output.starts_with("Created new file: ") {
+            // Format: "Created new file: path/to/file.ext"
+            let path = &output["Created new file: ".len()..];
+            files.push(path.trim().to_string());
         }
     }
     
@@ -219,7 +221,9 @@ mod tests {
         ];
         
         let files = extract_modified_files(&outputs);
-        assert!(files.contains(&"src/main.rs".to_string()) || files.len() > 0);
+        assert_eq!(files.len(), 2);
+        assert!(files.contains(&"src/main.rs".to_string()));
+        assert!(files.contains(&"src/new_module.rs".to_string()));
     }
 
     #[test]
