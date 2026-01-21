@@ -1,34 +1,39 @@
 # Handover: Continue Ralph Loop Research & Refinement
 
 **Date**: 2026-01-21  
-**Last Commit**: `6850baa` - feat: Implement context efficiency improvements  
-**Status**: Initial improvements implemented, ready for testing and further refinement
+**Last Commit**: `27da147` - feat: Wire progress tracking into task completion  
+**Status**: Progress tracking wired in, thresholds evaluated, ready for real-world testing
 
 ---
 
 ## What Was Done
 
-### Implemented Improvements (Commit 6850baa)
+### Implemented Improvements (Commits 6850baa, 27da147)
 
-1. **Progress Injection** (`src/progress.rs`)
+1. **Progress Injection & Recording** (`src/progress.rs`)
    - Loads `.ralph/progress.md` for inter-session context
    - Loads `CODEMAP.md` / `CODEMAP_COMPACT.md` for codebase overview
-   - Injects into system prompt so agent doesn't start from scratch
+   - **NEW**: `append_progress()` now wired into task completion
+   - **NEW**: `extract_modified_files()` fixed to parse edit_file outputs correctly
+   - Progress recorded on: Completed, Redline, and MaxIterations outcomes
 
 2. **Exploration Detection** (`src/claude_client.rs`)
    - `IterationMetrics` tracks tool usage (read_file, list_files, code_search vs edit_file, bash)
    - Detects exploration spirals: 5+ exploration calls with 0 edits
    - Injects intervention message every 3 iterations when spiraling
+   - **NEW**: `tool_outputs` tracked in `LoopResult` for progress recording
 
 3. **Stricter Primitives** (`src/primitives.rs`)
    - `list_files` recursive: 200 → 50 entry limit with warning
    - `read_file`: Added `start_line`/`end_line` for targeted reads
    - `bash`: Blocks `find`, `grep -r`, `cat`, `tree`, etc. with helpful errors
+   - **EVALUATED**: Bash blocking is appropriate - forces structured tool use
 
 4. **Rewritten Prompts** (`src/main.rs`)
    - System prompt includes codemap, progress, anti-patterns section
    - Task prompt has numbered execution plan (Orient → Implement → Verify)
    - Explicit "3-iteration rule" enforcement
+   - **NEW**: Progress recording on task completion/partial completion
 
 ---
 
@@ -72,21 +77,17 @@
 1. **Run Ralph on a real task** and observe:
    - Does the codebase map help?
    - Does exploration detection trigger appropriately?
-   - Are the bash blocks helpful or annoying?
+   - Is progress being recorded correctly?
+   - Does progress injection in subsequent runs provide useful context?
 
 2. **Measure token efficiency**:
    - Before: How many tokens to complete a typical task?
    - After: Same task with improvements?
+   - Check `.ralph/progress.md` after a few tasks
 
 ### Medium Priority - Additional Improvements
 
-3. **Add `summary_only` mode to `code_search`**:
-   ```rust
-   // Just return file paths + match counts, not full content
-   summary_only: Option<bool>
-   ```
-
-4. **Rate limit detection** (from analysis doc):
+3. **Rate limit detection** (from analysis doc):
    ```rust
    pub struct RateLimitDetector {
        patterns: Vec<regex::Regex>,
@@ -98,25 +99,27 @@
    }
    ```
 
-5. **Wire `append_progress` into task completion**:
-   - After closing a task, call `append_progress()` to record what was done
-   - Extract modified files from tool results
-
-### Low Priority - Nice to Have
-
-6. **Parallel tool execution for reads**:
+4. **Parallel tool execution for reads**:
    ```rust
    let tool_futures = tool_calls.iter().filter(|t| t.is_read_only()).map(...);
    let results = futures::future::join_all(tool_futures).await;
    ```
 
-7. **Auto-commit per edit** (like Loom):
+### Low Priority - Nice to Have
+
+5. **Auto-commit per edit** (like Loom):
    - Commit immediately after successful `edit_file`
    - Enables recovery on redline
 
-8. **Completion signal alternative**:
+6. **Completion signal alternative**:
    - Detect `<promise>COMPLETE</promise>` in agent output
    - Use as alternative/backup to `beads close`
+
+### ✅ Completed
+
+- ~~Wire `append_progress` into task completion~~ (Done in 27da147)
+- ~~Evaluate exploration threshold (5+/0)~~ (Kept as-is, appropriate threshold)
+- ~~Evaluate bash blocking~~ (Kept as-is, forces structured tool use)
 
 ---
 
@@ -124,9 +127,10 @@
 
 | File | Changes |
 |------|---------|
-| `src/progress.rs` | NEW - Progress loading/saving |
-| `src/claude_client.rs` | Added IterationMetrics, exploration detection |
+| `src/progress.rs` | Progress loading/saving, wired into task completion |
+| `src/claude_client.rs` | IterationMetrics, exploration detection, tool_outputs tracking |
 | `src/primitives.rs` | Stricter limits on list_files, read_file, bash |
+| `src/main.rs` | Progress recording on task completion (all outcomes) |
 | `src/main.rs` | Rewrote build_system_prompt, build_task_prompt |
 | `docs/IMPROVEMENT_ANALYSIS.md` | Full analysis of Loom CLI, Loom Tools, Ralph TUI |
 
@@ -161,23 +165,28 @@ Key files:
 
 ---
 
-## Questions to Answer
+## Questions Answered
 
 1. **Is 5+ exploration / 0 edits the right threshold for intervention?**
-   - Maybe 3+ is better?
-   - Maybe it should be time-based (X iterations without edit)?
+   - ✅ **YES** - Kept at 5+/0. Gives room for legitimate orientation (1-2 reads/searches).
+   - Intervention only triggers every 3 iterations AND when spiraling, so not too aggressive.
+   - If agent makes even 1 edit, intervention doesn't trigger.
 
-2. **Should recursive list_files be removed entirely?**
+2. **Is the bash blocklist too aggressive?**
+   - ✅ **NO** - Kept as-is. Forces structured tool use.
+   - `cat` → `read_file` with limits; `grep -r` → `code_search`; `find` → `list_files`
+   - Structured tools give bounded output; bash can return unbounded data.
+
+## Open Questions
+
+1. **Should recursive list_files be removed entirely?**
    - Loom doesn't have it
-   - Forces more deliberate navigation
+   - Current: 50 entry limit is quite restrictive, may be sufficient
 
-3. **Is the bash blocklist too aggressive?**
-   - `cat` might be annoying to block
-   - Maybe allow `cat` for small files?
-
-4. **Should we add per-edit auto-commit?**
+2. **Should we add per-edit auto-commit?**
    - Pro: Recovery on redline
    - Con: Noisy git history
+   - Loom does this; Ralph currently commits at task end
 
 ---
 
