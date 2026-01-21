@@ -157,18 +157,18 @@ pub fn get_tool_definitions() -> Vec<ToolDefinition> {
         },
         ToolDefinition {
             name: "beads".to_string(),
-            description: "Interact with the beads issue tracker. Actions: 'ready' (list unblocked tasks), 'show' (get task details), 'update' (change task status), 'close' (mark task complete), 'sync' (commit beads changes).".to_string(),
+            description: "Interact with the beads issue tracker. Actions: 'ready' (list unblocked tasks), 'show' (get task details), 'update' (change task status), 'close' (mark task complete), 'sync' (commit beads changes), 'create' (create new task), 'decompose' (break large task into subtasks).".to_string(),
             input_schema: serde_json::json!({
                 "type": "object",
                 "properties": {
                     "action": {
                         "type": "string",
-                        "enum": ["ready", "show", "update", "close", "sync"],
+                        "enum": ["ready", "show", "update", "close", "sync", "create", "decompose"],
                         "description": "The beads action to perform"
                     },
                     "task_id": {
                         "type": "string",
-                        "description": "Task ID (required for show, update, close)"
+                        "description": "Task ID (required for show, update, close, decompose)"
                     },
                     "status": {
                         "type": "string",
@@ -178,6 +178,31 @@ pub fn get_tool_definitions() -> Vec<ToolDefinition> {
                     "reason": {
                         "type": "string",
                         "description": "Reason for closing (for close action)"
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "Task title (for create action)"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Task description with acceptance criteria as checkboxes (for create action)"
+                    },
+                    "priority": {
+                        "type": "integer",
+                        "description": "Priority 0-4 (for create action, default: 2)"
+                    },
+                    "issue_type": {
+                        "type": "string",
+                        "enum": ["task", "bug", "feature", "epic"],
+                        "description": "Issue type (for create action, default: task)"
+                    },
+                    "labels": {
+                        "type": "string",
+                        "description": "Comma-separated labels (for create action)"
+                    },
+                    "blocks": {
+                        "type": "string",
+                        "description": "Task ID that this new task blocks (for create action - makes parent depend on new subtask)"
                     }
                 },
                 "required": ["action"]
@@ -249,6 +274,27 @@ async fn list_files(input: &serde_json::Value, project_root: &Path) -> ToolResul
     }
 }
 
+/// Directories to always skip when listing files
+const IGNORED_DIRS: &[&str] = &[
+    "node_modules", ".git", "target", ".next", "dist", "__pycache__",
+    "bin", "obj", ".cache", ".pytest_cache", "build", "coverage",
+    ".nuxt", ".output", ".turbo", "venv", ".venv", "vendor",
+    ".idea", ".vscode", ".vs", "packages", ".angular",
+];
+
+/// File patterns to skip
+const IGNORED_FILES: &[&str] = &[
+    ".DS_Store", "Thumbs.db", ".gitkeep",
+];
+
+fn should_skip_entry(name: &str, is_dir: bool) -> bool {
+    if is_dir {
+        IGNORED_DIRS.contains(&name)
+    } else {
+        IGNORED_FILES.contains(&name)
+    }
+}
+
 async fn list_files_flat(path: &Path) -> ToolResult {
     let mut entries = Vec::new();
 
@@ -258,6 +304,16 @@ async fn list_files_flat(path: &Path) -> ToolResult {
     };
 
     while let Ok(Some(entry)) = dir.next_entry().await {
+        let name = entry.file_name();
+        let name_str = name.to_string_lossy();
+        
+        let is_dir = entry.file_type().await.map(|ft| ft.is_dir()).unwrap_or(false);
+        
+        // Skip ignored entries
+        if should_skip_entry(&name_str, is_dir) {
+            continue;
+        }
+
         let file_type = match entry.file_type().await {
             Ok(ft) => {
                 if ft.is_dir() {
@@ -271,10 +327,17 @@ async fn list_files_flat(path: &Path) -> ToolResult {
             Err(_) => "unknown",
         };
 
-        entries.push(format!("{}\t{}", file_type, entry.file_name().to_string_lossy()));
+        entries.push(format!("{}\t{}", file_type, name_str));
     }
 
     entries.sort();
+    
+    // Limit entries to avoid context bloat
+    if entries.len() > 100 {
+        entries.truncate(100);
+        entries.push("[Truncated: showing first 100 entries]".to_string());
+    }
+    
     ToolResult::success(entries.join("\n"))
 }
 
@@ -291,27 +354,28 @@ async fn list_files_recursive(path: &Path) -> ToolResult {
         while let Ok(Some(entry)) = dir.next_entry().await {
             let entry_path = entry.path();
             let relative = entry_path.strip_prefix(path).unwrap_or(&entry_path);
+            let name = entry.file_name();
+            let name_str = name.to_string_lossy();
 
             if let Ok(ft) = entry.file_type().await {
                 if ft.is_dir() {
-                    // Skip common ignored directories
-                    let name = entry.file_name();
-                    let name_str = name.to_string_lossy();
-                    if !["node_modules", ".git", "target", ".next", "dist", "__pycache__"]
-                        .contains(&name_str.as_ref())
-                    {
+                    // Skip ignored directories
+                    if !should_skip_entry(&name_str, true) {
                         stack.push(entry_path.clone());
                         entries.push(format!("dir\t{}/", relative.display()));
                     }
                 } else {
-                    entries.push(format!("file\t{}", relative.display()));
+                    // Skip ignored files
+                    if !should_skip_entry(&name_str, false) {
+                        entries.push(format!("file\t{}", relative.display()));
+                    }
                 }
             }
         }
 
-        // Limit to avoid blowing up context
-        if entries.len() > 1000 {
-            entries.push("[Truncated: too many entries]".to_string());
+        // Limit to avoid blowing up context - much lower threshold
+        if entries.len() > 200 {
+            entries.push("[Truncated: showing first 200 entries]".to_string());
             break;
         }
     }
@@ -585,6 +649,25 @@ async fn beads(input: &serde_json::Value, project_root: &Path) -> ToolResult {
             beads_close(project_root, task_id, reason).await
         }
         "sync" => beads_sync(project_root).await,
+        "create" => {
+            let title = match input.get("title").and_then(|v| v.as_str()) {
+                Some(t) => t,
+                None => return ToolResult::error("Missing required parameter: title for create action"),
+            };
+            let description = input.get("description").and_then(|v| v.as_str());
+            let priority = input.get("priority").and_then(|v| v.as_u64()).unwrap_or(2) as u8;
+            let issue_type = input.get("issue_type").and_then(|v| v.as_str()).unwrap_or("task");
+            let labels = input.get("labels").and_then(|v| v.as_str());
+            let blocks = input.get("blocks").and_then(|v| v.as_str());
+            beads_create(project_root, title, description, priority, issue_type, labels, blocks).await
+        }
+        "decompose" => {
+            let task_id = match input.get("task_id").and_then(|v| v.as_str()) {
+                Some(id) => id,
+                None => return ToolResult::error("Missing required parameter: task_id for decompose action"),
+            };
+            beads_decompose(project_root, task_id).await
+        }
         _ => ToolResult::error(format!("Unknown beads action: {}", action)),
     }
 }
@@ -706,6 +789,100 @@ async fn beads_sync(project_root: &Path) -> ToolResult {
             }
         }
         Err(e) => ToolResult::error(format!("Failed to run bd sync: {}", e)),
+    }
+}
+
+async fn beads_create(
+    project_root: &Path,
+    title: &str,
+    description: Option<&str>,
+    priority: u8,
+    issue_type: &str,
+    labels: Option<&str>,
+    blocks: Option<&str>,
+) -> ToolResult {
+    let mut args = vec![
+        "create".to_string(),
+        format!("--title={}", title),
+        format!("--type={}", issue_type),
+        format!("--priority={}", priority),
+    ];
+    
+    if let Some(desc) = description {
+        args.push(format!("--description={}", desc));
+    }
+    
+    if let Some(lbls) = labels {
+        args.push(format!("--labels={}", lbls));
+    }
+    
+    let args_refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
+    
+    let output = Command::new("bd")
+        .args(&args_refs)
+        .current_dir(project_root)
+        .output()
+        .await;
+
+    match output {
+        Ok(out) => {
+            if out.status.success() {
+                let stdout = String::from_utf8_lossy(&out.stdout);
+                
+                // If blocks is specified, add the dependency
+                if let Some(parent_id) = blocks {
+                    // Extract task ID from output (format: "✓ Created issue: <id>")
+                    if let Some(id) = stdout.split("issue:").nth(1) {
+                        let new_id = id.trim().split_whitespace().next().unwrap_or("");
+                        if !new_id.is_empty() {
+                            // Add dependency: parent depends on new task (new task blocks parent)
+                            let _ = Command::new("bd")
+                                .args(["dep", "add", parent_id, new_id])
+                                .current_dir(project_root)
+                                .output()
+                                .await;
+                        }
+                    }
+                }
+                
+                ToolResult::success(format!("Created task: {}", stdout.trim()))
+            } else {
+                ToolResult::error(format!(
+                    "bd create failed: {}",
+                    String::from_utf8_lossy(&out.stderr)
+                ))
+            }
+        }
+        Err(e) => ToolResult::error(format!("Failed to run bd create: {}", e)),
+    }
+}
+
+async fn beads_decompose(project_root: &Path, task_id: &str) -> ToolResult {
+    // Use the ralph decompose command to decompose a task
+    let ralph_path = std::env::current_exe().unwrap_or_else(|_| std::path::PathBuf::from("ralph"));
+    
+    let output = Command::new(&ralph_path)
+        .args(["decompose", "--issue", task_id])
+        .current_dir(project_root)
+        .env("ANTHROPIC_API_KEY", std::env::var("ANTHROPIC_API_KEY").unwrap_or_default())
+        .output()
+        .await;
+
+    match output {
+        Ok(out) => {
+            let stdout = String::from_utf8_lossy(&out.stdout);
+            let stderr = String::from_utf8_lossy(&out.stderr);
+            
+            if out.status.success() {
+                ToolResult::success(format!("Decomposed task {}:\n{}", task_id, stdout))
+            } else {
+                ToolResult::error(format!(
+                    "Decompose failed: {}\n{}",
+                    stdout, stderr
+                ))
+            }
+        }
+        Err(e) => ToolResult::error(format!("Failed to run decompose: {}", e)),
     }
 }
 
