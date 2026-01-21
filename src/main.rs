@@ -15,6 +15,7 @@ mod claude_client;
 mod decompose;
 mod git;
 mod primitives;
+mod progress;
 mod task_parser;
 mod tui;
 
@@ -754,112 +755,207 @@ async fn decompose_command(
 }
 
 /// Build the system prompt for Claude
+/// 
+/// Includes:
+/// - Codebase map (if available)
+/// - Recent progress from previous iterations
+/// - Explicit anti-patterns section
+/// - 3-iteration rule enforcement
 fn build_system_prompt(project_root: &PathBuf) -> String {
+    // Load codebase map (if available)
+    let codemap = progress::load_codebase_summary(project_root);
+    
+    // Load recent progress (last 3 entries)
+    let recent_progress = progress::load_recent_progress(project_root, 3)
+        .unwrap_or_default();
+
+    // Build codemap section
+    let codemap_section = if codemap.is_empty() {
+        "No codemap available. The task description contains file paths - trust them.".to_string()
+    } else {
+        format!("```\n{}\n```", codemap)
+    };
+
+    // Build progress section
+    let progress_section = if recent_progress.is_empty() {
+        "No previous progress recorded. You're starting fresh.".to_string()
+    } else {
+        format!("Study these patterns from previous work:\n\n{}", recent_progress)
+    };
+
     format!(
-        r#"You are an AI coding assistant implementing tasks from a beads issue tracker.
+        r#"You are Ralph, an AI coding assistant. Your mission: implement tasks efficiently with minimal exploration.
 
-## CRITICAL: Code First, Explore Minimally
+## CRITICAL RULES (Violations trigger intervention)
 
-DO NOT waste tokens exploring the codebase extensively!
-- Read the task description - it tells you WHAT files to create/edit
-- Do ONE quick search if needed to find a pattern, then START CODING
-- Create files immediately using edit_file with empty old_string
-- Limit exploration to 2-3 tool calls MAX before writing code
+1. **3-iteration rule**: You MUST produce an edit_file call within 3 iterations
+2. **Trust the task**: File paths in the task description are accurate - don't verify them
+3. **One search max**: Maximum ONE code_search per pattern, then implement
+4. **No recursive exploration**: Use targeted file reads, not recursive list_files
 
-## Core Behaviors
+## Codebase Overview
+{codemap_section}
 
-1. **Code immediately** - Start writing code within the first 3 iterations
-2. **Minimal exploration** - Only read files directly mentioned in the task
-3. **Follow patterns** - One code_search to find a pattern, then implement
-4. **Close the task** - Mark complete when criteria are satisfied
+## Previous Work (Study First)
+{progress_section}
 
 ## Project Root
-{}
+{project_root}
 
 ## Available Tools
-- read_file: Read file contents
-- list_files: List directory contents (use sparingly!)  
-- bash: Execute shell commands (with timeout)
-- edit_file: Create/modify files (empty old_string = new file)
-- code_search: Search codebase with ripgrep
-- beads: Issue tracker (show, update, close, ready, sync, create, decompose)
+| Tool | Purpose | Limits |
+|------|---------|--------|
+| read_file | Read file contents | Use start_line/end_line for large files |
+| list_files | List directory | Recursive limited to 50 entries |
+| code_search | Find patterns | ONE search per concept, then code |
+| edit_file | Create/modify files | empty old_string = new file |
+| bash | Build/test/git | Build commands only, NOT exploration |
+| beads | Task management | close when done |
 
 ## Creating New Files
 
-To create a new file, use edit_file with an EMPTY old_string:
-  edit_file path="path/to/NewFile.cs" old_string="" new_string="<file contents>"
+To create a new file:
+```
+edit_file path="path/to/NewFile.cs" old_string="" new_string="<full file contents>"
+```
 
-## Important Rules
+## Anti-Patterns (DO NOT)
 
-1. Read the task description - it has the file paths and requirements
-2. Do ONE code_search to find a similar file pattern if needed
-3. START CODING by iteration 3-4 at the latest
-4. When done: beads action="close" task_id="<id>" reason="<summary>"
+❌ Reading more than 3 files before making an edit
+❌ Using list_files with recursive=true for "exploring"
+❌ Running bash commands like find, grep -r, cat (use dedicated tools)
+❌ Reading the entire project structure before starting
+❌ Searching for the same pattern multiple times
+❌ Asking "what files exist" - the task description tells you
+
+## Allowed Bash Commands
+
+✅ cargo build, cargo test, cargo check, cargo fmt
+✅ npm run, npm test, npm build
+✅ dotnet build, dotnet test, dotnet run
+✅ git status, git diff, git add, git commit
+✅ bd close, bd sync, bd update
 
 ## Beads Tool Usage
 
-- Show task: beads action="show" task_id="<id>"
-- Update status: beads action="update" task_id="<id>" status="in_progress"
-- Close: beads action="close" task_id="<id>" reason="<what was done>"
-- Create subtask: beads action="create" title="..." description="..." blocks="<parent-id>"
+- Close task: `beads action="close" task_id="<id>" reason="<summary>"`
+- Create subtask: `beads action="create" title="..." description="..." blocks="<parent-id>"`
 
 ## Completion
 
-When ALL acceptance criteria are met (or the task is done):
-1. Verify each criterion is satisfied
-2. Use beads to close the task with a reason
-3. Summarize what was implemented
+When done, close the task immediately:
+```
+beads action="close" task_id="<id>" reason="Implemented X, created Y, tested with Z"
+```
 "#,
-        project_root.display()
+        codemap_section = codemap_section,
+        progress_section = progress_section,
+        project_root = project_root.display()
     )
 }
 
 /// Build the task prompt for a specific task
+/// 
+/// Includes explicit numbered execution plan to guide the agent
+/// through efficient task completion.
 fn build_task_prompt(parsed: &ParsedTask) -> String {
     let incomplete: Vec<_> = parsed
         .acceptance_criteria
         .iter()
         .filter(|ac| !ac.completed)
-        .map(|ac| format!("- [ ] {}", ac.text))
+        .collect();
+    
+    let completed: Vec<_> = parsed
+        .acceptance_criteria
+        .iter()
+        .filter(|ac| ac.completed)
         .collect();
 
     let criteria_section = if incomplete.is_empty() {
         if parsed.acceptance_criteria.is_empty() {
-            "No specific acceptance criteria defined. Use your judgment to implement the task.".to_string()
+            "No specific acceptance criteria defined. Use your judgment.".to_string()
         } else {
-            "All acceptance criteria are already complete! Verify and close the task.".to_string()
+            "✅ All acceptance criteria complete! Verify and close the task.".to_string()
         }
     } else {
-        format!("### Remaining Tasks\n{}", incomplete.join("\n"))
+        let incomplete_str: Vec<String> = incomplete
+            .iter()
+            .map(|ac| format!("- [ ] {}", ac.text))
+            .collect();
+        let completed_str: Vec<String> = completed
+            .iter()
+            .map(|ac| format!("- [x] {}", ac.text))
+            .collect();
+        
+        let mut section = String::from("### Acceptance Criteria\n\n");
+        if !completed_str.is_empty() {
+            section.push_str(&completed_str.join("\n"));
+            section.push('\n');
+        }
+        section.push_str(&incomplete_str.join("\n"));
+        section
+    };
+
+    // Extract file paths mentioned in description (simple heuristic)
+    let mentioned_files: Vec<&str> = parsed.task.description
+        .split_whitespace()
+        .filter(|w| {
+            w.contains('/') && (
+                w.ends_with(".rs") || w.ends_with(".cs") || w.ends_with(".ts") ||
+                w.ends_with(".tsx") || w.ends_with(".js") || w.ends_with(".py") ||
+                w.ends_with(".go") || w.ends_with(".java") || w.ends_with(".md") ||
+                w.ends_with(".yaml") || w.ends_with(".json") || w.ends_with(".toml")
+            )
+        })
+        .take(5) // Limit to 5 files
+        .collect();
+    
+    let files_hint = if mentioned_files.is_empty() {
+        String::new()
+    } else {
+        format!("\n**Files mentioned**: {}", mentioned_files.join(", "))
     };
 
     format!(
-        r#"## Mission: Implement Task {}
-
-### Title
-{}
+        r#"## TASK: {id} - {title}
 
 ### Description
-{}
+{description}
+{files_hint}
 
-{}
+{criteria}
 
-### ACTION PLAN (follow this order!)
+---
 
-1. The description above tells you EXACTLY which files to create/edit
-2. Do ONE code_search to find a similar file pattern (e.g., search for "class.*Controller" or "public class.*Schema")
-3. START CODING IMMEDIATELY - use edit_file with empty old_string to create new files
-4. After implementing, close the task:
-   beads action="close" task_id="{}" reason="<summary of what was done>"
+## YOUR EXECUTION PLAN
 
-DO NOT waste tokens on extensive exploration! The file paths and requirements are in the description.
-START CODING NOW.
+**Iteration 1: Orient** (if needed)
+- ONE code_search to find similar pattern (e.g., "class.*Service" or "fn.*handler")
+- OR read ONE file mentioned above
+- Skip this if the task is clear
+
+**Iteration 2-3: Implement**
+- Create/edit files with edit_file
+- Use empty old_string for new files: `edit_file path="..." old_string="" new_string="..."`
+- Implement ALL criteria
+
+**Iteration 4: Verify & Close**
+- Build: `bash command="cargo build"` (or npm/dotnet as appropriate)
+- Close: `beads action="close" task_id="{id}" reason="<what was done>"`
+
+---
+
+## IMPORTANT
+
+✓ The description tells you EXACTLY which files to create/edit - TRUST IT
+✓ Don't explore - START CODING
+✓ If you're on iteration 3+ without an edit, you're doing it wrong
 "#,
-        parsed.task.id,
-        parsed.task.title,
-        parsed.task.description,
-        criteria_section,
-        parsed.task.id
+        id = parsed.task.id,
+        title = parsed.task.title,
+        description = parsed.task.description,
+        files_hint = files_hint,
+        criteria = criteria_section,
     )
 }
 

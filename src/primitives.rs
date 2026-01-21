@@ -55,13 +55,21 @@ pub fn get_tool_definitions() -> Vec<ToolDefinition> {
     vec![
         ToolDefinition {
             name: "read_file".to_string(),
-            description: "Read the contents of a file at the given path. Returns the file contents as a string.".to_string(),
+            description: "Read the contents of a file at the given path. For large files (>500 lines), use start_line/end_line to read specific sections instead of the whole file.".to_string(),
             input_schema: serde_json::json!({
                 "type": "object",
                 "properties": {
                     "path": {
                         "type": "string",
                         "description": "The path to the file to read"
+                    },
+                    "start_line": {
+                        "type": "integer",
+                        "description": "Read from this line (1-indexed). Use with end_line for targeted reads of large files."
+                    },
+                    "end_line": {
+                        "type": "integer",
+                        "description": "Read until this line (inclusive). Omit to read to end of file."
                     }
                 },
                 "required": ["path"]
@@ -69,17 +77,17 @@ pub fn get_tool_definitions() -> Vec<ToolDefinition> {
         },
         ToolDefinition {
             name: "list_files".to_string(),
-            description: "List files and directories at the given path. Returns a list of entries with their types (file/directory).".to_string(),
+            description: "List files and directories at the given path. Returns a list of entries with their types. WARNING: Recursive mode is limited to 50 entries - use targeted paths instead of broad recursive searches.".to_string(),
             input_schema: serde_json::json!({
                 "type": "object",
                 "properties": {
                     "path": {
                         "type": "string",
-                        "description": "The directory path to list"
+                        "description": "The directory path to list (be specific, avoid root-level recursive listing)"
                     },
                     "recursive": {
                         "type": "boolean",
-                        "description": "Whether to list recursively (default: false)"
+                        "description": "Whether to list recursively (default: false). Limited to 50 entries - prefer non-recursive with specific paths."
                     }
                 },
                 "required": ["path"]
@@ -228,7 +236,7 @@ pub async fn execute_tool(name: &str, input: &serde_json::Value, project_root: &
 // Tool Implementations
 // ============================================================================
 
-/// 1. read_file - Read file contents
+/// 1. read_file - Read file contents with optional line range
 async fn read_file(input: &serde_json::Value, project_root: &Path) -> ToolResult {
     let path_str = match input.get("path").and_then(|v| v.as_str()) {
         Some(p) => p,
@@ -236,17 +244,61 @@ async fn read_file(input: &serde_json::Value, project_root: &Path) -> ToolResult
     };
 
     let path = resolve_path(path_str, project_root);
+    
+    // Optional line range (1-indexed)
+    let start_line = input.get("start_line").and_then(|v| v.as_u64()).map(|l| l as usize);
+    let end_line = input.get("end_line").and_then(|v| v.as_u64()).map(|l| l as usize);
 
     match tokio::fs::read_to_string(&path).await {
         Ok(content) => {
-            // Truncate if too large (avoid blowing up context)
+            // If line range specified, extract those lines
+            if start_line.is_some() || end_line.is_some() {
+                let lines: Vec<&str> = content.lines().collect();
+                let total_lines = lines.len();
+                
+                let start = start_line.unwrap_or(1).saturating_sub(1); // Convert to 0-indexed
+                let end = end_line.unwrap_or(total_lines).min(total_lines);
+                
+                if start >= total_lines {
+                    return ToolResult::error(format!(
+                        "start_line {} exceeds file length ({} lines)",
+                        start + 1,
+                        total_lines
+                    ));
+                }
+                
+                let selected: Vec<String> = lines[start..end]
+                    .iter()
+                    .enumerate()
+                    .map(|(i, line)| format!("{:4}| {}", start + i + 1, line))
+                    .collect();
+                
+                return ToolResult::success(format!(
+                    "Lines {}-{} of {} total:\n\n{}",
+                    start + 1,
+                    end,
+                    total_lines,
+                    selected.join("\n")
+                ));
+            }
+            
+            // Full file read - truncate if too large (avoid blowing up context)
             let max_size = 100_000; // ~100KB
+            let lines: Vec<&str> = content.lines().collect();
+            
             if content.len() > max_size {
-                let truncated = &content[..max_size];
+                // Safe truncation at character boundary
+                let mut end = max_size;
+                while !content.is_char_boundary(end) && end > 0 {
+                    end -= 1;
+                }
+                let truncated = &content[..end];
                 ToolResult::success(format!(
-                    "{}\n\n[Truncated: file is {} bytes, showing first {} bytes]",
+                    "{}\n\n[Truncated: file is {} bytes ({} lines), showing first {} bytes]\n\
+                    [TIP: Use start_line/end_line to read specific sections]",
                     truncated,
                     content.len(),
+                    lines.len(),
                     max_size
                 ))
             } else {
@@ -341,9 +393,13 @@ async fn list_files_flat(path: &Path) -> ToolResult {
     ToolResult::success(entries.join("\n"))
 }
 
+/// Recursive limit - strict to prevent context burn
+const RECURSIVE_LIST_LIMIT: usize = 50;
+
 async fn list_files_recursive(path: &Path) -> ToolResult {
     let mut entries = Vec::new();
     let mut stack = vec![path.to_path_buf()];
+    let mut truncated = false;
 
     while let Some(current) = stack.pop() {
         let mut dir = match tokio::fs::read_dir(&current).await {
@@ -371,25 +427,85 @@ async fn list_files_recursive(path: &Path) -> ToolResult {
                     }
                 }
             }
+            
+            // Strict limit to prevent context burn
+            if entries.len() >= RECURSIVE_LIST_LIMIT {
+                truncated = true;
+                break;
+            }
         }
 
-        // Limit to avoid blowing up context - much lower threshold
-        if entries.len() > 200 {
-            entries.push("[Truncated: showing first 200 entries]".to_string());
+        if truncated {
             break;
         }
     }
 
     entries.sort();
+    
+    if truncated {
+        entries.push(format!(
+            "\n[TRUNCATED at {} entries - Use targeted paths instead of recursive listing]\n\
+            TIP: Navigate to specific subdirectories rather than listing the whole tree.",
+            RECURSIVE_LIST_LIMIT
+        ));
+    }
+    
     ToolResult::success(entries.join("\n"))
 }
 
+/// Blocked bash command patterns - use dedicated tools instead
+const BLOCKED_BASH_PATTERNS: &[(&str, &str)] = &[
+    ("find ", "Use list_files tool with recursive=true for directory exploration"),
+    ("find .", "Use list_files tool with recursive=true for directory exploration"),
+    ("locate ", "Use list_files or code_search tools instead"),
+    ("grep -r", "Use code_search tool for pattern searching"),
+    ("grep -R", "Use code_search tool for pattern searching"),
+    ("rg ", "Use code_search tool for pattern searching"),
+    ("cat ", "Use read_file tool for reading files"),
+    ("head ", "Use read_file tool with start_line/end_line parameters"),
+    ("tail ", "Use read_file tool with start_line/end_line parameters"),
+    ("tree ", "Use list_files tool for directory listing"),
+    ("ls -R", "Use list_files tool with recursive=true"),
+    ("ls -lR", "Use list_files tool with recursive=true"),
+];
+
+/// Check if a bash command should be blocked
+fn check_blocked_bash(command: &str) -> Option<String> {
+    let cmd_lower = command.to_lowercase();
+    let cmd_trimmed = command.trim();
+    
+    for (pattern, suggestion) in BLOCKED_BASH_PATTERNS {
+        // Check if command starts with pattern or contains " pattern" (after a pipe, etc.)
+        if cmd_trimmed.starts_with(pattern) 
+            || cmd_lower.starts_with(&pattern.to_lowercase())
+            || cmd_trimmed.contains(&format!(" {}", pattern))
+            || cmd_trimmed.contains(&format!("|{}", pattern))
+            || cmd_trimmed.contains(&format!("| {}", pattern))
+        {
+            return Some(format!(
+                "BLOCKED: '{}' detected.\n\n{}\n\n\
+                Bash is for build/test/git commands, not file exploration.\n\
+                Allowed examples: cargo build, npm test, git status, dotnet build, bd close",
+                pattern, suggestion
+            ));
+        }
+    }
+    None
+}
+
 /// 3. bash - Execute shell commands with timeout
+/// 
+/// Blocks exploratory commands (find, grep -r, cat) in favor of dedicated tools.
 async fn bash(input: &serde_json::Value, project_root: &Path) -> ToolResult {
     let command = match input.get("command").and_then(|v| v.as_str()) {
         Some(c) => c,
         None => return ToolResult::error("Missing required parameter: command"),
     };
+    
+    // Check for blocked exploratory commands
+    if let Some(error_msg) = check_blocked_bash(command) {
+        return ToolResult::error(error_msg);
+    }
 
     let timeout_secs = input
         .get("timeout_secs")

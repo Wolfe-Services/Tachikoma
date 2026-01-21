@@ -1,6 +1,7 @@
 //! Claude API Client - Handles communication with Claude Sonnet
 //!
 //! Uses the Messages API with streaming and tool use support.
+//! Includes exploration detection to prevent context burn.
 
 use anyhow::{Context, Result};
 use futures::StreamExt;
@@ -10,6 +11,80 @@ use std::path::Path;
 use tokio::sync::mpsc;
 
 use crate::primitives::{execute_tool, get_tool_definitions, ToolDefinition};
+
+// ============================================================================
+// Exploration Detection
+// ============================================================================
+
+/// Metrics for detecting exploration spirals
+/// 
+/// Tracks tool usage across iterations to identify when the agent
+/// is spending too much time exploring and not enough time coding.
+#[derive(Debug, Default, Clone)]
+pub struct IterationMetrics {
+    pub read_file_count: u32,
+    pub list_files_count: u32,
+    pub code_search_count: u32,
+    pub edit_file_count: u32,
+    pub bash_count: u32,
+    pub beads_count: u32,
+}
+
+impl IterationMetrics {
+    /// Record a tool call
+    pub fn record_tool(&mut self, name: &str) {
+        match name {
+            "read_file" => self.read_file_count += 1,
+            "list_files" => self.list_files_count += 1,
+            "code_search" => self.code_search_count += 1,
+            "edit_file" => self.edit_file_count += 1,
+            "bash" => self.bash_count += 1,
+            "beads" => self.beads_count += 1,
+            _ => {}
+        }
+    }
+
+    /// Total exploration calls (read + list + search)
+    pub fn total_exploration(&self) -> u32 {
+        self.read_file_count + self.list_files_count + self.code_search_count
+    }
+
+    /// Total action calls (edit + bash)
+    pub fn total_action(&self) -> u32 {
+        self.edit_file_count + self.bash_count
+    }
+
+    /// Check if we're in an exploration spiral
+    /// 
+    /// Returns true if:
+    /// - 5+ exploration calls (read_file, list_files, code_search)
+    /// - 0 action calls (edit_file, bash)
+    pub fn is_exploration_heavy(&self) -> bool {
+        self.total_exploration() >= 5 && self.total_action() == 0
+    }
+
+    /// Generate an intervention message for exploration spiral
+    pub fn intervention_message(&self) -> String {
+        format!(
+            "[INTERVENTION] You've made {} exploration calls but 0 edits.\n\
+             The task description contains file paths. Create files NOW with:\n\
+             edit_file path=\"<path>\" old_string=\"\" new_string=\"<content>\"\n\n\
+             Current stats:\n\
+             - read_file: {}\n\
+             - list_files: {}\n\
+             - code_search: {}\n\
+             - edit_file: {} ← NEED MORE OF THIS\n\
+             - bash: {}\n\n\
+             NO MORE EXPLORATION. START CODING.",
+            self.total_exploration(),
+            self.read_file_count,
+            self.list_files_count,
+            self.code_search_count,
+            self.edit_file_count,
+            self.bash_count
+        )
+    }
+}
 
 const CLAUDE_API_URL: &str = "https://api.anthropic.com/v1/messages";
 const CLAUDE_MODEL: &str = "claude-sonnet-4-20250514"; // Sonnet for agentic work
@@ -160,6 +235,10 @@ impl ClaudeClient {
     /// - Max iterations reached
     /// - Token redline exceeded (needs fresh context)
     /// - An error occurs
+    ///
+    /// Includes exploration detection: if the agent makes 5+ exploration calls
+    /// (read_file, list_files, code_search) without any edits, an intervention
+    /// message is injected to nudge it toward action.
     pub async fn run_agentic_loop(
         &self,
         system_prompt: &str,
@@ -178,6 +257,10 @@ impl ClaudeClient {
         let mut total_input_tokens = 0u32;
         let mut total_output_tokens = 0u32;
         let mut iterations = 0;
+        
+        // Track tool usage to detect exploration spirals
+        let mut session_metrics = IterationMetrics::default();
+        let mut intervention_sent = false;
 
         loop {
             iterations += 1;
@@ -194,11 +277,38 @@ impl ClaudeClient {
                 });
             }
 
-            // Log iteration
+            // Log iteration with metrics
             if let Some(tx) = &output_tx {
                 let _ = tx
-                    .send(format!("\n--- Iteration {} ---\n", iterations))
+                    .send(format!(
+                        "\n--- Iteration {} [explore:{}/action:{}] ---\n",
+                        iterations,
+                        session_metrics.total_exploration(),
+                        session_metrics.total_action()
+                    ))
                     .await;
+            }
+            
+            // Check for exploration spiral every 3 iterations
+            if iterations % 3 == 0 && session_metrics.is_exploration_heavy() && !intervention_sent {
+                intervention_sent = true;
+                let intervention = session_metrics.intervention_message();
+                
+                if let Some(tx) = &output_tx {
+                    let _ = tx.send(format!("\n{}\n", intervention)).await;
+                }
+                
+                tracing::warn!(
+                    "Exploration spiral detected: {} exploration calls, {} edits",
+                    session_metrics.total_exploration(),
+                    session_metrics.edit_file_count
+                );
+                
+                // Inject intervention as a user message
+                messages.push(Message {
+                    role: Role::User,
+                    content: vec![ContentBlock::Text { text: intervention }],
+                });
             }
 
             // Make API call
@@ -289,6 +399,14 @@ impl ClaudeClient {
                 let mut tool_results = Vec::new();
 
                 for (id, name, input) in tool_calls {
+                    // Record tool call for exploration detection
+                    session_metrics.record_tool(&name);
+                    
+                    // Reset intervention flag if we finally make an edit
+                    if name == "edit_file" {
+                        intervention_sent = false; // Allow future interventions if we spiral again
+                    }
+                    
                     if let Some(tx) = &output_tx {
                         let _ = tx
                             .send(format!("\n[Executing tool: {}]\n", name))
