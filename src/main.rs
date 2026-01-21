@@ -12,6 +12,7 @@
 //! 5. Auto-syncs beads after each successful implementation
 
 mod claude_client;
+mod decompose;
 mod git;
 mod primitives;
 mod task_parser;
@@ -82,6 +83,10 @@ enum Commands {
         /// Skip auto-sync after completion
         #[arg(long)]
         no_sync: bool,
+
+        /// Auto-decompose large tasks before running
+        #[arg(long)]
+        auto_decompose: bool,
     },
 
     /// Run the Ralph loop continuously until all tasks complete
@@ -105,6 +110,10 @@ enum Commands {
         /// Skip auto-sync
         #[arg(long)]
         no_sync: bool,
+
+        /// Auto-decompose large tasks before running
+        #[arg(long)]
+        auto_decompose: bool,
     },
 
     /// Show current progress
@@ -124,6 +133,17 @@ enum Commands {
     Show {
         /// Task ID to show
         issue: String,
+    },
+
+    /// Analyze and decompose large tasks into smaller subtasks
+    Decompose {
+        /// Only analyze without creating subtasks (dry run)
+        #[arg(long)]
+        dry_run: bool,
+
+        /// Decompose a specific task by ID
+        #[arg(short, long)]
+        issue: Option<String>,
     },
 
     /// Run with TUI (split-pane terminal interface)
@@ -186,7 +206,14 @@ async fn main() -> Result<()> {
             max_iterations,
             redline,
             no_sync,
+            auto_decompose,
         } => {
+            // Auto-decompose if requested
+            if auto_decompose {
+                let api_key = std::env::var("ANTHROPIC_API_KEY")
+                    .context("ANTHROPIC_API_KEY environment variable not set")?;
+                decompose::preprocess_tasks(&project_root, &api_key).await?;
+            }
             run_single(&project_root, issue.as_deref(), max_iterations, redline, !no_sync).await?;
         }
         Commands::Loop {
@@ -195,7 +222,14 @@ async fn main() -> Result<()> {
             max_tasks,
             fail_streak,
             no_sync,
+            auto_decompose,
         } => {
+            // Auto-decompose if requested
+            if auto_decompose {
+                let api_key = std::env::var("ANTHROPIC_API_KEY")
+                    .context("ANTHROPIC_API_KEY environment variable not set")?;
+                decompose::preprocess_tasks(&project_root, &api_key).await?;
+            }
             run_loop(&project_root, max_iterations, redline, max_tasks, fail_streak, !no_sync).await?;
         }
         Commands::Status => {
@@ -209,6 +243,9 @@ async fn main() -> Result<()> {
         }
         Commands::Show { issue } => {
             show_task(&project_root, &issue)?;
+        }
+        Commands::Decompose { dry_run, issue } => {
+            decompose_command(&project_root, dry_run, issue.as_deref()).await?;
         }
         Commands::Tui {
             max_iterations,
@@ -627,6 +664,91 @@ fn show_task(project_root: &PathBuf, task_id: &str) -> Result<()> {
     }
 
     println!("========================================\n");
+
+    Ok(())
+}
+
+/// Decompose large tasks into smaller subtasks
+async fn decompose_command(
+    project_root: &PathBuf,
+    dry_run: bool,
+    specific_issue: Option<&str>,
+) -> Result<()> {
+    let api_key = std::env::var("ANTHROPIC_API_KEY")
+        .context("ANTHROPIC_API_KEY environment variable not set")?;
+
+    if let Some(issue_id) = specific_issue {
+        // Decompose specific task
+        let task = get_task(project_root, issue_id)?;
+        let parsed = parse_task(&task);
+        let analysis = decompose::analyze_task(&parsed, project_root);
+
+        println!("\n========================================");
+        println!("  TASK ANALYSIS: {}", task.id);
+        println!("========================================");
+        println!("  Title: {}", task.title);
+        println!("  Description chars: {}", analysis.description_chars);
+        println!("  Criteria count: {}", analysis.criteria_count);
+        println!("  Has subtasks: {}", analysis.has_subtasks);
+        println!("  Needs decomposition: {}", analysis.is_too_large);
+        if !analysis.reason.is_empty() {
+            println!("  Reason: {}", analysis.reason);
+        }
+        println!("========================================\n");
+
+        if !analysis.is_too_large {
+            println!("Task does not need decomposition.");
+            return Ok(());
+        }
+
+        if dry_run {
+            println!("DRY RUN: Would decompose this task. Run without --dry-run to create subtasks.");
+            return Ok(());
+        }
+
+        println!("Decomposing task...\n");
+        let subtasks = decompose::decompose_task(&parsed, &api_key).await?;
+
+        if subtasks.is_empty() {
+            println!("No subtasks suggested.");
+            return Ok(());
+        }
+
+        println!("\nCreating {} subtasks...\n", subtasks.len());
+        let created = decompose::create_subtasks(
+            project_root,
+            &task.id,
+            &task.labels,
+            &subtasks,
+        )?;
+
+        println!("\n✓ Created {} subtasks.", created.len());
+        
+        // Sync beads
+        task_parser::sync_beads(project_root)?;
+    } else {
+        // Analyze all ready tasks
+        if dry_run {
+            println!("\n🔍 Analyzing tasks (dry run)...\n");
+            let needs_decomposition = decompose::find_tasks_needing_decomposition(project_root)?;
+
+            if needs_decomposition.is_empty() {
+                println!("✓ All tasks are appropriately sized.\n");
+                return Ok(());
+            }
+
+            println!("Found {} task(s) that need decomposition:\n", needs_decomposition.len());
+            for (parsed, analysis) in &needs_decomposition {
+                println!("  {} · {}", parsed.task.id, parsed.task.title);
+                println!("    Reason: {}", analysis.reason);
+                println!("    Description: {} chars, {} criteria\n", 
+                    analysis.description_chars, analysis.criteria_count);
+            }
+            println!("Run without --dry-run to decompose these tasks.");
+        } else {
+            decompose::preprocess_tasks(project_root, &api_key).await?;
+        }
+    }
 
     Ok(())
 }
