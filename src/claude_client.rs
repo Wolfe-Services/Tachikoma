@@ -547,6 +547,7 @@ mod tests {
             total_output_tokens: 10_000,
             final_text: String::new(),
             messages: vec![],
+            stop_reason: StopReason::Completed,
         };
 
         // Input: 100k * $3/1M = $0.30

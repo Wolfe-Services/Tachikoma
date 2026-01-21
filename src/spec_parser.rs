@@ -1,4 +1,7 @@
-//! Spec Parser - Navigates THE PIN (specs/README.md)
+//! Spec Parser - LEGACY: Navigates THE PIN (specs/README.md)
+//!
+//! NOTE: This module is kept for backward compatibility with spec-based projects.
+//! For beads-tracked projects, use task_parser.rs instead.
 //!
 //! Parses the master lookup table to find specs and their completion status.
 

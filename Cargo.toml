@@ -1,146 +1,57 @@
-[workspace]
-resolver = "2"
-members = [
-    "crates/*",
-]
-exclude = [
-    "tools/ralph",
-]
-
-[workspace.package]
+[package]
+name = "ralph"
 version = "0.1.0"
 edition = "2021"
-rust-version = "1.75"
+description = "Ralph Wiggum Loop - Agentic coding harness for Tachikoma"
 authors = ["Tachikoma Team"]
-license = "MIT OR Apache-2.0"
-repository = "https://github.com/tachikoma-project/tachikoma"
 
-[workspace.metadata.docs.rs]
-all-features = true
-rustdoc-args = ["--cfg", "docsrs"]
-
-[workspace.lints.rustdoc]
-missing_docs = "warn"
-
-[workspace.dependencies]
+[dependencies]
 # Async runtime
-tokio = { version = "1.35", features = ["full", "tracing"] }
+tokio = { version = "1.40", features = ["full"] }
 
-# Serialization
+# HTTP client for Claude API
+reqwest = { version = "0.12", features = ["json", "stream"] }
+
+# JSON handling
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-serde_yaml = "0.9"
+
+# CLI arguments
+clap = { version = "4.5", features = ["derive"] }
 
 # Error handling
-thiserror = "1.0"
 anyhow = "1.0"
+thiserror = "1.0"
 
-# Logging/Tracing
+# Regex for parsing
+regex = "1.10"
+
+# Environment variables
+dotenvy = "0.15"
+
+# Tracing/logging
 tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
-# HTTP
-reqwest = { version = "0.11", features = ["json", "stream"] }
+# Async streaming for SSE
+futures = "0.3"
+tokio-stream = "0.1"
+async-stream = "0.3"
+eventsource-stream = "0.2"
 
-# Async utilities
-futures-util = "0.3"
+# UUID for session IDs
+uuid = { version = "1.10", features = ["v4"] }
 
-# Bytes handling
-bytes = "1.5"
-
-# CLI
-clap = { version = "4.4", features = ["derive", "env"] }
-url = "2.5"
-semver = "1.0"
-glob = "0.3"
-
-# Date/Time
+# Time handling
 chrono = { version = "0.4", features = ["serde"] }
 
-# Testing
-proptest = "1.4"
-insta = { version = "1.34", features = ["yaml"] }
-test-case = "3.3"
-mockall = "0.12"
-tokio-test = "0.4"
+# TUI dependencies
+ratatui = "0.30"
+crossterm = "0.28"
 
-# External dependencies
-notify = "6.1"
-tempfile = "3.8"
+[dev-dependencies]
+tempfile = "3.24"
 
-# NAPI for Electron binding
-napi = "2.14"
-napi-derive = "2.14"
-
-# Primitives crate
-tachikoma-primitives = { path = "crates/tachikoma-primitives" }
-
-# Common crates
-tachikoma-common-core = { path = "crates/tachikoma-common-core" }
-tachikoma-common-config = { path = "crates/tachikoma-common-config" }
-tachikoma-test-utils = { path = "crates/tachikoma-test-utils" }
-tachikoma-test-harness = { path = "crates/tachikoma-test-harness" }
-
-# Audit crates
-tachikoma-audit-types = { path = "crates/tachikoma-audit-types" }
-tachikoma-audit-capture = { path = "crates/tachikoma-audit-capture" }
-tachikoma-audit-system-events = { path = "crates/tachikoma-audit-system-events" }
-tachikoma-audit-user-activity = { path = "crates/tachikoma-audit-user-activity" }
-tachikoma-audit-timeline = { path = "crates/tachikoma-audit-timeline" }
-tachikoma-audit-search = { path = "crates/tachikoma-audit-search" }
-tachikoma-audit-compliance = { path = "crates/tachikoma-audit-compliance" }
-tachikoma-audit-export = { path = "crates/tachikoma-audit-export" }
-tachikoma-audit-archival = { path = "crates/tachikoma-audit-archival" }
-tachikoma-audit-immutability = { path = "crates/tachikoma-audit-immutability" }
-tachikoma-audit-alerting = { path = "crates/tachikoma-audit-alerting" }
-tachikoma-plugin = { path = "crates/tachikoma-plugin" }
-
-# Build profiles
-[profile.dev]
-opt-level = 0
-debug = true
-debug-assertions = true
-overflow-checks = true
-lto = false
-panic = "unwind"
-incremental = true
-codegen-units = 256
-
-[profile.dev.package."*"]
-opt-level = 2  # Optimize dependencies even in dev
-
-[profile.release]
-opt-level = 3
-debug = false
-debug-assertions = false
-overflow-checks = false
-lto = "thin"
-panic = "abort"
-incremental = false
-codegen-units = 16
-strip = true
-
-# Distribution profile (maximum optimization)
-[profile.dist]
-inherits = "release"
-lto = "fat"
-codegen-units = 1
-strip = true
-panic = "abort"
-
-# Profile for benchmarks
-[profile.bench]
-inherits = "release"
-debug = true  # For profiling
-lto = "thin"
-
-# Profile for CI tests (balance speed and optimization)
-[profile.ci]
-inherits = "dev"
-opt-level = 1
-debug = 1
-
-[profile.release-debug]
-inherits = "release"
-debug = true
-strip = false
+[[bin]]
+name = "ralph"
+path = "src/main.rs"

@@ -119,7 +119,7 @@ pub fn current_branch(path: &Path) -> Result<String> {
     Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
 }
 
-/// Auto-commit changes for a completed spec
+/// Auto-commit changes for a completed spec (legacy)
 pub fn auto_commit_spec(path: &Path, spec_id: u32, spec_name: &str) -> Result<Option<String>> {
     if !has_changes(path)? {
         tracing::info!("No changes to commit for spec {}", spec_id);
@@ -141,6 +141,32 @@ pub fn auto_commit_spec(path: &Path, spec_id: u32, spec_name: &str) -> Result<Op
     let hash = current_commit_short(path).unwrap_or_else(|_| "unknown".to_string());
 
     tracing::info!("Committed spec {} as {}", spec_id, hash);
+
+    Ok(Some(hash))
+}
+
+/// Auto-commit changes for a completed task (beads)
+pub fn auto_commit_task(path: &Path, task_id: &str, task_title: &str) -> Result<Option<String>> {
+    if !has_changes(path)? {
+        tracing::info!("No changes to commit for task {}", task_id);
+        return Ok(None);
+    }
+
+    // Stage all changes
+    add_all(path)?;
+
+    // Create commit message
+    let message = format!(
+        "task({}): {}\n\nAutomated commit by Ralph loop.",
+        task_id, task_title
+    );
+
+    let _result = commit(path, &message)?;
+
+    // Get commit hash for confirmation
+    let hash = current_commit_short(path).unwrap_or_else(|_| "unknown".to_string());
+
+    tracing::info!("Committed task {} as {}", task_id, hash);
 
     Ok(Some(hash))
 }

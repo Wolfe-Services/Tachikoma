@@ -1,10 +1,11 @@
-//! The Five Primitives - Minimum viable toolbelt for agentic coding
+//! The Six Primitives - Minimum viable toolbelt for agentic coding
 //!
 //! 1. read_file - Read file contents
 //! 2. list_files - List directory contents
 //! 3. bash - Execute shell commands with timeout
 //! 4. edit_file - Modify files with uniqueness check
 //! 5. code_search - Ripgrep wrapper for pattern search
+//! 6. beads - Issue tracker operations (show, update, close, ready)
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
@@ -154,6 +155,34 @@ pub fn get_tool_definitions() -> Vec<ToolDefinition> {
                 "required": ["pattern"]
             }),
         },
+        ToolDefinition {
+            name: "beads".to_string(),
+            description: "Interact with the beads issue tracker. Actions: 'ready' (list unblocked tasks), 'show' (get task details), 'update' (change task status), 'close' (mark task complete), 'sync' (commit beads changes).".to_string(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "action": {
+                        "type": "string",
+                        "enum": ["ready", "show", "update", "close", "sync"],
+                        "description": "The beads action to perform"
+                    },
+                    "task_id": {
+                        "type": "string",
+                        "description": "Task ID (required for show, update, close)"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": ["open", "in_progress", "closed"],
+                        "description": "New status (for update action)"
+                    },
+                    "reason": {
+                        "type": "string",
+                        "description": "Reason for closing (for close action)"
+                    }
+                },
+                "required": ["action"]
+            }),
+        },
     ]
 }
 
@@ -165,6 +194,7 @@ pub async fn execute_tool(name: &str, input: &serde_json::Value, project_root: &
         "bash" => bash(input, project_root).await,
         "edit_file" => edit_file(input, project_root).await,
         "code_search" => code_search(input, project_root).await,
+        "beads" => beads(input, project_root).await,
         _ => ToolResult::error(format!("Unknown tool: {}", name)),
     }
 }
@@ -519,6 +549,166 @@ async fn code_search(input: &serde_json::Value, project_root: &Path) -> ToolResu
     }
 }
 
+/// 6. beads - Issue tracker operations
+async fn beads(input: &serde_json::Value, project_root: &Path) -> ToolResult {
+    let action = match input.get("action").and_then(|v| v.as_str()) {
+        Some(a) => a,
+        None => return ToolResult::error("Missing required parameter: action"),
+    };
+
+    match action {
+        "ready" => beads_ready(project_root).await,
+        "show" => {
+            let task_id = match input.get("task_id").and_then(|v| v.as_str()) {
+                Some(id) => id,
+                None => return ToolResult::error("Missing required parameter: task_id for show action"),
+            };
+            beads_show(project_root, task_id).await
+        }
+        "update" => {
+            let task_id = match input.get("task_id").and_then(|v| v.as_str()) {
+                Some(id) => id,
+                None => return ToolResult::error("Missing required parameter: task_id for update action"),
+            };
+            let status = match input.get("status").and_then(|v| v.as_str()) {
+                Some(s) => s,
+                None => return ToolResult::error("Missing required parameter: status for update action"),
+            };
+            beads_update(project_root, task_id, status).await
+        }
+        "close" => {
+            let task_id = match input.get("task_id").and_then(|v| v.as_str()) {
+                Some(id) => id,
+                None => return ToolResult::error("Missing required parameter: task_id for close action"),
+            };
+            let reason = input.get("reason").and_then(|v| v.as_str());
+            beads_close(project_root, task_id, reason).await
+        }
+        "sync" => beads_sync(project_root).await,
+        _ => ToolResult::error(format!("Unknown beads action: {}", action)),
+    }
+}
+
+async fn beads_ready(project_root: &Path) -> ToolResult {
+    let output = Command::new("bd")
+        .args(["ready"])
+        .current_dir(project_root)
+        .output()
+        .await;
+
+    match output {
+        Ok(out) => {
+            if out.status.success() {
+                ToolResult::success(String::from_utf8_lossy(&out.stdout).to_string())
+            } else {
+                ToolResult::error(format!(
+                    "bd ready failed: {}",
+                    String::from_utf8_lossy(&out.stderr)
+                ))
+            }
+        }
+        Err(e) => ToolResult::error(format!("Failed to run bd ready: {}", e)),
+    }
+}
+
+async fn beads_show(project_root: &Path, task_id: &str) -> ToolResult {
+    let output = Command::new("bd")
+        .args(["show", task_id])
+        .current_dir(project_root)
+        .output()
+        .await;
+
+    match output {
+        Ok(out) => {
+            if out.status.success() {
+                ToolResult::success(String::from_utf8_lossy(&out.stdout).to_string())
+            } else {
+                ToolResult::error(format!(
+                    "bd show {} failed: {}",
+                    task_id,
+                    String::from_utf8_lossy(&out.stderr)
+                ))
+            }
+        }
+        Err(e) => ToolResult::error(format!("Failed to run bd show: {}", e)),
+    }
+}
+
+async fn beads_update(project_root: &Path, task_id: &str, status: &str) -> ToolResult {
+    let output = Command::new("bd")
+        .args(["update", task_id, &format!("--status={}", status)])
+        .current_dir(project_root)
+        .output()
+        .await;
+
+    match output {
+        Ok(out) => {
+            if out.status.success() {
+                ToolResult::success(format!("Updated {} status to {}", task_id, status))
+            } else {
+                ToolResult::error(format!(
+                    "bd update failed: {}",
+                    String::from_utf8_lossy(&out.stderr)
+                ))
+            }
+        }
+        Err(e) => ToolResult::error(format!("Failed to run bd update: {}", e)),
+    }
+}
+
+async fn beads_close(project_root: &Path, task_id: &str, reason: Option<&str>) -> ToolResult {
+    let mut args = vec!["close", task_id];
+    let reason_arg;
+    
+    if let Some(r) = reason {
+        reason_arg = format!("--reason={}", r);
+        args.push(&reason_arg);
+    }
+
+    let output = Command::new("bd")
+        .args(&args)
+        .current_dir(project_root)
+        .output()
+        .await;
+
+    match output {
+        Ok(out) => {
+            if out.status.success() {
+                ToolResult::success(format!("Closed task {}", task_id))
+            } else {
+                ToolResult::error(format!(
+                    "bd close failed: {}",
+                    String::from_utf8_lossy(&out.stderr)
+                ))
+            }
+        }
+        Err(e) => ToolResult::error(format!("Failed to run bd close: {}", e)),
+    }
+}
+
+async fn beads_sync(project_root: &Path) -> ToolResult {
+    let output = Command::new("bd")
+        .args(["sync"])
+        .current_dir(project_root)
+        .output()
+        .await;
+
+    match output {
+        Ok(out) => {
+            if out.status.success() {
+                ToolResult::success("Synced beads state")
+            } else {
+                // Sync warnings aren't critical
+                ToolResult::success(format!(
+                    "Synced (with warnings): {}",
+                    String::from_utf8_lossy(&out.stderr)
+                ))
+            }
+        }
+        Err(e) => ToolResult::error(format!("Failed to run bd sync: {}", e)),
+    }
+}
+
 // ============================================================================
 // Helpers
 // ============================================================================
@@ -540,7 +730,7 @@ mod tests {
     #[test]
     fn test_tool_definitions() {
         let tools = get_tool_definitions();
-        assert_eq!(tools.len(), 5);
+        assert_eq!(tools.len(), 6);
 
         let names: Vec<_> = tools.iter().map(|t| t.name.as_str()).collect();
         assert!(names.contains(&"read_file"));
@@ -548,5 +738,6 @@ mod tests {
         assert!(names.contains(&"bash"));
         assert!(names.contains(&"edit_file"));
         assert!(names.contains(&"code_search"));
+        assert!(names.contains(&"beads"));
     }
 }
